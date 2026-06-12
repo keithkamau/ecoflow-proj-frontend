@@ -1,0 +1,290 @@
+/* ─── Google Fonts: Inter ────────────────────────────────────── */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── Base Reset & Root Styles ───────────────────────────────── */
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  html {
+    font-size: 16px;
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply font-sans bg-neutral-50 text-neutral-900 antialiased;
+    font-size: 0.875rem;   /* 14px body-regular */
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* ── Headings ─────────────────────────────────────── */
+  h1 { @apply text-h1 text-neutral-900; }
+  h2 { @apply text-h2 text-neutral-900; }
+  h3 { @apply text-h3 text-neutral-900; }
+  h4 { @apply text-h4 text-neutral-900; }
+  h5 { @apply text-h5 text-neutral-900; }
+  h6 { @apply text-h6 text-neutral-900; }
+
+  /* ── Links ────────────────────────────────────────── */
+  a {
+    @apply text-primary no-underline transition-colors duration-150;
+  }
+  a:hover { @apply text-primary-dark; }
+  a:active { @apply text-primary-darker; }
+
+  /* ── Focus outline (keyboard accessibility) ──────── */
+  :focus-visible {
+    outline: 2px solid #10B981;
+    outline-offset: 2px;
+  }
+
+  /* ── Scrollbar ────────────────────────────────────── */
+  ::-webkit-scrollbar         { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track   { @apply bg-neutral-100; }
+  ::-webkit-scrollbar-thumb   { @apply bg-neutral-300 rounded-full; }
+  ::-webkit-scrollbar-thumb:hover { @apply bg-neutral-400; }
+
+  /* ── Images ───────────────────────────────────────── */
+  img, video { max-width: 100%; display: block; }
+
+  /* ── Buttons base reset ───────────────────────────── */
+  button { cursor: pointer; font-family: inherit; }
+  button:disabled { cursor: not-allowed; }
+
+  /* ── Input base reset ─────────────────────────────── */
+  input, textarea, select {
+    font-family: inherit;
+    font-size: inherit;
+  }
+}
+
+/* ─── Reusable Component Layer ───────────────────────────────── */
+@layer components {
+
+  /* ── Buttons ──────────────────────────────────────── */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2
+           font-semibold text-sm rounded-md
+           transition-all duration-150
+           focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2
+           disabled:cursor-not-allowed select-none;
+    height: 40px;
+    padding: 0 1.25rem;
+  }
+
+  .btn-sm {
+    height: 32px;
+    padding: 0 0.75rem;
+    @apply text-xs rounded;
+  }
+
+  .btn-lg {
+    height: 48px;
+    padding: 0 1.5rem;
+    @apply text-base rounded-lg;
+  }
+
+  /* Primary — EcoFlow Green */
+  .btn-primary {
+    @apply btn bg-primary text-white
+           hover:bg-primary-dark hover:-translate-y-0.5 hover:shadow-md
+           active:bg-primary-darker active:translate-y-0
+           disabled:bg-primary-light disabled:text-primary
+           focus-visible:ring-primary;
+  }
+
+  /* Secondary — EcoFlow Orange */
+  .btn-secondary {
+    @apply btn bg-secondary text-white
+           hover:bg-secondary-dark hover:-translate-y-0.5 hover:shadow-md
+           active:bg-secondary-darker active:translate-y-0
+           disabled:bg-secondary-light disabled:text-secondary
+           focus-visible:ring-secondary;
+  }
+
+  /* Tertiary — White outlined */
+  .btn-tertiary {
+    @apply btn bg-white text-neutral-500 border border-neutral-300
+           hover:bg-neutral-50 hover:text-neutral-600 hover:border-neutral-400
+           active:bg-neutral-100
+           disabled:bg-neutral-100 disabled:text-neutral-300 disabled:border-neutral-200
+           focus-visible:ring-neutral-400;
+  }
+
+  /* Ghost — transparent */
+  .btn-ghost {
+    @apply btn bg-transparent text-primary
+           hover:bg-primary-light
+           active:bg-primary-light
+           focus-visible:ring-primary;
+  }
+
+  /* Danger — Red */
+  .btn-danger {
+    @apply btn bg-error text-white
+           hover:bg-error-dark hover:-translate-y-0.5 hover:shadow-md
+           active:translate-y-0
+           focus-visible:ring-error;
+  }
+
+  /* ── Cards ────────────────────────────────────────── */
+  .card {
+    @apply bg-white border border-neutral-200 rounded-md shadow-sm
+           transition-shadow duration-300;
+    padding: 20px;
+  }
+
+  .card-hover {
+    @apply card hover:shadow-card-hover hover:-translate-y-1;
+  }
+
+  .card-accent {
+    @apply card border-l-4 border-l-primary;
+  }
+
+  .card-accent-orange {
+    @apply card border-l-4 border-l-secondary;
+  }
+
+  /* ── Form Inputs ──────────────────────────────────── */
+  .input {
+    @apply w-full bg-neutral-50 border border-neutral-300 rounded-md
+           text-neutral-900 placeholder-neutral-400
+           transition-all duration-150
+           focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20
+           disabled:bg-neutral-100 disabled:text-neutral-400 disabled:cursor-not-allowed;
+    height: 40px;
+    padding: 0 0.75rem;
+    font-size: 0.875rem;
+  }
+
+  .input-error {
+    @apply border-error focus:border-error focus:ring-error/20;
+  }
+
+  .label {
+    @apply block text-sm font-semibold text-neutral-700 mb-1.5;
+  }
+
+  .helper-text {
+    @apply text-xs text-neutral-500 mt-1;
+  }
+
+  .error-text {
+    @apply text-xs text-error mt-1;
+  }
+
+  /* ── Status Badges ────────────────────────────────── */
+  .badge {
+    @apply inline-flex items-center gap-1.5 px-2.5 py-1
+           text-xs font-semibold rounded-full;
+  }
+
+  .badge-active   { @apply badge bg-success-light   text-success-dark; }
+  .badge-pending  { @apply badge bg-warning-light   text-warning-dark; }
+  .badge-completed{ @apply badge bg-info-light      text-info-dark;    }
+  .badge-error    { @apply badge bg-error-light     text-error-dark;   }
+  .badge-neutral  { @apply badge bg-neutral-100     text-neutral-600;  }
+
+  /* ── Alert / Message Banners ──────────────────────── */
+  .alert {
+    @apply flex items-start gap-3 p-4 rounded-md border-l-4 text-sm;
+  }
+
+  .alert-success { @apply alert bg-success-light border-l-primary   text-success-dark; }
+  .alert-warning { @apply alert bg-warning-light border-l-secondary text-warning-dark; }
+  .alert-error   { @apply alert bg-error-light   border-l-error     text-error-dark;   }
+  .alert-info    { @apply alert bg-info-light    border-l-info      text-info-dark;    }
+
+  /* ── Nav Link ─────────────────────────────────────── */
+  .nav-link {
+    @apply text-neutral-500 text-sm font-medium
+           transition-colors duration-150
+           hover:text-primary
+           flex items-center gap-2;
+  }
+
+  .nav-link-active {
+    @apply nav-link text-primary font-semibold;
+  }
+
+  /* ── Sidebar Link ─────────────────────────────────── */
+  .sidebar-link {
+    @apply flex items-center gap-3 px-3 py-2.5
+           text-sm font-medium text-neutral-500 rounded-md
+           transition-all duration-150
+           hover:bg-primary-light hover:text-primary;
+  }
+
+  .sidebar-link-active {
+    @apply sidebar-link bg-primary-light text-primary font-semibold;
+  }
+
+  /* ── Divider ──────────────────────────────────────── */
+  .divider {
+    @apply border-t border-neutral-200 my-4;
+  }
+
+  /* ── Page Wrapper ─────────────────────────────────── */
+  .page-wrapper {
+    @apply min-h-screen bg-neutral-50;
+  }
+
+  .page-content {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6;
+  }
+
+  /* ── Section Header ───────────────────────────────── */
+  .section-header {
+    @apply flex items-center justify-between mb-6;
+  }
+
+  /* ── Overline / Label text ────────────────────────── */
+  .overline {
+    @apply uppercase tracking-widest text-xs font-semibold text-neutral-400;
+  }
+}
+
+/* ─── Utility Layer Extras ───────────────────────────────────── */
+@layer utilities {
+  /* Smooth page transitions */
+  .animate-page  { @apply animate-fade-in; }
+
+  /* Text truncation */
+  .truncate-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .truncate-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* Hide scrollbar but keep scroll */
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+  /* Respect reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}

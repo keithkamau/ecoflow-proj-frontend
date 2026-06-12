@@ -1,4 +1,3 @@
-// ─── Colors ────────────────────────────────────────────────────
 export const COLORS = {
   primary: {
     light: "#D1FAE5",

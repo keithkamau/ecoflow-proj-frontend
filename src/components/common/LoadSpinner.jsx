@@ -1,318 +1,385 @@
-const SpinRing = ({
-  size = 24,
-  color = "#10B981",
-  trackColor = "#D1FAE5",
-  strokeWidth = 3,
-}) => (
-  <svg
-    width={size}
-    height={size}
-    viewBox='0 0 24 24'
-    fill='none'
-    xmlns='http://www.w3.org/2000/svg'
-    className='animate-spin'
-    aria-hidden='true'
-  >
-    {/* Track */}
-    <circle
-      cx='12'
-      cy='12'
-      r='10'
-      stroke={trackColor}
-      strokeWidth={strokeWidth}
-    />
-    {/* Active arc */}
-    <path
-      d='M12 2 A10 10 0 0 1 22 12'
-      stroke={color}
-      strokeWidth={strokeWidth}
-      strokeLinecap='round'
-    />
-  </svg>
-);
+const C = {
+  primary: "var(--color-primary)",
+  primaryLight: "var(--color-primary-light)",
+  secondary: "var(--color-secondary)",
+  neutral200: "var(--color-neutral-200)",
+  neutral500: "var(--color-neutral-500)",
+  neutral900: "var(--color-neutral-900)",
+  neutral50: "var(--color-neutral-50)",
+};
 
-// ─── Eco Flow Icon (branded loader) ───────────────────────────
-const EcoSpinIcon = ({ size = 40 }) => (
-  <div className='flex flex-col items-center gap-3'>
+/* ── Spin ring SVG ───────────────────────────────────────────── */
+function SpinRing({
+  size = 24,
+  color = C.primary,
+  track = C.primaryLight,
+  stroke = 3,
+}) {
+  return (
     <svg
       width={size}
       height={size}
-      viewBox='0 0 32 32'
+      viewBox='0 0 24 24'
       fill='none'
-      xmlns='http://www.w3.org/2000/svg'
-      className='animate-spin-slow'
+      style={{ animation: "spin 1s linear infinite" }}
       aria-hidden='true'
     >
-      <circle cx='16' cy='16' r='14' stroke='#D1FAE5' strokeWidth='2' />
-      <circle
-        cx='16'
-        cy='16'
-        r='14'
-        stroke='#10B981'
-        strokeWidth='2'
-        strokeLinecap='round'
-        strokeDasharray='22 66'
-        strokeDashoffset='0'
-      />
+      <circle cx='12' cy='12' r='10' stroke={track} strokeWidth={stroke} />
       <path
-        d='M16 6 C20 6, 23 9, 23 13 C23 17, 20 18, 16 18'
-        stroke='#10B981'
-        strokeWidth='2'
+        d='M12 2 A10 10 0 0 1 22 12'
+        stroke={color}
+        strokeWidth={stroke}
         strokeLinecap='round'
-        fill='none'
-      />
-      <path
-        d='M16 18 C12 18, 9 16, 9 13 C9 9, 12 8, 16 8'
-        stroke='#F97316'
-        strokeWidth='2'
-        strokeLinecap='round'
-        fill='none'
-      />
-      <path
-        d='M14 16.5 L16 18.5 L18 16.5'
-        stroke='#F97316'
-        strokeWidth='1.8'
-        strokeLinecap='round'
-        strokeLinejoin='round'
-        fill='none'
       />
     </svg>
-    <span className='text-sm font-medium text-primary animate-pulse'>
-      Loading…
-    </span>
-  </div>
-);
+  );
+}
 
-// ─── Pulsing Dots ──────────────────────────────────────────────
-const DotsLoader = ({ color = "bg-primary" }) => (
-  <div className='flex items-center gap-1.5' role='status' aria-label='Loading'>
-    {[0, 1, 2].map((i) => (
-      <span
-        key={i}
-        className={`w-2 h-2 rounded-full ${color} animate-pulse`}
-        style={{ animationDelay: `${i * 200}ms` }}
-      />
-    ))}
-    <span className='sr-only'>Loading…</span>
-  </div>
-);
-
-// ─── Progress Bar ──────────────────────────────────────────────
-const BarLoader = () => (
-  <div
-    className='w-full h-1 bg-primary-light rounded-full overflow-hidden'
-    role='status'
-    aria-label='Loading'
-  >
+/* ── Eco brand icon ──────────────────────────────────────────── */
+function EcoIcon({ size = 48 }) {
+  return (
     <div
-      className='h-full bg-primary rounded-full'
       style={{
-        animation: "bar-slide 1.4s ease-in-out infinite",
-        width: "40%",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        gap: 12,
       }}
-    />
-    <style>{`
-      @keyframes bar-slide {
-        0%   { transform: translateX(-100%); }
-        100% { transform: translateX(350%); }
-      }
-    `}</style>
-    <span className='sr-only'>Loading…</span>
-  </div>
-);
+    >
+      <svg
+        width={size}
+        height={size}
+        viewBox='0 0 32 32'
+        fill='none'
+        className='animate-spin-slow'
+        aria-hidden='true'
+      >
+        <circle
+          cx='16'
+          cy='16'
+          r='14'
+          stroke={C.primaryLight}
+          strokeWidth='2'
+        />
+        <circle
+          cx='16'
+          cy='16'
+          r='14'
+          stroke={C.primary}
+          strokeWidth='2'
+          strokeLinecap='round'
+          strokeDasharray='22 66'
+        />
+        <path
+          d='M16 6 C20 6,23 9,23 13 C23 17,20 18,16 18'
+          stroke={C.primary}
+          strokeWidth='2'
+          strokeLinecap='round'
+          fill='none'
+        />
+        <path
+          d='M16 18 C12 18,9 16,9 13 C9 9,12 8,16 8'
+          stroke={C.secondary}
+          strokeWidth='2'
+          strokeLinecap='round'
+          fill='none'
+        />
+        <path
+          d='M14 16.5 L16 18.5 L18 16.5'
+          stroke={C.secondary}
+          strokeWidth='1.8'
+          strokeLinecap='round'
+          strokeLinejoin='round'
+          fill='none'
+        />
+      </svg>
+      <span
+        style={{
+          fontSize: "0.875rem",
+          fontWeight: 500,
+          color: C.primary,
+          animation: "skeleton-pulse 1.5s ease-in-out infinite",
+        }}
+      >
+        Loading…
+      </span>
+    </div>
+  );
+}
 
-// ─── Size presets ──────────────────────────────────────────────
-const SIZE_MAP = {
-  xs: { ring: 14, stroke: 2 },
-  sm: { ring: 18, stroke: 2.5 },
-  md: { ring: 24, stroke: 3 },
-  lg: { ring: 36, stroke: 3.5 },
-  xl: { ring: 48, stroke: 4 },
-};
+/* ── Pulsing dots ────────────────────────────────────────────── */
+function Dots() {
+  return (
+    <div
+      role='status'
+      aria-label='Loading'
+      style={{ display: "flex", alignItems: "center", gap: 6 }}
+    >
+      {[0, 1, 2].map((i) => (
+        <span
+          key={i}
+          style={{
+            width: 8,
+            height: 8,
+            borderRadius: "50%",
+            background: C.primary,
+            animation: `skeleton-pulse 1.5s ease-in-out ${i * 200}ms infinite`,
+          }}
+        />
+      ))}
+      <span style={{ position: "absolute", left: "-9999px" }}>Loading…</span>
+    </div>
+  );
+}
 
-// ─── Default LoadingSpinner ────────────────────────────────────
-/**
- * @param {string}  variant   — "ring" | "dots" | "bar" | "eco"
- * @param {string}  size      — "xs" | "sm" | "md" | "lg" | "xl"
- * @param {string}  color     — hex color for spinner arc
- * @param {string}  className — additional classes
- * @param {string}  label     — accessible label
- */
-const LoadingSpinner = ({
+/* ── Progress bar ────────────────────────────────────────────── */
+function Bar() {
+  return (
+    <div
+      role='status'
+      aria-label='Loading'
+      style={{
+        width: "100%",
+        height: 4,
+        background: C.primaryLight,
+        borderRadius: 9999,
+        overflow: "hidden",
+      }}
+    >
+      <div
+        style={{
+          height: "100%",
+          width: "40%",
+          background: C.primary,
+          borderRadius: 9999,
+          animation: "bar-slide 1.4s ease-in-out infinite",
+        }}
+      />
+      <span style={{ position: "absolute", left: "-9999px" }}>Loading…</span>
+    </div>
+  );
+}
+
+const SIZES = { xs: 14, sm: 18, md: 24, lg: 36, xl: 48 };
+
+/* ── Default export ──────────────────────────────────────────── */
+export default function LoadingSpinner({
   variant = "ring",
   size = "md",
-  color = "#10B981",
-  trackColor = "#D1FAE5",
+  color = C.primary,
   className = "",
-  label = "Loading…",
-}) => {
-  const { ring, stroke } = SIZE_MAP[size] ?? SIZE_MAP.md;
-
-  if (variant === "dots") return <DotsLoader />;
-  if (variant === "bar") return <BarLoader />;
-  if (variant === "eco")
-    return <EcoSpinIcon size={SIZE_MAP[size]?.ring ?? 40} />;
-
+}) {
+  const px = SIZES[size] ?? 24;
+  if (variant === "dots") return <Dots />;
+  if (variant === "bar") return <Bar />;
+  if (variant === "eco") return <EcoIcon size={px} />;
   return (
     <span
       role='status'
-      aria-label={label}
-      className={`inline-flex items-center justify-center ${className}`}
+      aria-label='Loading'
+      className={className}
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
     >
-      <SpinRing
-        size={ring}
-        color={color}
-        trackColor={trackColor}
-        strokeWidth={stroke}
-      />
-      <span className='sr-only'>{label}</span>
+      <SpinRing size={px} color={color} />
+      <span style={{ position: "absolute", left: "-9999px" }}>Loading…</span>
     </span>
   );
-};
+}
 
-// ─── Full-Page Loader ──────────────────────────────────────────
-/**
- * Covers the viewport with a centered EcoFlow branded loader.
- * Use during initial app load, page transitions, or auth checks.
- *
- * @param {string} message — optional loading message
- */
-export const PageLoader = ({ message = "Loading EcoFlow…" }) => (
-  <div
-    role='status'
-    aria-label={message}
-    className='
-      fixed inset-0 z-50 flex flex-col items-center justify-center
-      bg-white/90 backdrop-blur-sm gap-5
-    '
-  >
-    <EcoSpinIcon size={56} />
-    {message && (
-      <p className='text-sm text-neutral-500 animate-pulse'>{message}</p>
-    )}
-    <span className='sr-only'>{message}</span>
-  </div>
-);
-
-// ─── Button Spinner (tiny, white, inline) ──────────────────────
-/**
- * Drop this inside a <button> while submitting forms.
- * Example: <button disabled={loading}>{loading ? <ButtonSpinner /> : "Save"}</button>
- */
-export const ButtonSpinner = ({ color = "#ffffff" }) => (
-  <SpinRing
-    size={16}
-    color={color}
-    trackColor='rgba(255,255,255,0.3)'
-    strokeWidth={2.5}
-  />
-);
-
-// ─── Skeleton Components ───────────────────────────────────────
-// Shared pulse style
-const SkeletonBlock = ({ className = "" }) => (
-  <div
-    className={`bg-neutral-200 rounded animate-pulse ${className}`}
-    aria-hidden='true'
-  />
-);
-
-/**
- * Skeleton text block — mimics a paragraph or heading.
- * @param {number} lines  — number of text rows
- * @param {boolean} heading — first line is wider (heading style)
- */
-export const SkeletonText = ({ lines = 3, heading = false }) => (
-  <div className='space-y-2' aria-hidden='true'>
-    {Array.from({ length: lines }).map((_, i) => (
-      <SkeletonBlock
-        key={i}
-        className={`h-3.5 ${
-          i === 0 && heading
-            ? "w-2/5 h-5"
-            : i === lines - 1
-              ? "w-3/5"
-              : "w-full"
-        }`}
-      />
-    ))}
-  </div>
-);
-
-/**
- * Skeleton card — placeholder for a listing/offer card while loading.
- */
-export const SkeletonCard = () => (
-  <div
-    className='bg-white border border-neutral-200 rounded-md shadow-sm p-5 space-y-4'
-    aria-hidden='true'
-    aria-label='Loading content'
-  >
-    {/* Header row */}
-    <div className='flex items-center gap-3'>
-      <SkeletonBlock className='w-10 h-10 rounded-full shrink-0' />
-      <div className='flex-1 space-y-2'>
-        <SkeletonBlock className='h-4 w-2/5' />
-        <SkeletonBlock className='h-3 w-1/4' />
-      </div>
-      <SkeletonBlock className='h-6 w-16 rounded-full' />
-    </div>
-
-    {/* Body */}
-    <SkeletonText lines={2} />
-
-    {/* Stat row */}
-    <div className='flex items-center gap-4 pt-1'>
-      <SkeletonBlock className='h-3 w-16' />
-      <SkeletonBlock className='h-3 w-20' />
-      <SkeletonBlock className='h-3 w-12' />
-    </div>
-
-    {/* Footer */}
-    <div className='flex justify-between items-center pt-2 border-t border-neutral-100'>
-      <SkeletonBlock className='h-4 w-20' />
-      <SkeletonBlock className='h-8 w-24 rounded-md' />
-    </div>
-  </div>
-);
-
-/**
- * Skeleton list — multiple skeleton rows (for tables / list views).
- * @param {number} rows  — number of skeleton rows
- */
-export const SkeletonList = ({ rows = 4 }) => (
-  <div className='space-y-2' aria-hidden='true' aria-label='Loading list'>
-    {Array.from({ length: rows }).map((_, i) => (
+/* ── Page loader overlay ─────────────────────────────────────── */
+export function PageLoader({ message = "Loading EcoFlow…" }) {
+  return (
+    <>
+      <style>{`
+        @keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+      `}</style>
       <div
-        key={i}
-        className='flex items-center gap-3 px-4 py-3 bg-white border border-neutral-200 rounded-md'
+        role='status'
+        aria-label={message}
+        style={{
+          position: "fixed",
+          inset: 0,
+          zIndex: 9999,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          background: "rgba(255,255,255,0.92)",
+          backdropFilter: "blur(4px)",
+          gap: 20,
+        }}
       >
-        <SkeletonBlock className='w-8 h-8 rounded-full shrink-0' />
-        <div className='flex-1 space-y-1.5'>
-          <SkeletonBlock className='h-3.5 w-1/3' />
-          <SkeletonBlock className='h-3 w-1/2' />
-        </div>
-        <SkeletonBlock className='h-6 w-16 rounded-full' />
-        <SkeletonBlock className='h-8 w-20 rounded-md' />
+        <EcoIcon size={56} />
+        {message && (
+          <p style={{ fontSize: "0.875rem", color: C.neutral500 }}>{message}</p>
+        )}
       </div>
-    ))}
-  </div>
-);
+    </>
+  );
+}
 
-/**
- * Skeleton grid — for cards in a grid layout.
- * @param {number} count  — number of skeleton cards
- * @param {string} cols   — Tailwind grid-cols class
- */
-export const SkeletonGrid = ({
-  count = 6,
-  cols = "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3",
-}) => (
-  <div className={`grid ${cols} gap-4`} aria-hidden='true'>
-    {Array.from({ length: count }).map((_, i) => (
-      <SkeletonCard key={i} />
-    ))}
-  </div>
-);
+/* ── Button spinner (tiny, white) ────────────────────────────── */
+export function ButtonSpinner({ color = "#fff" }) {
+  return (
+    <SpinRing
+      size={16}
+      color={color}
+      track='rgba(255,255,255,0.3)'
+      stroke={2.5}
+    />
+  );
+}
 
-export default LoadingSpinner;
+/* ── Skeleton building block ─────────────────────────────────── */
+function Bone({ style = {} }) {
+  return (
+    <div
+      aria-hidden='true'
+      style={{
+        background: C.neutral200,
+        borderRadius: 4,
+        animation: "skeleton-pulse 1.5s ease-in-out infinite",
+        ...style,
+      }}
+    />
+  );
+}
+
+/* ── Skeleton text ───────────────────────────────────────────── */
+export function SkeletonText({ lines = 3, heading = false }) {
+  return (
+    <div
+      aria-hidden='true'
+      style={{ display: "flex", flexDirection: "column", gap: 8 }}
+    >
+      {Array.from({ length: lines }).map((_, i) => (
+        <Bone
+          key={i}
+          style={{
+            height: i === 0 && heading ? 20 : 14,
+            width:
+              i === 0 && heading ? "40%" : i === lines - 1 ? "60%" : "100%",
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
+/* ── Skeleton card ───────────────────────────────────────────── */
+export function SkeletonCard() {
+  return (
+    <div
+      aria-hidden='true'
+      aria-label='Loading content'
+      style={{
+        background: "#fff",
+        border: `1px solid ${C.neutral200}`,
+        borderRadius: 8,
+        padding: 20,
+        display: "flex",
+        flexDirection: "column",
+        gap: 16,
+      }}
+    >
+      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+        <Bone
+          style={{ width: 40, height: 40, borderRadius: "50%", flexShrink: 0 }}
+        />
+        <div
+          style={{ flex: 1, display: "flex", flexDirection: "column", gap: 8 }}
+        >
+          <Bone style={{ height: 14, width: "40%" }} />
+          <Bone style={{ height: 12, width: "25%" }} />
+        </div>
+        <Bone style={{ height: 22, width: 60, borderRadius: 9999 }} />
+      </div>
+      <SkeletonText lines={2} />
+      <div style={{ display: "flex", gap: 16 }}>
+        <Bone style={{ height: 12, width: 60 }} />
+        <Bone style={{ height: 12, width: 80 }} />
+        <Bone style={{ height: 12, width: 50 }} />
+      </div>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          paddingTop: 8,
+          borderTop: `1px solid ${C.neutral200}`,
+        }}
+      >
+        <Bone style={{ height: 14, width: 80 }} />
+        <Bone style={{ height: 32, width: 96, borderRadius: 6 }} />
+      </div>
+    </div>
+  );
+}
+
+/* ── Skeleton list ───────────────────────────────────────────── */
+export function SkeletonList({ rows = 4 }) {
+  return (
+    <div
+      aria-hidden='true'
+      style={{ display: "flex", flexDirection: "column", gap: 8 }}
+    >
+      {Array.from({ length: rows }).map((_, i) => (
+        <div
+          key={i}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 12,
+            padding: "12px 16px",
+            background: "#fff",
+            border: `1px solid ${C.neutral200}`,
+            borderRadius: 6,
+          }}
+        >
+          <Bone
+            style={{
+              width: 32,
+              height: 32,
+              borderRadius: "50%",
+              flexShrink: 0,
+            }}
+          />
+          <div
+            style={{
+              flex: 1,
+              display: "flex",
+              flexDirection: "column",
+              gap: 6,
+            }}
+          >
+            <Bone style={{ height: 14, width: "33%" }} />
+            <Bone style={{ height: 12, width: "50%" }} />
+          </div>
+          <Bone style={{ height: 22, width: 64, borderRadius: 9999 }} />
+          <Bone style={{ height: 32, width: 80, borderRadius: 6 }} />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/* ── Skeleton grid ───────────────────────────────────────────── */
+export function SkeletonGrid({ count = 6 }) {
+  return (
+    <div
+      aria-hidden='true'
+      style={{
+        display: "grid",
+        gap: 16,
+        gridTemplateColumns: "repeat(auto-fill,minmax(280px,1fr))",
+      }}
+    >
+      {Array.from({ length: count }).map((_, i) => (
+        <SkeletonCard key={i} />
+      ))}
+    </div>
+  );
+}

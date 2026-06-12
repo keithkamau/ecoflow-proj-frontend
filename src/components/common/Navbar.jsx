@@ -7,86 +7,79 @@ import {
   LogOut,
   User,
   Settings,
-  Leaf,
   Bell,
 } from "lucide-react";
-import { NAV_ITEMS, ROLES } from "../../utils/constants";
 import { useAuth } from "../../hooks/useAuth";
+import { NAV_ITEMS, ROLES } from "../../utils/constants";
 
-// ─── EcoFlow SVG Logo Mark ─────────────────────────────────────
-const EcoFlowLogo = ({ white = false }) => (
-  <svg
-    width='32'
-    height='32'
-    viewBox='0 0 32 32'
-    fill='none'
-    xmlns='http://www.w3.org/2000/svg'
-    aria-label='EcoFlow logo mark'
-  >
-    {/* Outer ring */}
-    <circle
-      cx='16'
-      cy='16'
-      r='15'
-      stroke={white ? "#fff" : "#10B981"}
-      strokeWidth='2'
-    />
-    {/* Flow arrow top */}
-    <path
-      d='M16 5 C20 5, 24 9, 24 13 C24 17, 20 19, 16 19'
-      stroke={white ? "#fff" : "#10B981"}
-      strokeWidth='2.2'
-      strokeLinecap='round'
-      fill='none'
-    />
-    {/* Flow arrow bottom */}
-    <path
-      d='M16 19 C12 19, 8 17, 8 13 C8 9, 12 7, 16 7'
-      stroke={white ? "#F97316" : "#F97316"}
-      strokeWidth='2.2'
-      strokeLinecap='round'
-      fill='none'
-    />
-    {/* Arrow head */}
-    <path
-      d='M14 17 L16 19 L18 17'
-      stroke={white ? "#F97316" : "#F97316"}
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
-    />
-  </svg>
-);
+/* ── Inline style tokens (CSS vars from globals.css) ─────────── */
+const C = {
+  primary: "var(--color-primary)",
+  primaryLight: "var(--color-primary-light)",
+  secondary: "var(--color-secondary)",
+  neutral500: "var(--color-neutral-500)",
+  neutral700: "var(--color-neutral-700)",
+  neutral900: "var(--color-neutral-900)",
+  neutral100: "var(--color-neutral-100)",
+  neutral200: "var(--color-neutral-200)",
+  neutral50: "var(--color-neutral-50)",
+  errorLight: "var(--color-error-light)",
+  errorDark: "var(--color-error-dark)",
+  error: "var(--color-error)",
+  infoLight: "var(--color-info-light)",
+  infoDark: "var(--color-info-dark)",
+  white: "#ffffff",
+};
 
-// ─── Notification Bell with badge ─────────────────────────────
-const NotificationBell = ({ count = 0 }) => (
-  <button
-    className='relative p-2 rounded-md text-neutral-500 hover:text-primary hover:bg-primary-light transition-colors duration-150'
-    aria-label={`${count} notifications`}
-  >
-    <Bell size={20} />
-    {count > 0 && (
-      <span className='absolute top-1 right-1 flex items-center justify-center w-4 h-4 bg-secondary text-white text-[10px] font-bold rounded-full leading-none'>
-        {count > 9 ? "9+" : count}
-      </span>
-    )}
-  </button>
-);
+/* ── SVG Logo ─────────────────────────────────────────────────── */
+function EcoFlowLogo() {
+  return (
+    <svg
+      width='32'
+      height='32'
+      viewBox='0 0 32 32'
+      fill='none'
+      aria-hidden='true'
+    >
+      <circle cx='16' cy='16' r='15' stroke={C.primary} strokeWidth='2' />
+      <path
+        d='M16 5 C20 5, 24 9, 24 13 C24 17, 20 19, 16 19'
+        stroke={C.primary}
+        strokeWidth='2.2'
+        strokeLinecap='round'
+        fill='none'
+      />
+      <path
+        d='M16 19 C12 19, 8 17, 8 13 C8 9, 12 7, 16 7'
+        stroke={C.secondary}
+        strokeWidth='2.2'
+        strokeLinecap='round'
+        fill='none'
+      />
+      <path
+        d='M14 17 L16 19 L18 17'
+        stroke={C.secondary}
+        strokeWidth='2'
+        strokeLinecap='round'
+        strokeLinejoin='round'
+        fill='none'
+      />
+    </svg>
+  );
+}
 
-// ─── User Dropdown ─────────────────────────────────────────────
-const UserDropdown = ({ user, onLogout }) => {
+/* ── User avatar dropdown ─────────────────────────────────────── */
+function UserDropdown({ user, onLogout }) {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
   const navigate = useNavigate();
 
-  // Close on outside click
   useEffect(() => {
-    const handleClick = (e) => {
+    const close = (e) => {
       if (ref.current && !ref.current.contains(e.target)) setOpen(false);
     };
-    document.addEventListener("mousedown", handleClick);
-    return () => document.removeEventListener("mousedown", handleClick);
+    document.addEventListener("mousedown", close);
+    return () => document.removeEventListener("mousedown", close);
   }, []);
 
   const initials = user?.name
@@ -98,261 +91,472 @@ const UserDropdown = ({ user, onLogout }) => {
         .slice(0, 2)
     : "U";
 
-  const roleBadgeClass =
+  const roleBg =
     user?.role === ROLES.ADMIN
-      ? "bg-error-light text-error-dark"
+      ? C.errorLight
       : user?.role === ROLES.RECYCLER
-        ? "bg-info-light text-info-dark"
-        : "bg-primary-light text-primary-dark";
+        ? C.infoLight
+        : C.primaryLight;
+  const roleText =
+    user?.role === ROLES.ADMIN
+      ? C.errorDark
+      : user?.role === ROLES.RECYCLER
+        ? C.infoDark
+        : C.primary;
+
+  const menuItem = (label, icon, onClick) => (
+    <button
+      key={label}
+      onClick={onClick}
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: 8,
+        width: "100%",
+        padding: "10px 16px",
+        fontSize: "0.875rem",
+        color: C.neutral700,
+        background: "none",
+        border: "none",
+        cursor: "pointer",
+        textAlign: "left",
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.background = C.neutral50;
+        e.currentTarget.style.color = C.primary;
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.background = "none";
+        e.currentTarget.style.color = C.neutral700;
+      }}
+    >
+      {icon}
+      {label}
+    </button>
+  );
 
   return (
-    <div className='relative' ref={ref}>
+    <div style={{ position: "relative" }} ref={ref}>
       <button
         onClick={() => setOpen((v) => !v)}
-        className='flex items-center gap-2 p-1.5 rounded-lg hover:bg-neutral-100 transition-colors duration-150'
-        aria-expanded={open}
-        aria-haspopup='true'
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 8,
+          padding: "6px",
+          background: "none",
+          border: "none",
+          cursor: "pointer",
+          borderRadius: 8,
+        }}
       >
-        {/* Avatar */}
-        <span className='flex items-center justify-center w-8 h-8 rounded-full bg-primary text-white text-xs font-bold'>
+        <span
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            width: 32,
+            height: 32,
+            borderRadius: "50%",
+            background: C.primary,
+            color: "#fff",
+            fontSize: "0.75rem",
+            fontWeight: 700,
+          }}
+        >
           {initials}
         </span>
-        {/* Name + role — hidden on small screens */}
-        <span className='hidden md:flex flex-col items-start leading-tight'>
-          <span className='text-sm font-semibold text-neutral-700'>
-            {user?.name ?? "User"}
-          </span>
+        <span style={{ display: "none" }} className='md-show'>
           <span
-            className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full capitalize ${roleBadgeClass}`}
+            style={{
+              fontSize: "0.875rem",
+              fontWeight: 600,
+              color: C.neutral700,
+            }}
           >
-            {user?.role ?? "member"}
+            {user?.name}
           </span>
         </span>
         <ChevronDown
           size={14}
-          className={`text-neutral-400 transition-transform duration-150 ${open ? "rotate-180" : ""}`}
+          color={C.neutral500}
+          style={{
+            transform: open ? "rotate(180deg)" : "none",
+            transition: "transform 150ms",
+          }}
         />
       </button>
 
-      {/* Dropdown panel */}
       {open && (
-        <div className='absolute right-0 mt-2 w-52 bg-white border border-neutral-200 rounded-lg shadow-md z-50 animate-slide-down overflow-hidden'>
+        <div
+          className='animate-slide-down'
+          style={{
+            position: "absolute",
+            right: 0,
+            top: "calc(100% + 8px)",
+            width: 208,
+            background: "#fff",
+            border: `1px solid ${C.neutral200}`,
+            borderRadius: 8,
+            boxShadow: "var(--shadow-md)",
+            zIndex: 50,
+            overflow: "hidden",
+          }}
+        >
           {/* Header */}
-          <div className='px-4 py-3 border-b border-neutral-100'>
-            <p className='text-sm font-semibold text-neutral-900 truncate'>
+          <div
+            style={{
+              padding: "12px 16px",
+              borderBottom: `1px solid ${C.neutral100}`,
+            }}
+          >
+            <p
+              style={{
+                fontSize: "0.875rem",
+                fontWeight: 600,
+                color: C.neutral900,
+              }}
+            >
               {user?.name}
             </p>
-            <p className='text-xs text-neutral-400 truncate'>
+            <p style={{ fontSize: "0.75rem", color: C.neutral500 }}>
               {user?.phone ?? user?.email}
             </p>
+            <span
+              style={{
+                display: "inline-block",
+                marginTop: 4,
+                padding: "2px 8px",
+                background: roleBg,
+                color: roleText,
+                fontSize: "0.65rem",
+                fontWeight: 700,
+                borderRadius: 9999,
+                textTransform: "capitalize",
+              }}
+            >
+              {user?.role}
+            </span>
           </div>
-
-          {/* Menu items */}
-          <ul className='py-1'>
-            <li>
-              <button
-                onClick={() => {
-                  navigate("/profile");
-                  setOpen(false);
-                }}
-                className='flex w-full items-center gap-2.5 px-4 py-2.5 text-sm text-neutral-600 hover:bg-neutral-50 hover:text-primary transition-colors duration-150'
-              >
-                <User size={15} /> Profile
-              </button>
-            </li>
-            <li>
-              <button
-                onClick={() => {
-                  navigate("/settings");
-                  setOpen(false);
-                }}
-                className='flex w-full items-center gap-2.5 px-4 py-2.5 text-sm text-neutral-600 hover:bg-neutral-50 hover:text-primary transition-colors duration-150'
-              >
-                <Settings size={15} /> Settings
-              </button>
-            </li>
-            <li>
-              <button
-                onClick={() => {
-                  navigate("/analytics/impact");
-                  setOpen(false);
-                }}
-                className='flex w-full items-center gap-2.5 px-4 py-2.5 text-sm text-neutral-600 hover:bg-neutral-50 hover:text-primary transition-colors duration-150'
-              >
-                <Leaf size={15} /> My Impact
-              </button>
-            </li>
-          </ul>
-
+          {/* Items */}
+          <div style={{ padding: "4px 0" }}>
+            {menuItem("Profile", <User size={14} />, () => {
+              navigate("/profile");
+              setOpen(false);
+            })}
+            {menuItem("Settings", <Settings size={14} />, () => {
+              navigate("/settings");
+              setOpen(false);
+            })}
+          </div>
           {/* Logout */}
-          <div className='border-t border-neutral-100 py-1'>
+          <div
+            style={{ borderTop: `1px solid ${C.neutral100}`, padding: "4px 0" }}
+          >
             <button
               onClick={() => {
                 onLogout();
                 setOpen(false);
               }}
-              className='flex w-full items-center gap-2.5 px-4 py-2.5 text-sm text-error hover:bg-error-light transition-colors duration-150'
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+                width: "100%",
+                padding: "10px 16px",
+                fontSize: "0.875rem",
+                color: C.error,
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+              }}
+              onMouseEnter={(e) =>
+                (e.currentTarget.style.background = C.errorLight)
+              }
+              onMouseLeave={(e) => (e.currentTarget.style.background = "none")}
             >
-              <LogOut size={15} /> Sign out
+              <LogOut size={14} /> Sign out
             </button>
           </div>
         </div>
       )}
     </div>
   );
-};
+}
 
-// ─── Main Navbar ───────────────────────────────────────────────
-const Navbar = ({ onMenuToggle, sidebarOpen }) => {
+/* ── Main Navbar ──────────────────────────────────────────────── */
+export default function Navbar({ onMenuToggle, sidebarOpen }) {
   const { user, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const navItems = user?.role ? (NAV_ITEMS[user.role] ?? []) : [];
-
-  const isActive = (path) =>
-    path === "/"
-      ? location.pathname === "/"
-      : location.pathname.startsWith(path);
-
+  const isActive = (p) =>
+    p === "/dashboard"
+      ? location.pathname === "/dashboard"
+      : location.pathname.startsWith(p);
   const handleLogout = () => {
     logout();
     navigate("/login");
   };
 
+  const linkStyle = (active) => ({
+    display: "flex",
+    alignItems: "center",
+    padding: "6px 12px",
+    borderRadius: 6,
+    fontSize: "0.875rem",
+    fontWeight: active ? 600 : 500,
+    color: active ? C.primary : C.neutral500,
+    background: active ? C.primaryLight : "transparent",
+    textDecoration: "none",
+    transition: "all 150ms",
+  });
+
   return (
     <>
-      {/* ── Desktop / Tablet Navbar ────────────────────── */}
-      <header className='fixed top-0 left-0 right-0 z-40 h-16 bg-white border-b border-neutral-200 shadow-sm'>
-        <div className='flex items-center justify-between h-full px-4 md:px-6'>
-          {/* Left: sidebar toggle (md+) + logo */}
-          <div className='flex items-center gap-3'>
-            {/* Sidebar hamburger — only shown when sidebar is used */}
-            {user && (
-              <button
-                onClick={onMenuToggle}
-                className='hidden md:flex items-center justify-center w-9 h-9 rounded-md text-neutral-500 hover:text-primary hover:bg-primary-light transition-colors duration-150'
-                aria-label='Toggle sidebar'
-              >
-                {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
-              </button>
-            )}
-
-            {/* Logo */}
-            <Link
-              to='/'
-              className='flex items-center gap-2.5 group'
-              aria-label='EcoFlow home'
-            >
-              <EcoFlowLogo />
-              <span className='text-xl font-bold tracking-tight'>
-                <span className='text-primary'>Eco</span>
-                <span className='text-secondary'>Flow</span>
-              </span>
-            </Link>
-          </div>
-
-          {/* Center: nav links — hidden on mobile */}
+      {/* Fixed bar */}
+      <header
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          right: 0,
+          zIndex: 40,
+          height: 64,
+          background: "#fff",
+          borderBottom: `1px solid ${C.neutral200}`,
+          boxShadow: "var(--shadow-sm)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          padding: "0 24px",
+        }}
+      >
+        {/* Left */}
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
           {user && (
-            <nav
-              className='hidden lg:flex items-center gap-1'
-              aria-label='Main navigation'
+            <button
+              onClick={onMenuToggle}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: 36,
+                height: 36,
+                borderRadius: 6,
+                background: "none",
+                border: "none",
+                color: C.neutral500,
+                cursor: "pointer",
+              }}
+              aria-label='Toggle sidebar'
             >
-              {navItems.map((item) => (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-150 ${
-                    isActive(item.path)
-                      ? "text-primary bg-primary-light"
-                      : "text-neutral-500 hover:text-primary hover:bg-neutral-50"
-                  }`}
-                >
-                  {item.label}
-                </Link>
-              ))}
-            </nav>
+              {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
+            </button>
           )}
+          <Link
+            to='/'
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 10,
+              textDecoration: "none",
+            }}
+          >
+            <EcoFlowLogo />
+            <span
+              style={{
+                fontSize: "1.25rem",
+                fontWeight: 700,
+                letterSpacing: "-0.5px",
+              }}
+            >
+              <span style={{ color: C.primary }}>Eco</span>
+              <span style={{ color: C.secondary }}>Flow</span>
+            </span>
+          </Link>
+        </div>
 
-          {/* Right: actions */}
-          <div className='flex items-center gap-1.5'>
-            {user ? (
-              <>
-                <NotificationBell count={3} />
-                <UserDropdown user={user} onLogout={handleLogout} />
-              </>
-            ) : (
-              <>
-                <Link
-                  to='/login'
-                  className='btn btn-tertiary btn-sm hidden sm:inline-flex'
+        {/* Center — desktop nav */}
+        {user && (
+          <nav
+            style={{ display: "flex", alignItems: "center", gap: 4 }}
+            className='hide-mobile'
+            aria-label='Main navigation'
+          >
+            {navItems.map((item) => (
+              <Link
+                key={item.path}
+                to={item.path}
+                style={linkStyle(isActive(item.path))}
+                onMouseEnter={(e) => {
+                  if (!isActive(item.path)) {
+                    e.currentTarget.style.color = C.primary;
+                    e.currentTarget.style.background = C.neutral50;
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!isActive(item.path)) {
+                    e.currentTarget.style.color = C.neutral500;
+                    e.currentTarget.style.background = "transparent";
+                  }
+                }}
+              >
+                {item.label}
+              </Link>
+            ))}
+          </nav>
+        )}
+
+        {/* Right */}
+        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+          {user ? (
+            <>
+              {/* Bell */}
+              <button
+                style={{
+                  position: "relative",
+                  padding: 8,
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                  color: C.neutral500,
+                  borderRadius: 6,
+                }}
+                aria-label='Notifications'
+              >
+                <Bell size={20} />
+                <span
+                  style={{
+                    position: "absolute",
+                    top: 4,
+                    right: 4,
+                    width: 16,
+                    height: 16,
+                    background: C.secondary,
+                    color: "#fff",
+                    fontSize: "0.6rem",
+                    fontWeight: 700,
+                    borderRadius: "50%",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
                 >
-                  Sign in
-                </Link>
-                <Link to='/register' className='btn btn-primary  btn-sm'>
-                  Get Started
-                </Link>
-              </>
-            )}
-
-            {/* Mobile hamburger */}
-            {user && (
+                  3
+                </span>
+              </button>
+              <UserDropdown user={user} onLogout={handleLogout} />
+              {/* Mobile hamburger */}
               <button
                 onClick={() => setMobileOpen((v) => !v)}
-                className='flex md:hidden items-center justify-center w-9 h-9 rounded-md text-neutral-500 hover:text-primary hover:bg-primary-light transition-colors duration-150 ml-1'
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  width: 36,
+                  height: 36,
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                  color: C.neutral500,
+                  borderRadius: 6,
+                }}
+                className='show-mobile'
                 aria-label='Toggle mobile menu'
-                aria-expanded={mobileOpen}
               >
                 {mobileOpen ? <X size={20} /> : <Menu size={20} />}
               </button>
-            )}
-          </div>
+            </>
+          ) : (
+            <>
+              <Link to='/login' className='btn btn-tertiary btn-sm'>
+                Sign in
+              </Link>
+              <Link to='/register' className='btn btn-primary  btn-sm'>
+                Get Started
+              </Link>
+            </>
+          )}
         </div>
       </header>
 
-      {/* ── Mobile Drawer ──────────────────────────────── */}
+      {/* Mobile drawer */}
       {mobileOpen && user && (
         <>
-          {/* Overlay */}
           <div
-            className='fixed inset-0 z-30 bg-black/30 md:hidden'
             onClick={() => setMobileOpen(false)}
-            aria-hidden='true'
+            style={{
+              position: "fixed",
+              inset: 0,
+              zIndex: 30,
+              background: "rgba(0,0,0,0.3)",
+            }}
           />
-
-          {/* Drawer panel */}
-          <div className='fixed top-16 left-0 right-0 z-40 bg-white border-b border-neutral-200 shadow-lg md:hidden animate-slide-down'>
-            <nav className='px-4 py-3 space-y-1' aria-label='Mobile navigation'>
+          <div
+            className='animate-slide-down'
+            style={{
+              position: "fixed",
+              top: 64,
+              left: 0,
+              right: 0,
+              zIndex: 40,
+              background: "#fff",
+              borderBottom: `1px solid ${C.neutral200}`,
+              boxShadow: "var(--shadow-lg)",
+            }}
+          >
+            <nav
+              style={{
+                padding: "12px 16px",
+                display: "flex",
+                flexDirection: "column",
+                gap: 4,
+              }}
+            >
               {navItems.map((item) => (
                 <Link
                   key={item.path}
                   to={item.path}
                   onClick={() => setMobileOpen(false)}
-                  className={`flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition-colors duration-150 ${
-                    isActive(item.path)
-                      ? "text-primary bg-primary-light font-semibold"
-                      : "text-neutral-500 hover:text-primary hover:bg-neutral-50"
-                  }`}
+                  style={linkStyle(isActive(item.path))}
                 >
                   {item.label}
                 </Link>
               ))}
             </nav>
-
-            {/* Mobile user info */}
-            <div className='flex items-center justify-between px-4 py-3 border-t border-neutral-100'>
-              <div>
-                <p className='text-sm font-semibold text-neutral-800'>
-                  {user?.name}
-                </p>
-                <p className='text-xs text-neutral-400 capitalize'>
-                  {user?.role}
-                </p>
-              </div>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                padding: "12px 16px",
+                borderTop: `1px solid ${C.neutral100}`,
+              }}
+            >
+              <span
+                style={{
+                  fontSize: "0.875rem",
+                  fontWeight: 600,
+                  color: C.neutral900,
+                }}
+              >
+                {user?.name}
+              </span>
               <button
                 onClick={handleLogout}
-                className='flex items-center gap-1.5 text-sm text-error font-medium hover:underline'
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 6,
+                  fontSize: "0.875rem",
+                  color: C.error,
+                  background: "none",
+                  border: "none",
+                  cursor: "pointer",
+                }}
               >
                 <LogOut size={14} /> Sign out
               </button>
@@ -361,10 +565,14 @@ const Navbar = ({ onMenuToggle, sidebarOpen }) => {
         </>
       )}
 
-      {/* Spacer so content doesn't sit under fixed navbar */}
-      <div className='h-16' aria-hidden='true' />
+      {/* Spacer */}
+      <div style={{ height: 64 }} aria-hidden='true' />
+
+      {/* Responsive helpers */}
+      <style>{`
+        @media (max-width: 768px)  { .hide-mobile { display:none !important; } }
+        @media (min-width: 769px)  { .show-mobile { display:none !important; } }
+      `}</style>
     </>
   );
-};
-
-export default Navbar;
+}

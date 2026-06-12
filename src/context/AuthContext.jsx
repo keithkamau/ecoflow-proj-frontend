@@ -8,7 +8,7 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(false);
 
   const login = async (credentials) => {
-    // TODO: Member 1 — call POST /api/v1/auth/login
+    // TODO: call POST /api/v1/auth/login
     setLoading(true);
     try {
       // const { data } = await authService.login(credentials);

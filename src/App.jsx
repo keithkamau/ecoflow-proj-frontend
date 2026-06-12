@@ -11,159 +11,154 @@ import Navbar from "./components/common/Navbar";
 import Sidebar from "./components/common/Sidebar";
 import Footer from "./components/common/Footer";
 import { PageLoader } from "./components/common/LoadingSpinner";
-import "./styles/globals.css";
 
-const PUBLIC_ROUTES = [
+// ── Public routes — show footer, hide sidebar ──────────────────
+const PUBLIC_PATHS = [
   "/",
   "/login",
   "/register",
   "/how-it-works",
   "/about",
   "/pricing",
-  "/mission",
-  "/blog",
   "/help",
   "/contact",
   "/privacy",
   "/terms",
-  "/cookies",
 ];
 
-// ─── Inner layout (consumes AuthContext) ──────────────────────
-const AppLayout = () => {
+// ── Inner layout (needs AuthContext) ──────────────────────────
+function AppLayout() {
   const { user, loading } = useAuth();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
-  const isPublicRoute = PUBLIC_ROUTES.some(
-    (r) => location.pathname === r || location.pathname.startsWith(r + "/"),
+  const isPublic = PUBLIC_PATHS.some(
+    (p) => location.pathname === p || location.pathname.startsWith(p + "/"),
   );
-
-  const showSidebar = !!user && !isPublicRoute;
-  const showFooter = !user || isPublicRoute;
+  const showSidebar = !!user && !isPublic;
+  const showFooter = !user || isPublic;
 
   if (loading) return <PageLoader message='Loading EcoFlow…' />;
 
   return (
     <div className='page-wrapper'>
-      {/* ── Fixed top navbar ─────────────────────── */}
+      {/* Fixed top bar */}
       <Navbar
         onMenuToggle={() => setSidebarOpen((v) => !v)}
         sidebarOpen={sidebarOpen}
       />
 
-      {/* ── Sidebar (authenticated pages only) ───── */}
+      {/* Left sidebar — authenticated pages only */}
       {showSidebar && <Sidebar open={sidebarOpen} />}
 
-      {/* ── Main content area ─────────────────────── */}
+      {/* Main content */}
       <main
-        className={`
-          min-h-[calc(100vh-64px)]
-          transition-all duration-300
-          ${showSidebar && sidebarOpen ? "md:ml-60" : ""}
-        `}
+        style={{
+          marginLeft: showSidebar && sidebarOpen ? "240px" : "0",
+          transition: "margin-left 300ms ease",
+        }}
       >
-        {/* Page-level Routes go here — each team member adds their own */}
         <Routes>
-          {/* ── Public pages ── */}
-          <Route path='/' element={<PlaceholderPage title='Home' />} />
-          <Route path='/login' element={<PlaceholderPage title='Login' />} />
-          <Route
-            path='/register'
-            element={<PlaceholderPage title='Register' />}
-          />
+          {/* Public */}
+          <Route path='/' element={<Placeholder title='Home' />} />
+          <Route path='/login' element={<Placeholder title='Login' />} />
+          <Route path='/register' element={<Placeholder title='Register' />} />
 
-          {/* ── Member 1: Auth & Profile ── */}
-          <Route
-            path='/profile'
-            element={<PlaceholderPage title='Profile' />}
-          />
-          <Route
-            path='/settings'
-            element={<PlaceholderPage title='Settings' />}
-          />
+          {/* Member 1 — Auth & Profile */}
+          <Route path='/profile' element={<Placeholder title='Profile' />} />
+          <Route path='/settings' element={<Placeholder title='Settings' />} />
 
-          {/* ── Member 2: Listings ── */}
+          {/* Member 2 — Listings */}
           <Route
             path='/listings'
-            element={<PlaceholderPage title='My Listings' />}
+            element={<Placeholder title='My Listings' />}
           />
           <Route
             path='/listings/new'
-            element={<PlaceholderPage title='New Listing' />}
+            element={<Placeholder title='New Listing' />}
           />
           <Route
             path='/browse'
-            element={<PlaceholderPage title='Browse Waste' />}
+            element={<Placeholder title='Browse Waste' />}
           />
 
-          {/* ── Member 3: Offers & Transactions ── */}
-          <Route path='/offers' element={<PlaceholderPage title='Offers' />} />
+          {/* Member 3 — Offers & Transactions */}
+          <Route path='/offers' element={<Placeholder title='Offers' />} />
           <Route
             path='/transactions'
-            element={<PlaceholderPage title='Transactions' />}
+            element={<Placeholder title='Transactions' />}
           />
 
-          {/* ── Member 4: Pickup & Analytics ── */}
+          {/* Member 4 — Pickup & Analytics */}
           <Route
-            path='/pickups'
-            element={<PlaceholderPage title='Pickups' />}
+            path='/dashboard'
+            element={<Placeholder title='Dashboard' />}
           />
+          <Route path='/pickups' element={<Placeholder title='Pickups' />} />
           <Route
             path='/analytics'
-            element={<PlaceholderPage title='Analytics' />}
+            element={<Placeholder title='Analytics' />}
           />
           <Route
             path='/analytics/impact'
-            element={<PlaceholderPage title='My Impact' />}
+            element={<Placeholder title='My Impact' />}
           />
           <Route
-            path='/dashboard'
-            element={<PlaceholderPage title='Dashboard' />}
+            path='/inventory'
+            element={<Placeholder title='Inventory' />}
           />
 
-          {/* ── Admin ── */}
+          {/* Admin */}
           <Route
             path='/admin'
-            element={<PlaceholderPage title='Admin Overview' />}
+            element={<Placeholder title='Admin Overview' />}
           />
+          <Route path='/admin/users' element={<Placeholder title='Users' />} />
           <Route
-            path='/admin/users'
-            element={<PlaceholderPage title='Manage Users' />}
+            path='/admin/listings'
+            element={<Placeholder title='All Listings' />}
           />
 
           {/* 404 */}
           <Route
             path='*'
-            element={<PlaceholderPage title='404 — Page not found' />}
+            element={<Placeholder title='404 — Page not found' />}
           />
         </Routes>
       </main>
 
-      {/* ── Footer (public/auth pages only) ──────── */}
+      {/* Footer — public pages only */}
       {showFooter && <Footer />}
     </div>
   );
-};
+}
 
-// ─── Temporary placeholder — replaced by each member's page ───
-const PlaceholderPage = ({ title }) => (
-  <div className='page-content animate-fade-in'>
-    <div className='card-accent mt-6 max-w-lg'>
-      <h1 className='text-h3 mb-2'>{title}</h1>
-      <p className='text-body text-neutral-500'>
-        This page is reserved. The assigned team member will implement it.
-      </p>
+// ── Temporary placeholder page ────────────────────────────────
+function Placeholder({ title }) {
+  return (
+    <div className='page-content animate-fade-in'>
+      <div
+        className='card card-accent'
+        style={{ maxWidth: 480, marginTop: 24 }}
+      >
+        <h1 style={{ fontSize: "1.5rem", fontWeight: 700, marginBottom: 8 }}>
+          {title}
+        </h1>
+        <p style={{ color: "var(--color-neutral-500)", fontSize: "0.875rem" }}>
+          This page is reserved. The assigned team member will implement it.
+        </p>
+      </div>
     </div>
-  </div>
-);
+  );
+}
 
-const App = () => (
-  <Router>
-    <AuthProvider>
-      <AppLayout />
-    </AuthProvider>
-  </Router>
-);
-
-export default App;
+// ── Root: wrap with Router + AuthProvider ─────────────────────
+export default function App() {
+  return (
+    <Router>
+      <AuthProvider>
+        <AppLayout />
+      </AuthProvider>
+    </Router>
+  );
+}

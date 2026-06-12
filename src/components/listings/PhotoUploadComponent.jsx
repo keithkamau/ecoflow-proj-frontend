@@ -1,5 +1,5 @@
 // src/components/listings/PhotoUploadComponent.jsx
-import React, { useState, useRef } from 'react';
+import { useState, useRef } from 'react';
 
 const PhotoUploadComponent = ({ photos = [], onPhotosChange, maxPhotos = 5 }) => {
   const [previews, setPreviews] = useState(photos);

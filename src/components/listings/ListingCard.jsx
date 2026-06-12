@@ -1,5 +1,4 @@
 // src/components/listings/ListingCard.jsx
-import React from 'react';
 
 const statusColors = {
   active: 'bg-emerald-100 text-emerald-800',

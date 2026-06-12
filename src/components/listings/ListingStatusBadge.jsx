@@ -1,5 +1,4 @@
 // src/components/listings/ListingStatusBadge.jsx
-import React from 'react';
 
 const statusConfig = {
   active: { bg: 'bg-emerald-100', text: 'text-emerald-800', label: 'Active' },

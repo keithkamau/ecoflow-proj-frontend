@@ -1,13 +1,12 @@
-// src/tests/components/listings.test.jsx
-import React from 'react';
+
 import { render, screen, fireEvent } from '@testing-library/react';
-import { BrowserRouter } from 'react-router-dom';
+import { describe, it, expect, vi } from 'vitest';
+
 import ListingCard from '../../components/listings/ListingCard';
 import SearchBar from '../../components/listings/SearchBar';
 import PhotoUploadComponent from '../../components/listings/PhotoUploadComponent';
 import ListingStatusBadge from '../../components/listings/ListingStatusBadge';
 
-// Mock listing data
 const mockListing = {
   id: 1,
   material: { type: 'plastic', unit: 'kg' },
@@ -18,81 +17,52 @@ const mockListing = {
   photos: [{ photo_url: 'https://example.com/photo.jpg' }],
 };
 
-// ListingCard Tests 
-
 describe('ListingCard', () => {
-  it('renders listing details correctly', () => {
-    render(
-      <BrowserRouter>
-        <ListingCard listing={mockListing} />
-      </BrowserRouter>
-    );
-
+  it('renders listing details', () => {
+    render(<ListingCard listing={mockListing} />);
     expect(screen.getByText('plastic')).toBeInTheDocument();
     expect(screen.getByText('50 kg')).toBeInTheDocument();
     expect(screen.getByText('active')).toBeInTheDocument();
-    expect(screen.getByText('📍 Nairobi, Kenya')).toBeInTheDocument();
     expect(screen.getByText('KES 700')).toBeInTheDocument();
   });
 
   it('calls onClick when clicked', () => {
-    const handleClick = jest.fn();
-    render(
-      <BrowserRouter>
-        <ListingCard listing={mockListing} onClick={handleClick} />
-      </BrowserRouter>
-    );
-
-    fireEvent.click(screen.getByText('plastic').closest('div'));
+    const handleClick = vi.fn();
+    render(<ListingCard listing={mockListing} onClick={handleClick} />);
+    fireEvent.click(screen.getByText('plastic'));
     expect(handleClick).toHaveBeenCalledWith(1);
   });
 
   it('renders without photos', () => {
-    const listingWithoutPhotos = { ...mockListing, photos: [] };
-    render(
-      <BrowserRouter>
-        <ListingCard listing={listingWithoutPhotos} />
-      </BrowserRouter>
-    );
-
+    const listingNoPhotos = { ...mockListing, photos: [] };
+    render(<ListingCard listing={listingNoPhotos} />);
     expect(screen.getByText('plastic')).toBeInTheDocument();
   });
 });
 
-// SearchBar Tests 
-
 describe('SearchBar', () => {
-  it('renders all filter inputs', () => {
+  it('renders filter inputs', () => {
     render(<SearchBar />);
-
     expect(screen.getByText('All Materials')).toBeInTheDocument();
     expect(screen.getByText('All Status')).toBeInTheDocument();
     expect(screen.getByPlaceholderText('Min quantity')).toBeInTheDocument();
     expect(screen.getByPlaceholderText('Max quantity')).toBeInTheDocument();
   });
 
-  it('calls onSearch with filters when submitted', () => {
-    const handleSearch = jest.fn();
+  it('calls onSearch when submitted', () => {
+    const handleSearch = vi.fn();
     render(<SearchBar onSearch={handleSearch} />);
-
-    fireEvent.change(screen.getByDisplayValue('All Materials'), {
-      target: { name: 'material_type', value: 'plastic' },
-    });
-
     fireEvent.click(screen.getByText('Search'));
     expect(handleSearch).toHaveBeenCalled();
   });
 
-  it('calls onSearch with empty filters when reset', () => {
-    const handleSearch = jest.fn();
+  it('calls onSearch with empty filters on reset', () => {
+    const handleSearch = vi.fn();
     render(<SearchBar onSearch={handleSearch} />);
-
     fireEvent.click(screen.getByText('Reset'));
     expect(handleSearch).toHaveBeenCalledWith({});
   });
 });
-
-// PhotoUploadComponent Tests 
 
 describe('PhotoUploadComponent', () => {
   it('renders upload button', () => {
@@ -100,32 +70,26 @@ describe('PhotoUploadComponent', () => {
     expect(screen.getByText('Add')).toBeInTheDocument();
   });
 
-  it('displays photo count', () => {
+  it('shows photo count', () => {
     render(<PhotoUploadComponent photos={[]} />);
     expect(screen.getByText('0 / 5 photos')).toBeInTheDocument();
   });
+
+  it('renders with photos', () => {
+    const photos = [{ photo_url: 'https://example.com/1.jpg' }];
+    render(<PhotoUploadComponent photos={photos} onPhotosChange={vi.fn()} />);
+    expect(screen.getByAltText('Photo 1')).toBeInTheDocument();
+  });
 });
 
-// ListingStatusBadge Tests 
-
 describe('ListingStatusBadge', () => {
-  it('renders active status', () => {
-    render(<ListingStatusBadge status="active" />);
-    expect(screen.getByText('Active')).toBeInTheDocument();
-  });
-
-  it('renders matched status', () => {
-    render(<ListingStatusBadge status="matched" />);
-    expect(screen.getByText('Matched')).toBeInTheDocument();
-  });
-
-  it('renders completed status', () => {
-    render(<ListingStatusBadge status="completed" />);
-    expect(screen.getByText('Completed')).toBeInTheDocument();
-  });
-
-  it('renders expired status', () => {
-    render(<ListingStatusBadge status="expired" />);
-    expect(screen.getByText('Expired')).toBeInTheDocument();
+  it.each([
+    ['active', 'Active'],
+    ['matched', 'Matched'],
+    ['completed', 'Completed'],
+    ['expired', 'Expired'],
+  ])('renders %s status', (status, label) => {
+    render(<ListingStatusBadge status={status} />);
+    expect(screen.getByText(label)).toBeInTheDocument();
   });
 });

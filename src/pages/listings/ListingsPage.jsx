@@ -1,7 +1,7 @@
 // src/pages/listings/ListingsPage.jsx
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useListingContext } from '../../context/ListingContexts';
+import { useListingContext } from '../../context/useListingContext';
 import ListingCard from '../../components/listings/ListingCard';
 import SearchBar from '../../components/listings/SearchBar';
 

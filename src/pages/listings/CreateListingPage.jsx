@@ -1,7 +1,7 @@
 // src/pages/listings/CreateListingPage.jsx
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useListingContext } from '../../context/ListingContexts';
+import { useListingContext } from '../../context/useListingContext';
 import PhotoUploadComponent from '../../components/listings/PhotoUploadComponent';
 
 const CreateListingPage = () => {
@@ -38,7 +38,7 @@ const CreateListingPage = () => {
       };
       await createListing(data);
       navigate('/listings');
-    } catch (err) {
+    } catch {
       // error handled in context
     }
   };

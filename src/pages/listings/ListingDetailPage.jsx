@@ -1,7 +1,7 @@
 // src/pages/listings/ListingDetailPage.jsx
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useListingContext } from '../../context/ListingContexts';
+import { useListingContext } from '../../context/useListingContext';
 import ListingStatusBadge from '../../components/listings/ListingStatusBadge';
 
 const ListingDetailPage = () => {
@@ -18,7 +18,7 @@ const ListingDetailPage = () => {
     try {
       await deleteListing(id);
       navigate('/listings');
-    } catch (err) {
+    } catch {
       // error handled in context
     }
   };

@@ -1,5 +1,5 @@
 // src/components/listings/SearchBar.jsx
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 const materialOptions = [
   { value: '', label: 'All Materials' },
@@ -36,7 +36,7 @@ const SearchBar = ({ onSearch }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     const cleanFilters = Object.fromEntries(
-      Object.entries(filters).filter(([_, v]) => v !== '')
+      Object.entries(filters).filter(([, value]) => value !== '')
     );
     onSearch?.(cleanFilters);
   };

@@ -1,7 +1,7 @@
 // src/pages/listings/ListingsPage.jsx
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useListingContext } from '../../context/useListingContext';
+import { useListingContext } from '../../context/ListingContexts';
 import ListingCard from '../../components/listings/ListingCard';
 import SearchBar from '../../components/listings/SearchBar';
 
@@ -47,7 +47,7 @@ const ListingsPage = () => {
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-500"></div>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {listings.map((listing) => (
               <ListingCard
                 key={listing.id}

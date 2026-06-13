@@ -1,8 +1,15 @@
 // src/context/ListingContexts.jsx
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useContext } from 'react';
 import ListingContext from './ListingContext';
 import listingService from '../services/listingService';
 
+export const useListingContext = () => {
+  const context = useContext(ListingContext);
+  if (!context) {
+    throw new Error('useListingContext must be used within a ListingProvider');
+  }
+  return context;
+};
 
 export const ListingProvider = ({ children }) => {
   const [listings, setListings] = useState([]);

@@ -5,7 +5,10 @@ import { describe, it, expect, vi, beforeAll } from 'vitest';
 import PhotoUploadComponent from '../../components/listings/PhotoUploadComponent';
 
 beforeAll(() => {
-  global.URL.createObjectURL = vi.fn(() => 'blob:test');
+  vi.stubGlobal('URL', {
+    createObjectURL: vi.fn(() => 'blob:test'),
+    revokeObjectURL: vi.fn(),
+  });
 });
 
 describe('PhotoUploadComponent', () => {

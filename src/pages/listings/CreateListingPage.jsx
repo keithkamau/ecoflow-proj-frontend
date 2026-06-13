@@ -1,8 +1,10 @@
-// src/pages/listings/CreateListingPage.jsx
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useListingContext } from '../../context/useListingContext';
+import { useListingContext } from '../../context/ListingContexts';
+import LocationPicker from '../../components/listings/LocationPicker';
+import UnitSelector from '../../components/listings/UnitSelector';
 import PhotoUploadComponent from '../../components/listings/PhotoUploadComponent';
+import listingService from '../../services/listingService';
 
 const CreateListingPage = () => {
   const navigate = useNavigate();
@@ -16,7 +18,10 @@ const CreateListingPage = () => {
     price_expectation: '',
   });
 
+  const [unit, setUnit] = useState('');
+  const [location, setLocation] = useState(null);
   const [photos, setPhotos] = useState([]);
+  const [submitError, setSubmitError] = useState(null);
 
   useEffect(() => {
     fetchMaterials();
@@ -29,19 +34,36 @@ const CreateListingPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setSubmitError(null);
+
     try {
+      const selectedMaterial = materials.find(m => m.id === parseInt(formData.material_id));
+
       const data = {
         ...formData,
         material_id: parseInt(formData.material_id),
         quantity: parseFloat(formData.quantity),
+        unit: unit || selectedMaterial?.unit,
+        location_lat: location?.lat,
+        location_lng: location?.lng,
+        location_address: location?.address || formData.location_address,
         price_expectation: formData.price_expectation ? parseFloat(formData.price_expectation) : null,
       };
-      await createListing(data);
+
+      const newListing = await createListing(data);
+
+      const newPhotos = photos.filter(p => p.isNew);
+      for (const photo of newPhotos) {
+        await listingService.uploadListingPhoto(newListing.id, photo.file);
+      }
+
       navigate('/listings');
-    } catch {
-      // error handled in context
+    } catch (err) {
+      setSubmitError(err.response?.data?.detail || 'Failed to create listing');
     }
   };
+
+  const selectedMaterial = materials.find(m => m.id === parseInt(formData.material_id));
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -55,13 +77,14 @@ const CreateListingPage = () => {
 
         <h1 className="text-2xl font-bold text-gray-900 mb-6">Create New Listing</h1>
 
-        {error && (
+        {(error || submitError) && (
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4 text-sm">
-            {error}
+            {submitError || error}
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-sm p-6 space-y-5">
+          {/* Material Type */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Material Type</label>
             <select
@@ -80,6 +103,7 @@ const CreateListingPage = () => {
             </select>
           </div>
 
+          {/* Quantity */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Quantity</label>
             <input
@@ -95,6 +119,14 @@ const CreateListingPage = () => {
             />
           </div>
 
+          {/* Unit Selector */}
+          <UnitSelector
+            value={unit}
+            onChange={setUnit}
+            materialUnit={selectedMaterial?.unit}
+          />
+
+          {/* Condition */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Condition</label>
             <textarea
@@ -107,8 +139,19 @@ const CreateListingPage = () => {
             />
           </div>
 
+          {/* Location Picker */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Pickup Location
+            </label>
+            <LocationPicker onLocationSelect={setLocation} />
+          </div>
+
+          {/* Fallback address input */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Location Address (manual fallback)
+            </label>
             <input
               type="text"
               name="location_address"
@@ -119,6 +162,7 @@ const CreateListingPage = () => {
             />
           </div>
 
+          {/* Price */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Expected Price (KES)</label>
             <input
@@ -133,8 +177,10 @@ const CreateListingPage = () => {
             />
           </div>
 
+          {/* Photos */}
           <PhotoUploadComponent photos={photos} onPhotosChange={setPhotos} />
 
+          {/* Submit */}
           <div className="flex gap-3 pt-4">
             <button
               type="submit"

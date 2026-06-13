@@ -1,6 +1,6 @@
 // src/pages/listings/RecyclerInventoryPage.jsx
 import { useState } from 'react';
-import { useListingContext } from '../../context/useListingContext';
+import { useListingContext } from '../../context/ListingContexts';
 
 const RecyclerInventoryPage = () => {
   const { inventory, loading, error, fetchInventory } = useListingContext();

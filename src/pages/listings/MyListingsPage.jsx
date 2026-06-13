@@ -1,7 +1,7 @@
 // src/pages/listings/MyListingsPage.jsx
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useListingContext } from '../../context/useListingContext';
+import { useListingContext } from '../../context/ListingContexts';
 import ListingCard from '../../components/listings/ListingCard';
 
 const MyListingsPage = () => {

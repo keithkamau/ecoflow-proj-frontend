@@ -52,60 +52,72 @@ const SearchBar = ({ onSearch }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-sm p-4 mb-6">
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-        <select
-          name="material_type"
-          value={filters.material_type}
-          onChange={handleChange}
-          className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm"
-        >
-          {materialOptions.map((opt) => (
-            <option key={opt.value} value={opt.value}>{opt.label}</option>
-          ))}
-        </select>
+    <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-sm p-6 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="space-y-1.5">
+          <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Material</label>
+          <select
+            name="material_type"
+            value={filters.material_type}
+            onChange={handleChange}
+            className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-base"
+          >
+            {materialOptions.map((opt) => (
+              <option key={opt.value} value={opt.value}>{opt.label}</option>
+            ))}
+          </select>
+        </div>
 
-        <select
-          name="status"
-          value={filters.status}
-          onChange={handleChange}
-          className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm"
-        >
-          {statusOptions.map((opt) => (
-            <option key={opt.value} value={opt.value}>{opt.label}</option>
-          ))}
-        </select>
+        <div className="space-y-1.5">
+          <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Status</label>
+          <select
+            name="status"
+            value={filters.status}
+            onChange={handleChange}
+            className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-base"
+          >
+            {statusOptions.map((opt) => (
+              <option key={opt.value} value={opt.value}>{opt.label}</option>
+            ))}
+          </select>
+        </div>
 
-        <input
-          type="number"
-          name="min_quantity"
-          placeholder="Min quantity"
-          value={filters.min_quantity}
-          onChange={handleChange}
-          className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm"
-        />
+        <div className="space-y-1.5">
+          <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Min Quantity</label>
+          <input
+            type="number"
+            name="min_quantity"
+            placeholder="e.g. 10"
+            value={filters.min_quantity}
+            onChange={handleChange}
+            className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-base"
+          />
+        </div>
 
-        <input
-          type="number"
-          name="max_quantity"
-          placeholder="Max quantity"
-          value={filters.max_quantity}
-          onChange={handleChange}
-          className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm"
-        />
+        <div className="space-y-1.5">
+          <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Max Quantity</label>
+          <input
+            type="number"
+            name="max_quantity"
+            placeholder="e.g. 100"
+            value={filters.max_quantity}
+            onChange={handleChange}
+            className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-base"
+          />
+        </div>
       </div>
 
-      <div className="flex gap-2 mt-3">
+      <div className="flex gap-3 mt-5">
         <button
           type="submit"
-          className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white py-2 rounded-lg text-sm font-medium transition-colors"
+          className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white py-3 rounded-lg text-base font-medium transition-colors"
         >
           Search
         </button>
         <button
           type="button"
           onClick={handleReset}
-          className="px-4 py-2 border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50 transition-colors"
+          className="px-6 py-3 border border-gray-200 rounded-lg text-base text-gray-600 hover:bg-gray-50 transition-colors"
         >
           Reset
         </button>

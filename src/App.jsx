@@ -11,6 +11,9 @@ import Navbar from "./components/common/Navbar";
 import Sidebar from "./components/common/Sidebar";
 import Footer from "./components/common/Footer";
 import { PageLoader } from "./components/common/LoadingSpinner";
+import OfferPage from "./pages/offers/OfferPage";
+import TransactionPage from "./pages/offers/TransactionPage";
+import PaymentPage from "./pages/offers/PaymentPage";
 
 // ── Public routes — show footer, hide sidebar ──────────────────
 const PUBLIC_PATHS = [
@@ -83,11 +86,9 @@ function AppLayout() {
           />
 
           {/* Member 3 — Offers & Transactions */}
-          <Route path='/offers' element={<Placeholder title='Offers' />} />
-          <Route
-            path='/transactions'
-            element={<Placeholder title='Transactions' />}
-          />
+          <Route path='/offers' element={<OfferPage />} />
+          <Route path='/transactions' element={<TransactionPage />} />
+          <Route path='/payments' element={<PaymentPage />} />
 
           {/* Member 4 — Pickup & Analytics */}
           <Route

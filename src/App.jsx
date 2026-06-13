@@ -17,6 +17,8 @@ import TransactionPage from "./pages/offers/TransactionPage";
 import TransactionDetailPage from "./pages/offers/TransactionDetailPage";
 import PaymentPage from "./pages/offers/PaymentPage";
 import { offerService } from "./services/offerService";
+import { messageService } from "./services/messageService";
+import CreateOfferPage from "./pages/offers/CreateOfferPage";
 
 // ── Public routes — show footer, hide sidebar ──────────────────
 const PUBLIC_PATHS = [
@@ -42,9 +44,12 @@ function AppLayout() {
 
   async function fetchPending() {
     try {
-      const data = await offerService.getAll();
-      const pending = Array.isArray(data) ? data.filter((o) => o.status === "pending").length : 0;
-      setNotificationCount(pending);
+      const [offers, msgData] = await Promise.all([
+        offerService.getAll(),
+        messageService.getUnreadCount().catch(() => ({ count: 0 })),
+      ]);
+      const pending = Array.isArray(offers) ? offers.filter((o) => o.status === "pending").length : 0;
+      setNotificationCount(pending + (msgData.count || 0));
     } catch {}
   }
 
@@ -112,6 +117,7 @@ function AppLayout() {
 
           {/* Member 3 — Offers & Transactions */}
           <Route path='/offers' element={<OfferPage />} />
+          <Route path='/offers/new' element={<CreateOfferPage />} />
           <Route path='/offers/:id' element={<OfferDetailPage />} />
           <Route path='/transactions' element={<TransactionPage />} />
           <Route path='/transactions/:id' element={<TransactionDetailPage />} />

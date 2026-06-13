@@ -1,9 +1,7 @@
-import { Smartphone, CreditCard, Building2 } from "lucide-react";
+import { Smartphone } from "lucide-react";
 
 const METHODS = [
   { value: "mpesa", label: "M-Pesa", icon: Smartphone, desc: "Pay via mobile money" },
-  { value: "card", label: "Card", icon: CreditCard, desc: "Debit or credit card" },
-  { value: "bank", label: "Bank Transfer", icon: Building2, desc: "Direct bank deposit" },
 ];
 
 export default function PaymentSelector({ value, onChange }) {

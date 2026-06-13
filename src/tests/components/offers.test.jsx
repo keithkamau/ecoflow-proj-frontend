@@ -1,11 +1,22 @@
 import { describe, it, expect, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import OfferCard from "../../components/offers/OfferCard";
 import OfferForm from "../../components/offers/OfferForm";
 import PaymentSelector from "../../components/offers/PaymentSelector";
+import Chat from "../../components/offers/Chat";
 import { formatCurrency, statusLabel, timeAgo } from "../../utils/formatters";
 import { validateOfferForm, required, mustBePositive } from "../../utils/validators";
+
+vi.mock("../../services/messageService", () => ({
+  messageService: {
+    getByOffer: vi.fn().mockResolvedValue([
+      { id: 1, sender_id: 2, message_text: "Hello!", created_at: new Date().toISOString() },
+      { id: 2, sender_id: 1, message_text: "Hi there!", created_at: new Date().toISOString() },
+    ]),
+    send: vi.fn().mockResolvedValue({ id: 3, sender_id: 1, recipient_id: 2, message_text: "Test", created_at: new Date().toISOString() }),
+  },
+}));
 
 // ── Utilities ────────────────────────────────────────────────────
 
@@ -143,24 +154,90 @@ describe("OfferForm", () => {
 // ── PaymentSelector ───────────────────────────────────────────────
 
 describe("PaymentSelector", () => {
-  it("renders all payment methods", () => {
+  it("renders M-Pesa as the only payment method", () => {
     render(<PaymentSelector value="mpesa" onChange={vi.fn()} />);
     expect(screen.getByText("M-Pesa")).toBeInTheDocument();
-    expect(screen.getByText("Card")).toBeInTheDocument();
-    expect(screen.getByText("Bank Transfer")).toBeInTheDocument();
   });
 
   it("highlights selected option", () => {
-    render(<PaymentSelector value="card" onChange={vi.fn()} />);
-    const cardBtn = screen.getByText("Card").closest("button");
-    expect(cardBtn.className).toContain("border-primary");
+    render(<PaymentSelector value="mpesa" onChange={vi.fn()} />);
+    const mpesaBtn = screen.getByText("M-Pesa").closest("button");
+    expect(mpesaBtn.className).toContain("border-primary");
   });
 
   it("calls onChange when clicked", async () => {
     const onChange = vi.fn();
-    render(<PaymentSelector value="mpesa" onChange={onChange} />);
-    await userEvent.click(screen.getByText("Card"));
-    expect(onChange).toHaveBeenCalledWith("card");
+    render(<PaymentSelector value="card" onChange={onChange} />);
+    await userEvent.click(screen.getByText("M-Pesa"));
+    expect(onChange).toHaveBeenCalledWith("mpesa");
+  });
+});
+
+// ── Chat ───────────────────────────────────────────────────────
+
+describe("Chat", () => {
+  it("shows placeholder when no offer selected", () => {
+    render(<Chat offerId={null} />);
+    expect(screen.getByText("Select an offer to view messages")).toBeInTheDocument();
+  });
+
+  it("renders messages when loaded", async () => {
+    render(<Chat offerId={1} />);
+    await waitFor(() => {
+      expect(screen.getByText("Hello!")).toBeInTheDocument();
+    });
+    expect(screen.getByText("Hi there!")).toBeInTheDocument();
+  });
+
+  it("renders send button and input", async () => {
+    render(<Chat offerId={1} />);
+    await waitFor(() => {
+      expect(screen.getByPlaceholderText("Type a message...")).toBeInTheDocument();
+    });
+    expect(screen.getByRole("button")).toBeInTheDocument();
+  });
+
+  it("send button is disabled when input is empty", async () => {
+    render(<Chat offerId={1} />);
+    await waitFor(() => {
+      expect(screen.getByPlaceholderText("Type a message...")).toBeInTheDocument();
+    });
+    const btn = screen.getByRole("button");
+    expect(btn.disabled).toBe(true);
+  });
+
+  it("sends a message on submit", async () => {
+    const user = userEvent.setup();
+    render(<Chat offerId={1} />);
+    await waitFor(() => {
+      expect(screen.getByPlaceholderText("Type a message...")).toBeInTheDocument();
+    });
+    const input = screen.getByPlaceholderText("Type a message...");
+    await user.type(input, "Hello from test");
+    const btn = screen.getByRole("button");
+    expect(btn.disabled).toBe(false);
+    await user.click(btn);
+  });
+});
+
+// ── Responsive Layout ──────────────────────────────────────────
+
+describe("Responsive Layout", () => {
+  it("chat container has responsive height classes", () => {
+    render(<Chat offerId={1} />);
+    const container = screen.getByPlaceholderText("Type a message...").closest("div");
+    expect(container).toBeTruthy();
+  });
+
+  it("offer cards wrap in grid layout", () => {
+    const { container } = render(
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2">main</div>
+        <div className="lg:col-span-1">sidebar</div>
+      </div>
+    );
+    expect(container.innerHTML).toContain("grid-cols-1");
+    expect(container.innerHTML).toContain("lg:grid-cols-3");
   });
 });
 

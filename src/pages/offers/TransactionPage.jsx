@@ -110,8 +110,7 @@ export default function TransactionPage() {
                     No transactions match the selected filter
                   </td>
                 </tr>
-              ) : (
-                filtered.map((tx) => (
+              ) : filtered.map((tx) => (
                 <tr key={tx.id} className="hover:bg-neutral-50 transition-colors cursor-pointer group" onClick={() => navigate(`/transactions/${tx.id}`)}>
                   <td className="px-4 py-3 font-mono text-xs whitespace-nowrap">
                     <span className="flex items-center gap-1.5">

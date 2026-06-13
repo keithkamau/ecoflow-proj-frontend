@@ -1,164 +1,107 @@
-import { useState } from "react";
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  useLocation,
-} from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
-import { useAuth } from "./hooks/useAuth";
+import ProtectedRoute from "./components/auth/ProtectedRoute";
+import RoleGuard from "./components/auth/RoleGuard";
 import Navbar from "./components/common/Navbar";
 import Sidebar from "./components/common/Sidebar";
 import Footer from "./components/common/Footer";
-import { PageLoader } from "./components/common/LoadingSpinner";
+import RegisterPage from "./pages/auth/RegisterPage";
+import LoginPage from "./pages/auth/LoginPage";
+import OTPPage from "./pages/auth/OTPPage";
+import KYCPage from "./pages/auth/KYCPage";
+import ProfilePage from "./pages/ProfilePage";
+import SettingsPage from "./pages/SettingsPage";
 
-// ── Public routes — show footer, hide sidebar ──────────────────
-const PUBLIC_PATHS = [
-  "/",
-  "/login",
-  "/register",
-  "/how-it-works",
-  "/about",
-  "/pricing",
-  "/help",
-  "/contact",
-  "/privacy",
-  "/terms",
-];
-
-// ── Inner layout (needs AuthContext) ──────────────────────────
-function AppLayout() {
-  const { user, loading } = useAuth();
-  const location = useLocation();
-  const [sidebarOpen, setSidebarOpen] = useState(true);
-
-  const isPublic = PUBLIC_PATHS.some(
-    (p) => location.pathname === p || location.pathname.startsWith(p + "/"),
-  );
-  const showSidebar = !!user && !isPublic;
-  const showFooter = !user || isPublic;
-
-  if (loading) return <PageLoader message='Loading EcoFlow…' />;
-
+export default function App() {
   return (
-    <div className='page-wrapper'>
-      {/* Fixed top bar */}
-      <Navbar
-        onMenuToggle={() => setSidebarOpen((v) => !v)}
-        sidebarOpen={sidebarOpen}
-      />
-
-      {/* Left sidebar — authenticated pages only */}
-      {showSidebar && <Sidebar open={sidebarOpen} />}
-
-      {/* Main content */}
-      <main
-        style={{
-          marginLeft: showSidebar && sidebarOpen ? "240px" : "0",
-          transition: "margin-left 300ms ease",
-        }}
-      >
+    <BrowserRouter>
+      <AuthProvider>
         <Routes>
-          {/* Public */}
-          <Route path='/' element={<Placeholder title='Home' />} />
-          <Route path='/login' element={<Placeholder title='Login' />} />
-          <Route path='/register' element={<Placeholder title='Register' />} />
+          {/* Public routes */}
+          <Route path='/register' element={<RegisterPage />} />
+          <Route path='/login' element={<LoginPage />} />
+          <Route path='/otp' element={<OTPPage />} />
 
-          {/* Member 1 — Auth & Profile */}
-          <Route path='/profile' element={<Placeholder title='Profile' />} />
-          <Route path='/settings' element={<Placeholder title='Settings' />} />
-
-          {/* Member 2 — Listings */}
+          {/* Protected routes */}
           <Route
-            path='/listings'
-            element={<Placeholder title='My Listings' />}
+            path='/kyc'
+            element={
+              <ProtectedRoute>
+                <KYCPage />
+              </ProtectedRoute>
+            }
           />
           <Route
-            path='/listings/new'
-            element={<Placeholder title='New Listing' />}
+            path='/profile'
+            element={
+              <ProtectedRoute>
+                <ProfilePage />
+              </ProtectedRoute>
+            }
           />
           <Route
-            path='/browse'
-            element={<Placeholder title='Browse Waste' />}
+            path='/settings'
+            element={
+              <ProtectedRoute>
+                <SettingsPage />
+              </ProtectedRoute>
+            }
           />
 
-          {/* Member 3 — Offers & Transactions */}
-          <Route path='/offers' element={<Placeholder title='Offers' />} />
-          <Route
-            path='/transactions'
-            element={<Placeholder title='Transactions' />}
-          />
-
-          {/* Member 4 — Pickup & Analytics */}
+          {/* Protected routes with layout */}
           <Route
             path='/dashboard'
-            element={<Placeholder title='Dashboard' />}
-          />
-          <Route path='/pickups' element={<Placeholder title='Pickups' />} />
-          <Route
-            path='/analytics'
-            element={<Placeholder title='Analytics' />}
-          />
-          <Route
-            path='/analytics/impact'
-            element={<Placeholder title='My Impact' />}
-          />
-          <Route
-            path='/inventory'
-            element={<Placeholder title='Inventory' />}
+            element={
+              <ProtectedRoute>
+                <LayoutWrapper>
+                  <DashboardPage />
+                </LayoutWrapper>
+              </ProtectedRoute>
+            }
           />
 
-          {/* Admin */}
+          {/* Admin routes with role guard */}
           <Route
             path='/admin'
-            element={<Placeholder title='Admin Overview' />}
-          />
-          <Route path='/admin/users' element={<Placeholder title='Users' />} />
-          <Route
-            path='/admin/listings'
-            element={<Placeholder title='All Listings' />}
+            element={
+              <ProtectedRoute>
+                <RoleGuard roles={["admin"]}>
+                  <LayoutWrapper>
+                    <AdminDashboard />
+                  </LayoutWrapper>
+                </RoleGuard>
+              </ProtectedRoute>
+            }
           />
 
-          {/* 404 */}
-          <Route
-            path='*'
-            element={<Placeholder title='404 — Page not found' />}
-          />
+          {/* Default redirect */}
+          <Route path='/' element={<Navigate to='/dashboard' replace />} />
+          <Route path='*' element={<Navigate to='/dashboard' replace />} />
         </Routes>
-      </main>
-
-      {/* Footer — public pages only */}
-      {showFooter && <Footer />}
-    </div>
+      </AuthProvider>
+    </BrowserRouter>
   );
 }
 
-// ── Temporary placeholder page ────────────────────────────────
-function Placeholder({ title }) {
+// Layout wrapper for routes that need Navbar + Sidebar + Footer
+function LayoutWrapper({ children }) {
   return (
-    <div className='page-content animate-fade-in'>
-      <div
-        className='card card-accent'
-        style={{ maxWidth: 480, marginTop: 24 }}
-      >
-        <h1 style={{ fontSize: "1.5rem", fontWeight: 700, marginBottom: 8 }}>
-          {title}
-        </h1>
-        <p style={{ color: "var(--color-neutral-500)", fontSize: "0.875rem" }}>
-          This page is reserved. The assigned team member will implement it.
-        </p>
+    <div className='min-h-screen flex'>
+      <Sidebar />
+      <div className='flex-1 flex flex-col'>
+        <Navbar />
+        <main className='flex-1 p-6'>{children}</main>
+        <Footer />
       </div>
     </div>
   );
 }
 
-// ── Root: wrap with Router + AuthProvider ─────────────────────
-export default function App() {
-  return (
-    <Router>
-      <AuthProvider>
-        <AppLayout />
-      </AuthProvider>
-    </Router>
-  );
+// Placeholder — other members will replace these
+function DashboardPage() {
+  return <h1 className='text-2xl font-bold'>Dashboard</h1>;
+}
+
+function AdminDashboard() {
+  return <h1 className='text-2xl font-bold'>Admin Dashboard</h1>;
 }

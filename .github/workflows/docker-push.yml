@@ -30,19 +30,9 @@ jobs:
           username: simpson069
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Extract metadata
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: simpson069/ecoflow-frontend
-          tags: |
-            type=ref,event=branch
-            type=sha,prefix=
-
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
           context: .
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: simpson069/ecoflow-frontend:latest

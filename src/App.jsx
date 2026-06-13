@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -38,14 +38,22 @@ function AppLayout() {
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [notificationCount, setNotificationCount] = useState(0);
+  const intervalRef = useRef(null);
 
-  useEffect(() => {
-    if (!user) return;
-    offerService.getAll().then((data) => {
+  async function fetchPending() {
+    try {
+      const data = await offerService.getAll();
       const pending = Array.isArray(data) ? data.filter((o) => o.status === "pending").length : 0;
       setNotificationCount(pending);
-    }).catch(() => {});
-  }, [user, location.pathname]);
+    } catch {}
+  }
+
+  useEffect(() => {
+    if (!user) { setNotificationCount(0); return; }
+    fetchPending();
+    intervalRef.current = setInterval(fetchPending, 30000);
+    return () => clearInterval(intervalRef.current);
+  }, [user]);
 
   const isPublic = PUBLIC_PATHS.some(
     (p) => location.pathname === p || location.pathname.startsWith(p + "/"),

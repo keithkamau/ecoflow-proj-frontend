@@ -97,7 +97,7 @@ const SearchBar = ({ onSearch }) => {
           <input
             type="number"
             name="min_quantity"
-            placeholder="e.g. 10"
+            placeholder="Min qty e.g. 10"
             value={filters.min_quantity}
             onChange={handleChange}
             className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-base"
@@ -109,7 +109,7 @@ const SearchBar = ({ onSearch }) => {
           <input
             type="number"
             name="max_quantity"
-            placeholder="e.g. 100"
+            placeholder="Max qty e.g. 100"
             value={filters.max_quantity}
             onChange={handleChange}
             className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-base"
@@ -122,7 +122,7 @@ const SearchBar = ({ onSearch }) => {
             type="number"
             step="any"
             name="lat"
-            placeholder="e.g. -1.2921"
+            placeholder="Lat e.g. -1.2921"
             value={filters.lat}
             onChange={handleChange}
             className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-base"
@@ -135,7 +135,7 @@ const SearchBar = ({ onSearch }) => {
             type="number"
             step="any"
             name="lng"
-            placeholder="e.g. 36.8219"
+            placeholder="Lng e.g. 36.8219"
             value={filters.lng}
             onChange={handleChange}
             className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-base"
@@ -147,7 +147,7 @@ const SearchBar = ({ onSearch }) => {
           <input
             type="number"
             name="radius_km"
-            placeholder="e.g. 10"
+            placeholder="Radius km e.g. 10"
             value={filters.radius_km}
             onChange={handleChange}
             className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-base"

@@ -45,8 +45,8 @@ describe('SearchBar', () => {
     render(<SearchBar />);
     expect(screen.getByText('All Materials')).toBeInTheDocument();
     expect(screen.getByText('All Status')).toBeInTheDocument();
-    expect(screen.getByPlaceholderText('Min quantity')).toBeInTheDocument();
-    expect(screen.getByPlaceholderText('Max quantity')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('Min qty e.g. 10')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('Max qty e.g. 100')).toBeInTheDocument();
   });
 
   it('calls onSearch when submitted', () => {

@@ -1,6 +1,6 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { Plus, RefreshCw, Tag, ExternalLink } from "lucide-react";
+import { Plus, RefreshCw, Tag, ExternalLink, Filter, ArrowUpDown } from "lucide-react";
 import { offerService } from "../../services/offerService";
 import OfferCard from "../../components/offers/OfferCard";
 import OfferForm from "../../components/offers/OfferForm";
@@ -14,6 +14,8 @@ export default function OfferPage() {
   const [showForm, setShowForm] = useState(false);
   const [selectedOffer, setSelectedOffer] = useState(null);
   const [error, setError] = useState(null);
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [sortOrder, setSortOrder] = useState("newest");
 
   const fetchOffers = useCallback(async () => {
     setLoading(true);
@@ -49,6 +51,19 @@ export default function OfferPage() {
 
   const pendingCount = offers.filter((o) => o.status === "pending").length;
 
+  const filteredOffers = useMemo(() => {
+    let result = [...offers];
+    if (statusFilter !== "all") {
+      result = result.filter((o) => o.status === statusFilter);
+    }
+    result.sort((a, b) => {
+      const da = new Date(a.created_at).getTime();
+      const db = new Date(b.created_at).getTime();
+      return sortOrder === "newest" ? db - da : da - db;
+    });
+    return result;
+  }, [offers, statusFilter, sortOrder]);
+
   if (loading && !offers.length) return <PageLoader message="Loading offers..." />;
 
   return (
@@ -75,16 +90,39 @@ export default function OfferPage() {
         <div className="alert alert-error mb-4">{error}</div>
       )}
 
+      <div className="flex flex-wrap items-center gap-3 mb-4">
+        <div className="flex items-center gap-1.5 text-sm text-neutral-500">
+          <Filter size={14} />
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="input input-sm"
+          >
+            <option value="all">All Status</option>
+            <option value="pending">Pending</option>
+            <option value="accepted">Accepted</option>
+            <option value="rejected">Rejected</option>
+          </select>
+        </div>
+        <button
+          className="btn btn-ghost btn-xs flex items-center gap-1"
+          onClick={() => setSortOrder((s) => (s === "newest" ? "oldest" : "newest"))}
+        >
+          <ArrowUpDown size={14} />
+          {sortOrder === "newest" ? "Newest" : "Oldest"}
+        </button>
+      </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-4">
-          {offers.length === 0 ? (
+          {filteredOffers.length === 0 ? (
             <div className="card flex flex-col items-center justify-center py-12 text-neutral-400">
               <Tag size={40} />
               <p className="mt-3 text-sm font-medium">No offers yet</p>
               <p className="text-xs mt-1">Create your first offer to get started</p>
             </div>
           ) : (
-            offers.map((offer) => (
+            filteredOffers.map((offer) => (
               <div key={offer.id} className="relative group cursor-pointer" onClick={() => navigate(`/offers/${offer.id}`)}>
                 <OfferCard
                   offer={offer}

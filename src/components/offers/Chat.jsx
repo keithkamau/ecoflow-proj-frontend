@@ -7,7 +7,9 @@ export default function Chat({ offerId, currentUserId = 1 }) {
   const [messages, setMessages] = useState([]);
   const [text, setText] = useState("");
   const [loading, setLoading] = useState(true);
+  const [typing, setTyping] = useState(false);
   const bottomRef = useRef(null);
+  const typingTimeout = useRef(null);
 
   useEffect(() => {
     if (!offerId) return;
@@ -20,8 +22,15 @@ export default function Chat({ offerId, currentUserId = 1 }) {
   }, [offerId]);
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    bottomRef.current?.scrollIntoView?.({ behavior: "smooth" });
   }, [messages]);
+
+  function handleTyping(e) {
+    setText(e.target.value);
+    setTyping(true);
+    clearTimeout(typingTimeout.current);
+    typingTimeout.current = setTimeout(() => setTyping(false), 1000);
+  }
 
   async function handleSend(e) {
     e.preventDefault();
@@ -84,7 +93,7 @@ export default function Chat({ offerId, currentUserId = 1 }) {
       <form onSubmit={handleSend} className="flex items-center gap-2 border-t border-neutral-200 p-3">
         <input
           value={text}
-          onChange={(e) => setText(e.target.value)}
+          onChange={handleTyping}
           className="input flex-1"
           placeholder="Type a message..."
         />
@@ -92,6 +101,12 @@ export default function Chat({ offerId, currentUserId = 1 }) {
           <Send size={16} />
         </button>
       </form>
+
+      {typing && text.length > 0 && (
+        <p className="text-xs text-neutral-400 px-3 pb-2 italic animate-pulse">
+          typing...
+        </p>
+      )}
     </div>
   );
 }

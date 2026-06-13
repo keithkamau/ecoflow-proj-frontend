@@ -59,30 +59,32 @@ export default function TransactionPage() {
               <tr className="bg-neutral-50 text-neutral-600 text-left">
                 <th className="px-4 py-3 font-semibold">ID</th>
                 <th className="px-4 py-3 font-semibold">Status</th>
-                <th className="px-4 py-3 font-semibold">Agreed Price</th>
-                <th className="px-4 py-3 font-semibold">Qty</th>
+                <th className="px-4 py-3 font-semibold hidden md:table-cell">Price</th>
+                <th className="px-4 py-3 font-semibold hidden sm:table-cell">Qty</th>
                 <th className="px-4 py-3 font-semibold">Total</th>
-                <th className="px-4 py-3 font-semibold">Created</th>
-                <th className="px-4 py-3 font-semibold">Completed</th>
+                <th className="px-4 py-3 font-semibold hidden sm:table-cell">Created</th>
+                <th className="px-4 py-3 font-semibold hidden lg:table-cell">Completed</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-neutral-200">
               {transactions.map((tx) => (
                 <tr key={tx.id} className="hover:bg-neutral-50 transition-colors cursor-pointer group" onClick={() => navigate(`/transactions/${tx.id}`)}>
-                  <td className="px-4 py-3 font-mono text-xs flex items-center gap-2">
-                    #{tx.id}
-                    <ExternalLink size={12} className="text-neutral-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <td className="px-4 py-3 font-mono text-xs whitespace-nowrap">
+                    <span className="flex items-center gap-1.5">
+                      #{tx.id}
+                      <ExternalLink size={12} className="text-neutral-400 opacity-0 group-hover:opacity-100 transition-opacity inline" />
+                    </span>
                   </td>
                   <td className="px-4 py-3">
                     <span className={`badge ${statusBadgeClass(tx.status)}`}>
                       {statusLabel(tx.status)}
                     </span>
                   </td>
-                  <td className="px-4 py-3">{formatCurrency(tx.agreed_price)}</td>
-                  <td className="px-4 py-3">{tx.final_quantity} kg</td>
+                  <td className="px-4 py-3 hidden md:table-cell">{formatCurrency(tx.agreed_price)}</td>
+                  <td className="px-4 py-3 hidden sm:table-cell">{tx.final_quantity} kg</td>
                   <td className="px-4 py-3 font-medium">{formatCurrency(tx.final_price)}</td>
-                  <td className="px-4 py-3 text-neutral-500">{formatDateTime(tx.created_at)}</td>
-                  <td className="px-4 py-3 text-neutral-500">{formatDateTime(tx.completed_at)}</td>
+                  <td className="px-4 py-3 text-neutral-500 hidden sm:table-cell">{formatDateTime(tx.created_at)}</td>
+                  <td className="px-4 py-3 text-neutral-500 hidden lg:table-cell">{formatDateTime(tx.completed_at)}</td>
                 </tr>
               ))}
             </tbody>

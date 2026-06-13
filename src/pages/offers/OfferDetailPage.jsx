@@ -73,7 +73,7 @@ export default function OfferDetailPage() {
             <Tag size={16} />
             Messages
           </h2>
-          <div className="h-[400px]">
+          <div className="min-h-[300px] sm:h-[400px]">
             <Chat offerId={offer.id} />
           </div>
         </div>

@@ -107,7 +107,7 @@ export default function OfferPage() {
               <Tag size={16} />
               Messages
             </h2>
-            <div className="h-[500px]">
+            <div className="min-h-[300px] sm:h-[400px] lg:h-[500px]">
               <Chat offerId={selectedOffer?.id} />
             </div>
           </div>

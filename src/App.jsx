@@ -69,10 +69,14 @@ function AppLayout() {
 
       {/* Main content */}
       <main
-        style={{
-          marginLeft: showSidebar && sidebarOpen ? "240px" : "0",
-          transition: "margin-left 300ms ease",
-        }}
+        className={
+          showSidebar
+            ? sidebarOpen
+              ? "ml-0 lg:ml-60"
+              : "ml-0 lg:ml-18"
+            : "ml-0"
+        }
+        style={{ transition: "margin-left 300ms ease" }}
       >
         <Routes>
           {/* Public */}

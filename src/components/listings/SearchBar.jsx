@@ -26,6 +26,11 @@ const SearchBar = ({ onSearch }) => {
     status: '',
     min_quantity: '',
     max_quantity: '',
+    lat: '',
+    lng: '',
+    radius_km: '',
+    date_from: '',
+    date_to: '',
   });
 
   const handleChange = (e) => {
@@ -47,6 +52,11 @@ const SearchBar = ({ onSearch }) => {
       status: '',
       min_quantity: '',
       max_quantity: '',
+      lat: '',
+      lng: '',
+      radius_km: '',
+      date_from: '',
+      date_to: '',
     });
     onSearch?.({});
   };
@@ -101,6 +111,66 @@ const SearchBar = ({ onSearch }) => {
             name="max_quantity"
             placeholder="e.g. 100"
             value={filters.max_quantity}
+            onChange={handleChange}
+            className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-base"
+          />
+        </div>
+
+        <div className="space-y-1.5">
+          <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Latitude</label>
+          <input
+            type="number"
+            step="any"
+            name="lat"
+            placeholder="e.g. -1.2921"
+            value={filters.lat}
+            onChange={handleChange}
+            className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-base"
+          />
+        </div>
+
+        <div className="space-y-1.5">
+          <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Longitude</label>
+          <input
+            type="number"
+            step="any"
+            name="lng"
+            placeholder="e.g. 36.8219"
+            value={filters.lng}
+            onChange={handleChange}
+            className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-base"
+          />
+        </div>
+
+        <div className="space-y-1.5">
+          <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Radius (km)</label>
+          <input
+            type="number"
+            name="radius_km"
+            placeholder="e.g. 10"
+            value={filters.radius_km}
+            onChange={handleChange}
+            className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-base"
+          />
+        </div>
+
+        <div className="space-y-1.5">
+          <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Date From</label>
+          <input
+            type="date"
+            name="date_from"
+            value={filters.date_from}
+            onChange={handleChange}
+            className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-base"
+          />
+        </div>
+
+        <div className="space-y-1.5">
+          <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Date To</label>
+          <input
+            type="date"
+            name="date_to"
+            value={filters.date_to}
             onChange={handleChange}
             className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 text-base"
           />

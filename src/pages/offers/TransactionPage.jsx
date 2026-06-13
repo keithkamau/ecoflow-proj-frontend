@@ -1,10 +1,12 @@
 import { useState, useEffect, useCallback } from "react";
-import { RefreshCw, ArrowLeftRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { RefreshCw, ArrowLeftRight, ExternalLink } from "lucide-react";
 import { transactionService } from "../../services/transactionService";
 import { PageLoader } from "../../components/common/LoadingSpinner";
 import { formatCurrency, formatDateTime, statusBadgeClass, statusLabel } from "../../utils/formatters";
 
 export default function TransactionPage() {
+  const navigate = useNavigate();
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -66,8 +68,11 @@ export default function TransactionPage() {
             </thead>
             <tbody className="divide-y divide-neutral-200">
               {transactions.map((tx) => (
-                <tr key={tx.id} className="hover:bg-neutral-50 transition-colors">
-                  <td className="px-4 py-3 font-mono text-xs">#{tx.id}</td>
+                <tr key={tx.id} className="hover:bg-neutral-50 transition-colors cursor-pointer group" onClick={() => navigate(`/transactions/${tx.id}`)}>
+                  <td className="px-4 py-3 font-mono text-xs flex items-center gap-2">
+                    #{tx.id}
+                    <ExternalLink size={12} className="text-neutral-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </td>
                   <td className="px-4 py-3">
                     <span className={`badge ${statusBadgeClass(tx.status)}`}>
                       {statusLabel(tx.status)}

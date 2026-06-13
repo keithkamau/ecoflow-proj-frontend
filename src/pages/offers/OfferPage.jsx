@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
-import { Plus, RefreshCw, Tag } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Plus, RefreshCw, Tag, ExternalLink } from "lucide-react";
 import { offerService } from "../../services/offerService";
 import OfferCard from "../../components/offers/OfferCard";
 import OfferForm from "../../components/offers/OfferForm";
@@ -7,6 +8,7 @@ import Chat from "../../components/offers/Chat";
 import { PageLoader } from "../../components/common/LoadingSpinner";
 
 export default function OfferPage() {
+  const navigate = useNavigate();
   const [offers, setOffers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -83,14 +85,18 @@ export default function OfferPage() {
             </div>
           ) : (
             offers.map((offer) => (
-              <OfferCard
-                key={offer.id}
-                offer={offer}
-                isSeller={true}
-                onAccept={handleAccept}
-                onReject={handleReject}
-                onMessage={(o) => setSelectedOffer(selectedOffer?.id === o.id ? null : o)}
-              />
+              <div key={offer.id} className="relative group cursor-pointer" onClick={() => navigate(`/offers/${offer.id}`)}>
+                <OfferCard
+                  offer={offer}
+                  isSeller={true}
+                  onAccept={(e) => { e.stopPropagation(); handleAccept(offer.id); }}
+                  onReject={(e) => { e.stopPropagation(); handleReject(offer.id); }}
+                  onMessage={(o) => { setSelectedOffer(selectedOffer?.id === o.id ? null : o); }}
+                />
+                <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <ExternalLink size={14} className="text-neutral-400" />
+                </div>
+              </div>
             ))
           )}
         </div>

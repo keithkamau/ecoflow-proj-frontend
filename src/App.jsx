@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -12,8 +12,11 @@ import Sidebar from "./components/common/Sidebar";
 import Footer from "./components/common/Footer";
 import { PageLoader } from "./components/common/LoadingSpinner";
 import OfferPage from "./pages/offers/OfferPage";
+import OfferDetailPage from "./pages/offers/OfferDetailPage";
 import TransactionPage from "./pages/offers/TransactionPage";
+import TransactionDetailPage from "./pages/offers/TransactionDetailPage";
 import PaymentPage from "./pages/offers/PaymentPage";
+import { offerService } from "./services/offerService";
 
 // ── Public routes — show footer, hide sidebar ──────────────────
 const PUBLIC_PATHS = [
@@ -34,6 +37,15 @@ function AppLayout() {
   const { user, loading } = useAuth();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [notificationCount, setNotificationCount] = useState(0);
+
+  useEffect(() => {
+    if (!user) return;
+    offerService.getAll().then((data) => {
+      const pending = Array.isArray(data) ? data.filter((o) => o.status === "pending").length : 0;
+      setNotificationCount(pending);
+    }).catch(() => {});
+  }, [user, location.pathname]);
 
   const isPublic = PUBLIC_PATHS.some(
     (p) => location.pathname === p || location.pathname.startsWith(p + "/"),
@@ -49,6 +61,7 @@ function AppLayout() {
       <Navbar
         onMenuToggle={() => setSidebarOpen((v) => !v)}
         sidebarOpen={sidebarOpen}
+        notificationCount={notificationCount}
       />
 
       {/* Left sidebar — authenticated pages only */}
@@ -87,7 +100,9 @@ function AppLayout() {
 
           {/* Member 3 — Offers & Transactions */}
           <Route path='/offers' element={<OfferPage />} />
+          <Route path='/offers/:id' element={<OfferDetailPage />} />
           <Route path='/transactions' element={<TransactionPage />} />
+          <Route path='/transactions/:id' element={<TransactionDetailPage />} />
           <Route path='/payments' element={<PaymentPage />} />
 
           {/* Member 4 — Pickup & Analytics */}

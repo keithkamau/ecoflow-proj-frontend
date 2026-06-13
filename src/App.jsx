@@ -1,6 +1,7 @@
 // src/App.jsx
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ListingProvider } from './context/ListingContexts';
+import EditListingPage from './pages/listings/EditListingPage';
 
 // Pages
 import ListingsPage from './pages/listings/ListingsPage';
@@ -18,7 +19,7 @@ function App() {
             <Route path="/listings" element={<ListingsPage />} />
             <Route path="/listings/new" element={<CreateListingPage />} />
             <Route path="/listings/:id" element={<ListingDetailPage />} />
-            <Route path="/listings/:id/edit" element={<CreateListingPage />} />
+            <Route path="/listings/:id/edit" element={<EditListingPage />} />
             <Route path="/my-listings" element={<MyListingsPage />} />
             <Route path="/inventory" element={<RecyclerInventoryPage />} />
             <Route path="/" element={<ListingsPage />} />

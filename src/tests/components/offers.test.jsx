@@ -163,3 +163,32 @@ describe("PaymentSelector", () => {
     expect(onChange).toHaveBeenCalledWith("card");
   });
 });
+
+// ── Additional formatter coverage ───────────────────────────────
+
+describe("formatters (extra)", () => {
+  it("formats dates", () => {
+    const { formatDate } = require("../../utils/formatters");
+    expect(formatDate(null)).toBe("—");
+    expect(formatDate("2026-06-13T12:00:00Z")).toContain("Jun");
+  });
+
+  it("formats date-time", () => {
+    const { formatDateTime } = require("../../utils/formatters");
+    expect(formatDateTime(null)).toBe("—");
+  });
+
+  it("handles timeAgo edge cases", () => {
+    const { timeAgo } = require("../../utils/formatters");
+    const fiveMinAgo = new Date(Date.now() - 300000).toISOString();
+    expect(timeAgo(fiveMinAgo)).toContain("m ago");
+    const twoHoursAgo = new Date(Date.now() - 7200000).toISOString();
+    expect(timeAgo(twoHoursAgo)).toContain("h ago");
+  });
+
+  it("maps status to badge class", () => {
+    const { statusBadgeClass } = require("../../utils/formatters");
+    expect(statusBadgeClass("completed")).toBe("badge-completed");
+    expect(statusBadgeClass("unknown")).toBe("badge-neutral");
+  });
+});

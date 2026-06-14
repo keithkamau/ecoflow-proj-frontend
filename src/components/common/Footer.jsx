@@ -1,9 +1,5 @@
 import { Link } from "react-router-dom";
 import {
-  Twitter,
-  Linkedin,
-  Instagram,
-  Facebook,
   Mail,
   Phone,
   MapPin,
@@ -49,18 +45,10 @@ const EcoFlowLogoWhite = () => (
 
 // ─── Social Links Config ───────────────────────────────────────
 const SOCIAL_LINKS = [
-  { icon: Twitter, href: "https://twitter.com/ecoflow", label: "Twitter" },
-  {
-    icon: Linkedin,
-    href: "https://linkedin.com/company/ecoflow",
-    label: "LinkedIn",
-  },
-  {
-    icon: Instagram,
-    href: "https://instagram.com/ecoflow",
-    label: "Instagram",
-  },
-  { icon: Facebook, href: "https://facebook.com/ecoflow", label: "Facebook" },
+  { icon: ExternalLink, href: "https://twitter.com/ecoflow", label: "Twitter" },
+  { icon: ExternalLink, href: "https://linkedin.com/company/ecoflow", label: "LinkedIn" },
+  { icon: ExternalLink, href: "https://instagram.com/ecoflow", label: "Instagram" },
+  { icon: ExternalLink, href: "https://facebook.com/ecoflow", label: "Facebook" },
 ];
 
 // ─── Footer Link Columns ───────────────────────────────────────

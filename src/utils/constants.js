@@ -130,6 +130,7 @@ export const NAV_ITEMS = {
     { label: "New Listing", path: "/listings/new", icon: "PlusCircle" },
     { label: "Offers", path: "/offers", icon: "Tag" },
     { label: "Transactions", path: "/transactions", icon: "ArrowLeftRight" },
+    { label: "Nearby", path: "/nearby", icon: "MapPin" },
     { label: "Impact", path: "/analytics/impact", icon: "Leaf" },
   ],
   recycler: [
@@ -138,6 +139,7 @@ export const NAV_ITEMS = {
     { label: "My Offers", path: "/offers", icon: "Tag" },
     { label: "Inventory", path: "/inventory", icon: "Package" },
     { label: "Pickups", path: "/pickups", icon: "Truck" },
+    { label: "Nearby", path: "/nearby", icon: "MapPin" },
     { label: "Analytics", path: "/analytics", icon: "BarChart2" },
   ],
   admin: [
@@ -183,4 +185,4 @@ export const MATERIAL_TYPES = [
 
 // ─── API Base URL ─────────────────────────────────────────────────
 export const API_BASE_URL =
-  process.env.REACT_APP_API_BASE_URL || "http://localhost:8000/api/v1";
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:8000/api/v1";

@@ -1,9 +1,9 @@
 import { Link } from "react-router-dom";
 import {
-  Twitter,
-  Linkedin,
-  Instagram,
-  Facebook,
+  Globe,
+  MessageCircle,
+  Share2,
+  Users,
   Mail,
   Phone,
   MapPin,
@@ -25,10 +25,10 @@ const C = {
 };
 
 const SOCIALS = [
-  { Icon: Twitter, href: "#", label: "Twitter" },
-  { Icon: Linkedin, href: "#", label: "LinkedIn" },
-  { Icon: Instagram, href: "#", label: "Instagram" },
-  { Icon: Facebook, href: "#", label: "Facebook" },
+  { Icon: Globe, href: "#", label: "Twitter" },
+  { Icon: MessageCircle, href: "#", label: "LinkedIn" },
+  { Icon: Share2, href: "#", label: "Instagram" },
+  { Icon: Users, href: "#", label: "Facebook" },
 ];
 
 const COLS = [

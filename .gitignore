@@ -51,3 +51,6 @@ $RECYCLE.BIN/
 *.msm
 *.msp
 *.lnk
+
+.env
+.env.local

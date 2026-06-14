@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 vi.mock('../../services/api', () => ({
-  default: {
+  api: {
     get: vi.fn(),
     post: vi.fn(),
     put: vi.fn(),
@@ -10,7 +10,7 @@ vi.mock('../../services/api', () => ({
 }));
 
 import listingService from '../../services/listingService';
-import api from '../../services/api';
+import { api } from '../../services/api';
 
 beforeEach(() => {
   vi.clearAllMocks();

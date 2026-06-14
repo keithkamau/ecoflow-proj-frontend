@@ -285,7 +285,7 @@ function UserDropdown({ user, onLogout }) {
 }
 
 /* ── Main Navbar ──────────────────────────────────────────────── */
-export default function Navbar({ onMenuToggle, sidebarOpen }) {
+export default function Navbar({ onMenuToggle, sidebarOpen, notificationCount = 0 }) {
   const { user, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
@@ -445,7 +445,7 @@ export default function Navbar({ onMenuToggle, sidebarOpen }) {
                     justifyContent: "center",
                   }}
                 >
-                  3
+                  {notificationCount > 99 ? "99+" : notificationCount}
                 </span>
               </button>
               <UserDropdown user={user} onLogout={handleLogout} />

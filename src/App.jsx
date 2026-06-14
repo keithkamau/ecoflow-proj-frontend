@@ -19,6 +19,12 @@ import PaymentPage from "./pages/offers/PaymentPage";
 import { offerService } from "./services/offerService";
 import { messageService } from "./services/messageService";
 import CreateOfferPage from "./pages/offers/CreateOfferPage";
+import ListingsPage from './pages/listings/ListingsPage';
+import ListingDetailPage from './pages/listings/ListingDetailPage';
+import CreateListingPage from './pages/listings/CreateListingPage';
+import MyListingsPage from './pages/listings/MyListingsPage';
+import RecyclerInventoryPage from './pages/listings/RecyclerInventoryPage';
+import EditListingPage from './pages/listings/EditListingPage';
 
 // ── Public routes — show footer, hide sidebar ──────────────────
 const PUBLIC_PATHS = [
@@ -68,6 +74,7 @@ function AppLayout() {
 
   if (loading) return <PageLoader message='Loading EcoFlow…' />;
 
+function App() {
   return (
     <div className='page-wrapper'>
       {/* Fixed top bar */}
@@ -102,18 +109,13 @@ function AppLayout() {
           <Route path='/settings' element={<Placeholder title='Settings' />} />
 
           {/* Member 2 — Listings */}
-          <Route
-            path='/listings'
-            element={<Placeholder title='My Listings' />}
-          />
-          <Route
-            path='/listings/new'
-            element={<Placeholder title='New Listing' />}
-          />
-          <Route
-            path='/browse'
-            element={<Placeholder title='Browse Waste' />}
-          />
+          <Route path='/listings' element={<ListingsPage />} />
+          <Route path='/listings/new' element={<CreateListingPage />} />
+          <Route path='/listings/:id' element={<ListingDetailPage />} />
+          <Route path='/listings/:id/edit' element={<EditListingPage />} />
+          <Route path='/my-listings' element={<MyListingsPage />} />
+          <Route path='/inventory' element={<RecyclerInventoryPage />} />
+          <Route path='/browse' element={<Placeholder title='Browse Waste' />} />
 
           {/* Member 3 — Offers & Transactions */}
           <Route path='/offers' element={<OfferPage />} />
@@ -124,40 +126,18 @@ function AppLayout() {
           <Route path='/payments' element={<PaymentPage />} />
 
           {/* Member 4 — Pickup & Analytics */}
-          <Route
-            path='/dashboard'
-            element={<Placeholder title='Dashboard' />}
-          />
+          <Route path='/dashboard' element={<Placeholder title='Dashboard' />} />
           <Route path='/pickups' element={<Placeholder title='Pickups' />} />
-          <Route
-            path='/analytics'
-            element={<Placeholder title='Analytics' />}
-          />
-          <Route
-            path='/analytics/impact'
-            element={<Placeholder title='My Impact' />}
-          />
-          <Route
-            path='/inventory'
-            element={<Placeholder title='Inventory' />}
-          />
+          <Route path='/analytics' element={<Placeholder title='Analytics' />} />
+          <Route path='/analytics/impact' element={<Placeholder title='My Impact' />} />
 
           {/* Admin */}
-          <Route
-            path='/admin'
-            element={<Placeholder title='Admin Overview' />}
-          />
+          <Route path='/admin' element={<Placeholder title='Admin Overview' />} />
           <Route path='/admin/users' element={<Placeholder title='Users' />} />
-          <Route
-            path='/admin/listings'
-            element={<Placeholder title='All Listings' />}
-          />
+          <Route path='/admin/listings' element={<Placeholder title='All Listings' />} />
 
           {/* 404 */}
-          <Route
-            path='*'
-            element={<Placeholder title='404 — Page not found' />}
-          />
+          <Route path='*' element={<Placeholder title='404 — Page not found' />} />
         </Routes>
       </main>
 
@@ -167,32 +147,4 @@ function AppLayout() {
   );
 }
 
-// ── Temporary placeholder page ────────────────────────────────
-function Placeholder({ title }) {
-  return (
-    <div className='page-content animate-fade-in'>
-      <div
-        className='card card-accent'
-        style={{ maxWidth: 480, marginTop: 24 }}
-      >
-        <h1 style={{ fontSize: "1.5rem", fontWeight: 700, marginBottom: 8 }}>
-          {title}
-        </h1>
-        <p style={{ color: "var(--color-neutral-500)", fontSize: "0.875rem" }}>
-          This page is reserved. The assigned team member will implement it.
-        </p>
-      </div>
-    </div>
-  );
-}
-
-// ── Root: wrap with Router + AuthProvider ─────────────────────
-export default function App() {
-  return (
-    <Router>
-      <AuthProvider>
-        <AppLayout />
-      </AuthProvider>
-    </Router>
-  );
-}
+export default App;

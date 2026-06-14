@@ -1,14 +1,16 @@
+// src/pages/listings/EditListingPage.jsx
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useListingContext } from '../../context/ListingContexts';
 import LocationPicker from '../../components/listings/LocationPicker';
 import UnitSelector from '../../components/listings/UnitSelector';
 import PhotoUploadComponent from '../../components/listings/PhotoUploadComponent';
 import listingService from '../../services/listingService';
 
-const CreateListingPage = () => {
+const EditListingPage = () => {
+  const { id } = useParams();
   const navigate = useNavigate();
-  const { materials, loading, error, fetchMaterials, createListing } = useListingContext();
+  const { materials, loading, error, fetchMaterials, updateListing } = useListingContext();
 
   const [formData, setFormData] = useState({
     material_id: '',
@@ -25,7 +27,32 @@ const CreateListingPage = () => {
 
   useEffect(() => {
     fetchMaterials();
-  }, [fetchMaterials]);
+    const loadListing = async () => {
+      try {
+        const response = await listingService.getListing(id);
+        const listing = response.data;
+        setFormData({
+          material_id: listing.material_id.toString(),
+          quantity: listing.quantity.toString(),
+          condition: listing.condition || '',
+          location_address: listing.location_address || '',
+          price_expectation: listing.price_expectation?.toString() || '',
+        });
+        setUnit(listing.unit || '');
+        if (listing.location_lat && listing.location_lng) {
+          setLocation({
+            lat: listing.location_lat,
+            lng: listing.location_lng,
+            address: listing.location_address,
+          });
+        }
+        setPhotos(listing.photos?.map(p => ({ ...p, isNew: false })) || []);
+      } catch (err) {
+        setSubmitError('Failed to load listing');
+      }
+    };
+    loadListing();
+  }, [id, fetchMaterials]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -50,16 +77,16 @@ const CreateListingPage = () => {
         price_expectation: formData.price_expectation ? parseFloat(formData.price_expectation) : null,
       };
 
-      const newListing = await createListing(data);
+      await updateListing(id, data);
 
       const newPhotos = photos.filter(p => p.isNew);
       for (const photo of newPhotos) {
-        await listingService.uploadListingPhoto(newListing.id, photo.file);
+        await listingService.uploadListingPhoto(id, photo.file);
       }
 
-      navigate('/listings');
+      navigate(`/listings/${id}`);
     } catch (err) {
-      setSubmitError(err.response?.data?.detail || 'Failed to create listing');
+      setSubmitError(err.response?.data?.detail || 'Failed to update listing');
     }
   };
 
@@ -69,13 +96,13 @@ const CreateListingPage = () => {
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-2xl mx-auto px-4 py-6">
         <button
-          onClick={() => navigate('/listings')}
+          onClick={() => navigate(`/listings/${id}`)}
           className="text-emerald-500 hover:text-emerald-600 text-sm font-medium mb-4"
         >
-          ← Back to listings
+          Back to listing
         </button>
 
-        <h1 className="text-2xl font-bold text-gray-900 mb-6">Create New Listing</h1>
+        <h1 className="text-2xl font-bold text-gray-900 mb-6">Edit Listing</h1>
 
         {(error || submitError) && (
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4 text-sm">
@@ -84,7 +111,6 @@ const CreateListingPage = () => {
         )}
 
         <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-sm p-6 space-y-5">
-          {/* Material Type */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Material Type</label>
             <select
@@ -103,7 +129,6 @@ const CreateListingPage = () => {
             </select>
           </div>
 
-          {/* Quantity */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Quantity</label>
             <input
@@ -114,19 +139,16 @@ const CreateListingPage = () => {
               required
               min="0.1"
               step="0.1"
-              placeholder="e.g. 50"
               className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
             />
           </div>
 
-          {/* Unit Selector */}
           <UnitSelector
             value={unit}
             onChange={setUnit}
             materialUnit={selectedMaterial?.unit}
           />
 
-          {/* Condition */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Condition</label>
             <textarea
@@ -134,35 +156,26 @@ const CreateListingPage = () => {
               value={formData.condition}
               onChange={handleChange}
               rows="3"
-              placeholder="Describe the condition of your recyclables..."
               className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 resize-none"
             />
           </div>
 
-          {/* Location Picker */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Pickup Location
-            </label>
-            <LocationPicker onLocationSelect={setLocation} />
+            <label className="block text-sm font-medium text-gray-700 mb-2">Pickup Location</label>
+            <LocationPicker onLocationSelect={setLocation} initialLocation={location} />
           </div>
 
-          {/* Fallback address input */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Location Address (manual fallback)
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Location Address (manual)</label>
             <input
               type="text"
               name="location_address"
               value={formData.location_address}
               onChange={handleChange}
-              placeholder="e.g. Nairobi, Kenya"
               className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
             />
           </div>
 
-          {/* Price */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Expected Price (KES)</label>
             <input
@@ -172,26 +185,23 @@ const CreateListingPage = () => {
               onChange={handleChange}
               min="0"
               step="1"
-              placeholder="Optional"
               className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
             />
           </div>
 
-          {/* Photos */}
           <PhotoUploadComponent photos={photos} onPhotosChange={setPhotos} />
 
-          {/* Submit */}
           <div className="flex gap-3 pt-4">
             <button
               type="submit"
               disabled={loading}
               className="flex-1 bg-emerald-500 hover:bg-emerald-600 disabled:bg-emerald-300 text-white py-2.5 rounded-lg text-sm font-medium transition-colors"
             >
-              {loading ? 'Creating...' : 'Create Listing'}
+              {loading ? 'Updating...' : 'Update Listing'}
             </button>
             <button
               type="button"
-              onClick={() => navigate('/listings')}
+              onClick={() => navigate(`/listings/${id}`)}
               className="px-6 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50 transition-colors"
             >
               Cancel
@@ -203,4 +213,4 @@ const CreateListingPage = () => {
   );
 };
 
-export default CreateListingPage;
+export default EditListingPage;

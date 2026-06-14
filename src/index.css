@@ -1,1 +1,84 @@
 @import "tailwindcss";
+
+/* ─── EcoFlow Design Token Theme ───────────────────────────────
+   Defines every custom token used in globals.css @apply calls
+   and throughout all components.
+────────────────────────────────────────────────────────────── */
+@theme {
+  /* ── Brand colors ───────────────────────────────── */
+  --color-primary:        #10B981;
+  --color-primary-light:  #D1FAE5;
+  --color-primary-dark:   #059669;
+  --color-primary-darker: #047857;
+
+  --color-secondary:        #F97316;
+  --color-secondary-light:  #FED7AA;
+  --color-secondary-dark:   #EA580C;
+  --color-secondary-darker: #C2410C;
+
+  /* ── Semantic colors ────────────────────────────── */
+  --color-success:       #10B981;
+  --color-success-light: #D1FAE5;
+  --color-success-dark:  #047857;
+
+  --color-warning:       #F97316;
+  --color-warning-light: #FED7AA;
+  --color-warning-dark:  #92400E;
+
+  --color-error:         #EF4444;
+  --color-error-light:   #FEE2E2;
+  --color-error-dark:    #DC2626;
+
+  --color-info:          #3B82F6;
+  --color-info-light:    #DBEAFE;
+  --color-info-dark:     #2563EB;
+
+  /* ── Typography ──────────────────────────────────── */
+  --font-family-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+  --font-size-h1: 2rem;
+  --font-size-h2: 1.75rem;
+  --font-size-h3: 1.5rem;
+  --font-size-h4: 1.25rem;
+  --font-size-h5: 1.125rem;
+  --font-size-h6: 1rem;
+  --font-size-body-lg: 1rem;
+  --font-size-body:    0.875rem;
+  --font-size-body-sm: 0.75rem;
+  --font-size-caption: 0.6875rem;
+
+  /* ── Custom shadows ───────────────────────────────── */
+  --shadow-card-hover: 0 4px 6px rgba(0,0,0,0.15);
+  --shadow-green-sm:   0 2px 8px rgba(16,185,129,0.20);
+  --shadow-green-md:   0 4px 14px rgba(16,185,129,0.25);
+  --shadow-orange-sm:  0 2px 8px rgba(249,115,22,0.20);
+
+  /* ── Custom animations ────────────────────────────── */
+  --animate-fade-in:      fade-in 0.3s ease-out;
+  --animate-slide-down:   slide-down 0.3s ease-out;
+  --animate-slide-in-left: slide-in-left 0.35s ease-out;
+  --animate-pulse-green:  pulse-green 1.8s ease-in-out infinite;
+  --animate-spin-smooth:  spin-smooth 0.9s linear infinite;
+}
+
+/* ─── Keyframes ─────────────────────────────────────────────── */
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes slide-down {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes slide-in-left {
+  from { opacity: 0; transform: translateX(-20px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes pulse-green {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(16,185,129,0.4); }
+  50%       { box-shadow: 0 0 0 8px rgba(16,185,129,0); }
+}
+@keyframes spin-smooth {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}

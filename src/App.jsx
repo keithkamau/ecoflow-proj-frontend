@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, lazy, Suspense, useEffect, useRef } from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -25,8 +25,15 @@ import CreateListingPage from './pages/listings/CreateListingPage';
 import MyListingsPage from './pages/listings/MyListingsPage';
 import RecyclerInventoryPage from './pages/listings/RecyclerInventoryPage';
 import EditListingPage from './pages/listings/EditListingPage';
+import "./styles/globals.css";
 
-// ── Public routes — show footer, hide sidebar ──────────────────
+const PickupPage             = lazy(() => import("./pages/pickup/PickupPage"));
+const TrackingPage           = lazy(() => import("./pages/pickup/TrackingPage"));
+const AnalyticsPage          = lazy(() => import("./pages/analytics/AnalyticsPage"));
+const EnvironmentalImpactPage = lazy(() => import("./pages/analytics/EnvironmentalImpactPage"));
+const DashboardPage          = lazy(() => import("./pages/DashboardPage"));
+const NearbyPage             = lazy(() => import("./pages/nearby/NearbyPage"));
+
 const PUBLIC_PATHS = [
   "/",
   "/login",
@@ -40,7 +47,17 @@ const PUBLIC_PATHS = [
   "/terms",
 ];
 
-// ── Inner layout (needs AuthContext) ──────────────────────────
+const Placeholder = ({ title }) => (
+  <div className='page-content animate-fade-in'>
+    <div className='card-accent mt-6 max-w-lg'>
+      <h1 className='text-h3 mb-2'>{title}</h1>
+      <p className='text-body text-neutral-500'>
+        This page is reserved. The assigned team member will implement it.
+      </p>
+    </div>
+  </div>
+);
+
 function AppLayout() {
   const { user, loading } = useAuth();
   const location = useLocation();
@@ -76,17 +93,12 @@ function AppLayout() {
 
   return (
     <div className='page-wrapper'>
-      {/* Fixed top bar */}
       <Navbar
         onMenuToggle={() => setSidebarOpen((v) => !v)}
         sidebarOpen={sidebarOpen}
         notificationCount={notificationCount}
       />
-
-      {/* Left sidebar — authenticated pages only */}
       {showSidebar && <Sidebar open={sidebarOpen} />}
-
-      {/* Main content */}
       <main
         className={
           showSidebar
@@ -97,50 +109,52 @@ function AppLayout() {
         }
         style={{ transition: "margin-left 300ms ease" }}
       >
-        <Routes>
-          {/* Public */}
-          <Route path='/' element={<Placeholder title='Home' />} />
-          <Route path='/login' element={<Placeholder title='Login' />} />
-          <Route path='/register' element={<Placeholder title='Register' />} />
+        <Suspense fallback={<PageLoader message='Loading…' />}>
+          <Routes>
+            {/* Public */}
+            <Route path='/' element={<Placeholder title='Home' />} />
+            <Route path='/login' element={<Placeholder title='Login' />} />
+            <Route path='/register' element={<Placeholder title='Register' />} />
 
-          {/* Member 1 — Auth & Profile */}
-          <Route path='/profile' element={<Placeholder title='Profile' />} />
-          <Route path='/settings' element={<Placeholder title='Settings' />} />
+            {/* Member 1 — Auth & Profile */}
+            <Route path='/profile' element={<Placeholder title='Profile' />} />
+            <Route path='/settings' element={<Placeholder title='Settings' />} />
 
-          {/* Member 2 — Listings */}
-          <Route path='/listings' element={<ListingsPage />} />
-          <Route path='/listings/new' element={<CreateListingPage />} />
-          <Route path='/listings/:id' element={<ListingDetailPage />} />
-          <Route path='/listings/:id/edit' element={<EditListingPage />} />
-          <Route path='/my-listings' element={<MyListingsPage />} />
-          <Route path='/inventory' element={<RecyclerInventoryPage />} />
-          <Route path='/browse' element={<Placeholder title='Browse Waste' />} />
+            {/* Member 2 — Listings */}
+            <Route path='/listings' element={<ListingsPage />} />
+            <Route path='/listings/new' element={<CreateListingPage />} />
+            <Route path='/listings/:id' element={<ListingDetailPage />} />
+            <Route path='/listings/:id/edit' element={<EditListingPage />} />
+            <Route path='/my-listings' element={<MyListingsPage />} />
+            <Route path='/inventory' element={<RecyclerInventoryPage />} />
+            <Route path='/browse' element={<Placeholder title='Browse Waste' />} />
 
-          {/* Member 3 — Offers & Transactions */}
-          <Route path='/offers' element={<OfferPage />} />
-          <Route path='/offers/new' element={<CreateOfferPage />} />
-          <Route path='/offers/:id' element={<OfferDetailPage />} />
-          <Route path='/transactions' element={<TransactionPage />} />
-          <Route path='/transactions/:id' element={<TransactionDetailPage />} />
-          <Route path='/payments' element={<PaymentPage />} />
+            {/* Member 3 — Offers & Transactions */}
+            <Route path='/offers' element={<OfferPage />} />
+            <Route path='/offers/new' element={<CreateOfferPage />} />
+            <Route path='/offers/:id' element={<OfferDetailPage />} />
+            <Route path='/transactions' element={<TransactionPage />} />
+            <Route path='/transactions/:id' element={<TransactionDetailPage />} />
+            <Route path='/payments' element={<PaymentPage />} />
 
-          {/* Member 4 — Pickup & Analytics */}
-          <Route path='/dashboard' element={<Placeholder title='Dashboard' />} />
-          <Route path='/pickups' element={<Placeholder title='Pickups' />} />
-          <Route path='/analytics' element={<Placeholder title='Analytics' />} />
-          <Route path='/analytics/impact' element={<Placeholder title='My Impact' />} />
+            {/* Member 4 — Pickup & Analytics */}
+            <Route path='/dashboard'        element={<DashboardPage />} />
+            <Route path='/pickups'          element={<PickupPage />} />
+            <Route path='/pickups/:id'      element={<TrackingPage />} />
+            <Route path='/analytics'        element={<AnalyticsPage />} />
+            <Route path='/analytics/impact' element={<EnvironmentalImpactPage />} />
+            <Route path='/nearby'           element={<NearbyPage />} />
 
-          {/* Admin */}
-          <Route path='/admin' element={<Placeholder title='Admin Overview' />} />
-          <Route path='/admin/users' element={<Placeholder title='Users' />} />
-          <Route path='/admin/listings' element={<Placeholder title='All Listings' />} />
+            {/* Admin */}
+            <Route path='/admin' element={<Placeholder title='Admin Overview' />} />
+            <Route path='/admin/users' element={<Placeholder title='Users' />} />
+            <Route path='/admin/listings' element={<Placeholder title='All Listings' />} />
 
-          {/* 404 */}
-          <Route path='*' element={<Placeholder title='404 — Page not found' />} />
-        </Routes>
+            {/* 404 */}
+            <Route path='*' element={<Placeholder title='404 — Page not found' />} />
+          </Routes>
+        </Suspense>
       </main>
-
-      {/* Footer — public pages only */}
       {showFooter && <Footer />}
     </div>
   );

@@ -45,14 +45,6 @@
   --color-info-light:    #DBEAFE;
   --color-info-dark:     #2563EB;
 
-  /* ── Spacing (8px grid) ───────────────────────────────────── */
-  --spacing-xs:  0.5rem;    /*  8px */
-  --spacing-sm:  1rem;      /* 16px */
-  --spacing-md:  1.5rem;    /* 24px */
-  --spacing-lg:  2rem;      /* 32px */
-  --spacing-xl:  3rem;      /* 48px */
-  --spacing-2xl: 4rem;      /* 64px */
-
   /* ── Border Radius ────────────────────────────────────────── */
   --radius-sm:   4px;
   --radius-md:   8px;
@@ -179,6 +171,7 @@ input, textarea, select { font-family: inherit; font-size: inherit; }
 }
 .btn:disabled { cursor: not-allowed; }
 
+.btn-xs { height: 26px; padding: 0 0.5rem; font-size: 0.7rem; border-radius: var(--radius-sm); }
 .btn-sm { height: var(--height-btn-sm); padding: 0 0.75rem; font-size: 0.75rem; border-radius: var(--radius-sm); }
 .btn-lg { height: var(--height-btn-lg); padding: 0 1.5rem;  font-size: 1rem;    border-radius: var(--radius-lg); }
 
@@ -252,6 +245,7 @@ input, textarea, select { font-family: inherit; font-size: inherit; }
 .input::placeholder { color: var(--color-neutral-400); }
 .input:focus        { outline: none; border-color: var(--color-primary); box-shadow: var(--shadow-focus-green); }
 .input:disabled     { background: var(--color-neutral-100); color: var(--color-neutral-400); cursor: not-allowed; }
+.input-sm { height: 32px; font-size: 0.8rem; }
 .input-error        { border-color: var(--color-error); }
 .input-error:focus  { box-shadow: 0 0 0 3px rgba(239,68,68,0.20); }
 

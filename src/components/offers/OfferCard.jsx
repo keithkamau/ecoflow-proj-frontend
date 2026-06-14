@@ -40,15 +40,15 @@ export default function OfferCard({ offer, onAccept, onReject, onMessage, isSell
           <div className="flex items-center gap-2 flex-wrap">
             {isSeller && offer.status === "pending" && (
               <>
-                <button className="btn btn-primary btn-sm" onClick={() => onAccept?.(offer.id)}>
+                <button className="btn btn-primary btn-sm" onClick={(e) => { e.stopPropagation(); onAccept?.(offer.id); }}>
                   Accept
                 </button>
-                <button className="btn btn-danger btn-sm" onClick={() => onReject?.(offer.id)}>
+                <button className="btn btn-danger btn-sm" onClick={(e) => { e.stopPropagation(); onReject?.(offer.id); }}>
                   Reject
                 </button>
               </>
             )}
-            <button className="btn btn-ghost btn-sm" onClick={() => onMessage?.(offer)}>
+            <button className="btn btn-ghost btn-sm" onClick={(e) => { e.stopPropagation(); onMessage?.(offer); }}>
               <Tag size={14} />
               Message
             </button>

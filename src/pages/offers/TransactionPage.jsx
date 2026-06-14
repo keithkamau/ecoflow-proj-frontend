@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { RefreshCw, ArrowLeftRight, ExternalLink, Filter, ArrowUpDown } from "lucide-react";
+import { RefreshCw, ArrowLeftRight, ExternalLink, Lock, Filter, ArrowUpDown } from "lucide-react";
 import { transactionService } from "../../services/transactionService";
 import { PageLoader } from "../../components/common/LoadingSpinner";
 import { formatCurrency, formatDateTime, statusBadgeClass, statusLabel } from "../../utils/formatters";
@@ -46,10 +46,10 @@ export default function TransactionPage() {
 
   return (
     <div className="page-content">
-      <div className="section-header">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
         <div>
           <h1 className="text-xl font-bold text-neutral-900">Transactions</h1>
-          <p className="text-sm text-neutral-500 mt-1">
+          <p className="text-sm text-neutral-500 mt-0.5">
             {transactions.filter((t) => t.status === "completed").length} completed &middot;{" "}
             {transactions.length} total
           </p>
@@ -110,12 +110,14 @@ export default function TransactionPage() {
                     No transactions match the selected filter
                   </td>
                 </tr>
-              ) : filtered.map((tx) => (
-                <tr key={tx.id} className="hover:bg-neutral-50 transition-colors cursor-pointer group" onClick={() => navigate(`/transactions/${tx.id}`)}>
+              ) : filtered.map((tx) => {
+                const isLocked = tx.status === "completed" || tx.status === "cancelled" || tx.status === "disputed";
+                return (
+                <tr key={tx.id} className={`transition-colors ${isLocked ? "opacity-50 cursor-not-allowed" : "hover:bg-neutral-50 cursor-pointer group"}`} onClick={() => !isLocked && navigate(`/transactions/${tx.id}`)}>
                   <td className="px-4 py-3 font-mono text-xs whitespace-nowrap">
                     <span className="flex items-center gap-1.5">
+                      {isLocked ? <Lock size={12} className="text-neutral-400" /> : <ExternalLink size={12} className="text-neutral-400 opacity-0 group-hover:opacity-100 transition-opacity inline" />}
                       #{tx.id}
-                      <ExternalLink size={12} className="text-neutral-400 opacity-0 group-hover:opacity-100 transition-opacity inline" />
                     </span>
                   </td>
                   <td className="px-4 py-3">
@@ -129,7 +131,8 @@ export default function TransactionPage() {
                   <td className="px-4 py-3 text-neutral-500 hidden sm:table-cell">{formatDateTime(tx.created_at)}</td>
                   <td className="px-4 py-3 text-neutral-500 hidden lg:table-cell">{formatDateTime(tx.completed_at)}</td>
                 </tr>
-              ))}
+                );
+              })}
             </tbody>
           </table>
         </div>

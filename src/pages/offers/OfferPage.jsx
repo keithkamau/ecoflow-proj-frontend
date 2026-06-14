@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Plus, RefreshCw, Tag, ExternalLink, Filter, ArrowUpDown } from "lucide-react";
 import { offerService } from "../../services/offerService";
+import { transactionService } from "../../services/transactionService";
 import OfferCard from "../../components/offers/OfferCard";
 import OfferForm from "../../components/offers/OfferForm";
 import Chat from "../../components/offers/Chat";
@@ -39,9 +40,19 @@ export default function OfferPage() {
     fetchOffers();
   }
 
-  async function handleAccept(id) {
-    await offerService.update(id, { status: "accepted" });
-    fetchOffers();
+  async function handleAccept(offer) {
+    const id = typeof offer === "object" ? offer.id : offer;
+    const updated = await offerService.update(id, { status: "accepted" });
+    await transactionService.create({
+      offer_id: updated.id,
+      listing_id: updated.listing_id,
+      seller_id: 1,
+      recycler_id: updated.recycler_id,
+      agreed_price: updated.offered_price,
+      final_quantity: updated.quantity,
+      final_price: updated.offered_price * updated.quantity,
+    });
+    navigate("/transactions");
   }
 
   async function handleReject(id) {
@@ -68,10 +79,10 @@ export default function OfferPage() {
 
   return (
     <div className="page-content">
-      <div className="section-header">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
         <div>
           <h1 className="text-xl font-bold text-neutral-900">Offers</h1>
-          <p className="text-sm text-neutral-500 mt-1">
+          <p className="text-sm text-neutral-500 mt-0.5">
             {pendingCount} pending &middot; {offers.length} total
           </p>
         </div>
@@ -127,8 +138,8 @@ export default function OfferPage() {
                 <OfferCard
                   offer={offer}
                   isSeller={true}
-                  onAccept={(e) => { e.stopPropagation(); handleAccept(offer.id); }}
-                  onReject={(e) => { e.stopPropagation(); handleReject(offer.id); }}
+                  onAccept={handleAccept}
+                  onReject={handleReject}
                   onMessage={(o) => { setSelectedOffer(selectedOffer?.id === o.id ? null : o); }}
                 />
                 <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">

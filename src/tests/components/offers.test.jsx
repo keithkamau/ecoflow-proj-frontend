@@ -119,7 +119,7 @@ describe("OfferCard", () => {
 describe("OfferForm", () => {
   it("renders form fields", () => {
     render(<OfferForm onSubmit={vi.fn()} onClose={vi.fn()} />);
-    expect(screen.getByPlaceholderText(/e.g. 15.00/)).toBeInTheDocument();
+    expect(screen.getByPlaceholderText(/0.00/)).toBeInTheDocument();
     expect(screen.getByText("Submit Offer")).toBeInTheDocument();
   });
 
@@ -132,8 +132,8 @@ describe("OfferForm", () => {
   it("calls onSubmit with form data", async () => {
     const onSubmit = vi.fn();
     render(<OfferForm listingId={1} onSubmit={onSubmit} onClose={vi.fn()} />);
-    await userEvent.type(screen.getByPlaceholderText(/e.g. 15.00/), "20");
-    await userEvent.type(screen.getByPlaceholderText(/e.g. 50/), "100");
+    await userEvent.type(screen.getByPlaceholderText(/0.00/), "20");
+    await userEvent.type(screen.getByPlaceholderText("0"), "100");
     await userEvent.click(screen.getByText("Submit Offer"));
     expect(onSubmit).toHaveBeenCalledWith({
       listing_id: 1,

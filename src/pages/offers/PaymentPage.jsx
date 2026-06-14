@@ -5,12 +5,52 @@ import { paymentService } from "../../services/paymentService";
 import PaymentSelector from "../../components/offers/PaymentSelector";
 import { formatCurrency } from "../../utils/formatters";
 
+function WaitingScreen({ payment, phone, onSuccess, onError, onCancel }) {
+  return (
+    <div className="page-content max-w-md mx-auto">
+      <div className="card text-center py-12 animate-fade-in">
+        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-warning-light mb-4">
+          <Smartphone size={32} className="text-warning" />
+        </div>
+        <h1 className="text-xl font-bold text-neutral-900 mb-2">Check Your Phone</h1>
+        <p className="text-sm text-neutral-500 mb-2">
+          M-Pesa PIN prompt sent to <strong>{phone}</strong>
+        </p>
+        <p className="text-xs text-neutral-400 mb-4">
+          Enter your M-Pesa PIN to complete the payment
+        </p>
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-6 text-xs text-blue-700 text-left">
+          <strong>Sandbox Notice:</strong> The live M-Pesa prompt requires a public server with a real domain.
+          In this demo, click <strong>"I've Paid"</strong> after checking your M-Pesa to confirm.
+        </div>
+
+        <div className="flex gap-3">
+          <button className="btn btn-primary flex-1" onClick={async () => {
+            try {
+              const receipt = `MANUAL-${Date.now()}`;
+              const confirmed = await paymentService.confirm(payment.id, receipt);
+              onSuccess(confirmed);
+            } catch {
+              onError("Failed to confirm payment. Try again.");
+            }
+          }}>
+            I've Paid
+          </button>
+          <button className="btn btn-tertiary flex-1" onClick={onCancel}>
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function PaymentPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [step, setStep] = useState(searchParams.get("success") ? "success" : "select");
-  const [transactionId, setTransactionId] = useState("");
-  const [amount, setAmount] = useState("");
+  const [transactionId, setTransactionId] = useState(searchParams.get("transaction_id") || "");
+  const [amount, setAmount] = useState(searchParams.get("amount") || "");
   const [method, setMethod] = useState("mpesa");
   const [phone, setPhone] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -77,30 +117,13 @@ export default function PaymentPage() {
   }
 
   if (step === "waiting") {
-    return (
-      <div className="page-content max-w-md mx-auto">
-        <div className="card text-center py-12 animate-fade-in">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-warning-light mb-4">
-            <Smartphone size={32} className="text-warning" />
-          </div>
-          <h1 className="text-xl font-bold text-neutral-900 mb-2">Check Your Phone</h1>
-          <p className="text-sm text-neutral-500 mb-2">
-            M-Pesa PIN prompt sent to <strong>{phone}</strong>
-          </p>
-          <p className="text-xs text-neutral-400 mb-6">
-            Enter your M-Pesa PIN to complete the payment
-          </p>
-          <div className="flex gap-3">
-            <button className="btn btn-primary flex-1" onClick={() => { setStep("success"); setPayment({ ...payment, status: "success" }); }}>
-              I've Paid
-            </button>
-            <button className="btn btn-tertiary flex-1" onClick={() => setStep("select")}>
-              Cancel
-            </button>
-          </div>
-        </div>
-      </div>
-    );
+    return <WaitingScreen
+      payment={payment}
+      phone={phone}
+      onSuccess={(p) => { setPayment(p); setStep("success"); }}
+      onError={setError}
+      onCancel={() => setStep("select")}
+    />;
   }
 
   return (
@@ -127,6 +150,7 @@ export default function PaymentPage() {
               onChange={(e) => setTransactionId(e.target.value)}
               className="input"
               placeholder="e.g. 1"
+              readOnly={!!searchParams.get("transaction_id")}
             />
           </div>
 
@@ -139,6 +163,7 @@ export default function PaymentPage() {
               onChange={(e) => setAmount(e.target.value)}
               className="input"
               placeholder="e.g. 750.00"
+              readOnly={!!searchParams.get("amount")}
             />
           </div>
 

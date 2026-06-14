@@ -1,15 +1,17 @@
 import { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, ArrowLeftRight } from "lucide-react";
+import { ArrowLeft, ArrowLeftRight, CreditCard, CheckCircle, Lock } from "lucide-react";
 import { transactionService } from "../../services/transactionService";
+import { paymentService } from "../../services/paymentService";
 import TransactionTimeline from "../../components/offers/TransactionTimeline";
 import { PageLoader } from "../../components/common/LoadingSpinner";
-import { formatCurrency, formatDateTime } from "../../utils/formatters";
+import { formatCurrency, formatDateTime, statusLabel } from "../../utils/formatters";
 
 export default function TransactionDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [tx, setTx] = useState(null);
+  const [payment, setPayment] = useState(null);
   const [loading, setLoading] = useState(true);
 
   const fetch = useCallback(async () => {
@@ -17,6 +19,12 @@ export default function TransactionDetailPage() {
     try {
       const data = await transactionService.getById(id);
       setTx(data);
+      try {
+        const p = await paymentService.getByTransaction(id);
+        setPayment(p);
+      } catch {
+        setPayment(null);
+      }
     } catch {
       setTx(null);
     } finally {
@@ -76,6 +84,28 @@ export default function TransactionDetailPage() {
                 <span className="text-neutral-500">Completed</span>
                 <p className="font-semibold">{tx.completed_at ? formatDateTime(tx.completed_at) : "—"}</p>
               </div>
+            </div>
+
+            <div className="mt-4 pt-4 border-t border-neutral-200">
+              {tx.status === "completed" || tx.status === "cancelled" || tx.status === "disputed" ? (
+                <div className="flex items-center gap-2 text-neutral-500 bg-neutral-100 rounded-lg p-3 text-sm font-medium">
+                  <Lock size={16} />
+                  Transaction {statusLabel(tx.status)} — Locked
+                </div>
+              ) : payment && payment.status === "success" ? (
+                <div className="flex items-center gap-2 text-success-dark bg-success-light rounded-lg p-3 text-sm font-medium">
+                  <CheckCircle size={18} />
+                  Paid — Ref: {payment.mpesa_receipt || payment.reference || payment.id}
+                </div>
+              ) : (
+                <button
+                  className="btn btn-primary w-full"
+                  onClick={() => navigate(`/payments?transaction_id=${tx.id}&amount=${tx.final_price}`)}
+                >
+                  <CreditCard size={16} />
+                  Pay Now
+                </button>
+              )}
             </div>
           </div>
         </div>

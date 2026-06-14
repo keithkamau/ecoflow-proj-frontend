@@ -4,12 +4,29 @@ function getToken() {
   return localStorage.getItem("access_token");
 }
 
-async function request(endpoint, options = {}) {
-  const headers = { "Content-Type": "application/json", ...options.headers };
+function buildQuery(params) {
+  if (!params) return "";
+  const qs = new URLSearchParams();
+  for (const [k, v] of Object.entries(params)) {
+    if (v !== undefined && v !== null) qs.append(k, v);
+  }
+  const str = qs.toString();
+  return str ? `?${str}` : "";
+}
+
+async function request(url, options = {}) {
+  const headers = {};
   const token = getToken();
   if (token) headers["Authorization"] = `Bearer ${token}`;
 
-  const res = await fetch(`${API_BASE}${endpoint}`, { ...options, headers });
+  if (options.body && !(options.body instanceof FormData)) {
+    headers["Content-Type"] = "application/json";
+  }
+
+  Object.assign(headers, options.headers);
+
+  const query = buildQuery(options.params);
+  const res = await fetch(`${API_BASE}${url}${query}`, { ...options, headers });
 
   if (res.status === 204) return null;
   if (!res.ok) {
@@ -20,8 +37,11 @@ async function request(endpoint, options = {}) {
 }
 
 export const api = {
-  get: (url) => request(url),
-  post: (url, data) => request(url, { method: "POST", body: JSON.stringify(data) }),
-  put: (url, data) => request(url, { method: "PUT", body: JSON.stringify(data) }),
-  delete: (url) => request(url, { method: "DELETE" }),
+  get: (url, config) => request(url, { method: "GET", ...config }),
+  post: (url, data, config) => {
+    const body = data instanceof FormData ? data : JSON.stringify(data);
+    return request(url, { method: "POST", body, ...config });
+  },
+  put: (url, data, config) => request(url, { method: "PUT", body: JSON.stringify(data), ...config }),
+  delete: (url, config) => request(url, { method: "DELETE", ...config }),
 };

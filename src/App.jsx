@@ -74,7 +74,6 @@ function AppLayout() {
 
   if (loading) return <PageLoader message='Loading EcoFlow…' />;
 
-function App() {
   return (
     <div className='page-wrapper'>
       {/* Fixed top bar */}
@@ -144,6 +143,16 @@ function App() {
       {/* Footer — public pages only */}
       {showFooter && <Footer />}
     </div>
+  );
+}
+
+function App() {
+  return (
+    <AuthProvider>
+      <Router>
+        <AppLayout />
+      </Router>
+    </AuthProvider>
   );
 }
 

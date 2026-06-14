@@ -1,249 +1,384 @@
 import { Link } from "react-router-dom";
 import {
+  Globe,
+  MessageCircle,
+  Share2,
+  Users,
   Mail,
   Phone,
   MapPin,
   Leaf,
-  ExternalLink,
 } from "lucide-react";
 
-// ─── EcoFlow Logo (white variant for dark footer) ──────────────
-const EcoFlowLogoWhite = () => (
-  <svg
-    width='30'
-    height='30'
-    viewBox='0 0 32 32'
-    fill='none'
-    xmlns='http://www.w3.org/2000/svg'
-    aria-label='EcoFlow logo'
-  >
-    <circle cx='16' cy='16' r='15' stroke='#ffffff' strokeWidth='2' />
-    <path
-      d='M16 5 C20 5, 24 9, 24 13 C24 17, 20 19, 16 19'
-      stroke='#ffffff'
-      strokeWidth='2.2'
-      strokeLinecap='round'
-      fill='none'
-    />
-    <path
-      d='M16 19 C12 19, 8 17, 8 13 C8 9, 12 7, 16 7'
-      stroke='#F97316'
-      strokeWidth='2.2'
-      strokeLinecap='round'
-      fill='none'
-    />
-    <path
-      d='M14 17 L16 19 L18 17'
-      stroke='#F97316'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
-    />
-  </svg>
-);
+const C = {
+  primary: "var(--color-primary)",
+  secondary: "var(--color-secondary)",
+  neutral800: "#1F2937",
+  neutral700: "#374151",
+  neutral500: "var(--color-neutral-500)",
+  neutral400: "var(--color-neutral-400)",
+  neutral300: "var(--color-neutral-300)",
+  neutral100: "var(--color-neutral-100)",
+  white: "#ffffff",
+  bg: "#111827",
+  bgAlt: "#1F2937",
+};
 
-// ─── Social Links Config ───────────────────────────────────────
-const SOCIAL_LINKS = [
-  { icon: ExternalLink, href: "https://twitter.com/ecoflow", label: "Twitter" },
-  { icon: ExternalLink, href: "https://linkedin.com/company/ecoflow", label: "LinkedIn" },
-  { icon: ExternalLink, href: "https://instagram.com/ecoflow", label: "Instagram" },
-  { icon: ExternalLink, href: "https://facebook.com/ecoflow", label: "Facebook" },
+const SOCIALS = [
+  { Icon: Globe, href: "#", label: "Twitter" },
+  { Icon: MessageCircle, href: "#", label: "LinkedIn" },
+  { Icon: Share2, href: "#", label: "Instagram" },
+  { Icon: Users, href: "#", label: "Facebook" },
 ];
 
-// ─── Footer Link Columns ───────────────────────────────────────
-const FOOTER_LINKS = {
-  platform: {
+const COLS = [
+  {
     title: "Platform",
     links: [
       { label: "Browse Listings", to: "/browse" },
       { label: "Create Listing", to: "/listings/new" },
       { label: "How It Works", to: "/how-it-works" },
-      { label: "Pricing", to: "/pricing" },
       { label: "Impact Dashboard", to: "/analytics/impact" },
     ],
   },
-  company: {
+  {
     title: "Company",
     links: [
       { label: "About EcoFlow", to: "/about" },
       { label: "Our Mission", to: "/mission" },
-      { label: "Careers", to: "/careers" },
-      { label: "Press", to: "/press" },
       { label: "Blog", to: "/blog" },
+      { label: "Careers", to: "/careers" },
     ],
   },
-  support: {
+  {
     title: "Support",
     links: [
       { label: "Help Center", to: "/help" },
       { label: "Contact Us", to: "/contact" },
       { label: "Privacy Policy", to: "/privacy" },
       { label: "Terms of Service", to: "/terms" },
-      { label: "Cookie Policy", to: "/cookies" },
     ],
   },
-};
+];
 
-// ─── Impact Stats ──────────────────────────────────────────────
-const IMPACT_STATS = [
+const STATS = [
   { value: "0+", label: "kg Recycled" },
   { value: "0+", label: "Transactions" },
-  { value: "0+", label: "Active Members" },
+  { value: "0+", label: "Members" },
   { value: "0 kg", label: "CO₂ Saved" },
 ];
 
-// ─── Link column component ─────────────────────────────────────
-const FooterLinkColumn = ({ title, links }) => (
-  <div>
-    <h4 className='text-sm font-semibold text-white mb-4 tracking-wide'>
-      {title}
-    </h4>
-    <ul className='space-y-2.5'>
-      {links.map((link) => (
-        <li key={link.to}>
-          <Link
-            to={link.to}
-            className='text-sm text-neutral-400 hover:text-primary transition-colors duration-150 flex items-center gap-1 group'
-          >
-            {link.label}
-          </Link>
-        </li>
-      ))}
-    </ul>
-  </div>
-);
+function FooterLink({ label, to }) {
+  return (
+    <li style={{ listStyle: "none" }}>
+      <Link
+        to={to}
+        style={{
+          fontSize: "0.875rem",
+          color: C.neutral400,
+          textDecoration: "none",
+          transition: "color 150ms",
+        }}
+        onMouseEnter={(e) => (e.currentTarget.style.color = C.primary)}
+        onMouseLeave={(e) => (e.currentTarget.style.color = C.neutral400)}
+      >
+        {label}
+      </Link>
+    </li>
+  );
+}
 
-// ─── Main Footer ───────────────────────────────────────────────
-const Footer = () => {
-  const currentYear = new Date().getFullYear();
+export default function Footer() {
+  const year = new Date().getFullYear();
 
   return (
-    <footer className='bg-neutral-900 text-white' aria-label='Site footer'>
-      {/* ── Impact stats bar ───────────────────────────── */}
-      <div className='border-b border-neutral-700 bg-neutral-800'>
-        <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6'>
-          <div className='grid grid-cols-2 sm:grid-cols-4 gap-6 text-center'>
-            {IMPACT_STATS.map((stat) => (
-              <div key={stat.label}>
-                <p className='text-2xl font-bold text-primary'>{stat.value}</p>
-                <p className='text-xs text-neutral-400 mt-0.5'>{stat.label}</p>
+    <footer style={{ background: C.bg, color: C.white }}>
+      {/* Stats bar */}
+      <div style={{ background: C.bgAlt, borderBottom: `1px solid #374151` }}>
+        <div
+          style={{ maxWidth: "80rem", margin: "0 auto", padding: "24px 24px" }}
+        >
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(4,1fr)",
+              gap: 16,
+              textAlign: "center",
+            }}
+            className='stats-grid'
+          >
+            {STATS.map(({ value, label }) => (
+              <div key={label}>
+                <p
+                  style={{
+                    fontSize: "1.5rem",
+                    fontWeight: 700,
+                    color: C.primary,
+                  }}
+                >
+                  {value}
+                </p>
+                <p
+                  style={{
+                    fontSize: "0.75rem",
+                    color: C.neutral400,
+                    marginTop: 2,
+                  }}
+                >
+                  {label}
+                </p>
               </div>
             ))}
           </div>
         </div>
       </div>
 
-      {/* ── Main footer grid ───────────────────────────── */}
-      <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12'>
-        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10'>
-          {/* Brand column */}
-          <div className='sm:col-span-2 lg:col-span-1'>
-            {/* Logo */}
-            <Link to='/' className='flex items-center gap-2.5 mb-4 group'>
-              <EcoFlowLogoWhite />
-              <span className='text-xl font-bold tracking-tight'>
-                <span className='text-primary'>Eco</span>
-                <span className='text-secondary'>Flow</span>
+      {/* Main grid */}
+      <div
+        style={{ maxWidth: "80rem", margin: "0 auto", padding: "48px 24px" }}
+      >
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(4,1fr)",
+            gap: 32,
+          }}
+          className='footer-grid'
+        >
+          {/* Brand */}
+          <div style={{ gridColumn: "span 1" }}>
+            <Link
+              to='/'
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+                marginBottom: 16,
+                textDecoration: "none",
+              }}
+            >
+              <svg
+                width='28'
+                height='28'
+                viewBox='0 0 32 32'
+                fill='none'
+                aria-hidden='true'
+              >
+                <circle cx='16' cy='16' r='15' stroke='#fff' strokeWidth='2' />
+                <path
+                  d='M16 5 C20 5, 24 9, 24 13 C24 17, 20 19, 16 19'
+                  stroke='#fff'
+                  strokeWidth='2.2'
+                  strokeLinecap='round'
+                  fill='none'
+                />
+                <path
+                  d='M16 19 C12 19, 8 17, 8 13 C8 9, 12 7, 16 7'
+                  stroke='#F97316'
+                  strokeWidth='2.2'
+                  strokeLinecap='round'
+                  fill='none'
+                />
+                <path
+                  d='M14 17 L16 19 L18 17'
+                  stroke='#F97316'
+                  strokeWidth='2'
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                  fill='none'
+                />
+              </svg>
+              <span style={{ fontSize: "1.2rem", fontWeight: 700 }}>
+                <span style={{ color: C.primary }}>Eco</span>
+                <span style={{ color: C.secondary }}>Flow</span>
               </span>
             </Link>
-
-            {/* Mission */}
-            <p className='text-sm text-neutral-400 leading-relaxed mb-5'>
+            <p
+              style={{
+                fontSize: "0.875rem",
+                color: C.neutral400,
+                lineHeight: 1.7,
+                marginBottom: 20,
+              }}
+            >
               Transforming waste into resources through a transparent,
-              community-driven marketplace. Empowering communities to
-              participate in the circular economy.
+              community-driven marketplace for the circular economy.
             </p>
-
             {/* Contact */}
-            <ul className='space-y-2 mb-6'>
-              <li className='flex items-center gap-2 text-xs text-neutral-400'>
-                <MapPin size={13} className='text-primary shrink-0' />
-                Nairobi, Kenya
-              </li>
-              <li className='flex items-center gap-2 text-xs text-neutral-400'>
-                <Mail size={13} className='text-primary shrink-0' />
-                <a
-                  href='mailto:hello@ecoflow.co.ke'
-                  className='hover:text-primary transition-colors duration-150'
-                >
-                  hello@ecoflow.co.ke
-                </a>
-              </li>
-              <li className='flex items-center gap-2 text-xs text-neutral-400'>
-                <Phone size={13} className='text-primary shrink-0' />
-                <a
-                  href='tel:+254700000000'
-                  className='hover:text-primary transition-colors duration-150'
-                >
-                  +254 700 000 000
-                </a>
-              </li>
-            </ul>
-
-            {/* Social links */}
-            <div className='flex items-center gap-3'>
-              {SOCIAL_LINKS.map(({ icon: Icon, href, label }) => (
+            {[
+              { Icon: MapPin, text: "Nairobi, Kenya", href: null },
+              {
+                Icon: Mail,
+                text: "hello@ecoflow.co.ke",
+                href: "mailto:hello@ecoflow.co.ke",
+              },
+              {
+                Icon: Phone,
+                text: "+254 700 000 000",
+                href: "tel:+254700000000",
+              },
+            ].map(({ Icon, text, href }) => (
+              <div
+                key={text}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+                  marginBottom: 8,
+                }}
+              >
+                <Icon size={13} color={C.primary} style={{ flexShrink: 0 }} />
+                {href ? (
+                  <a
+                    href={href}
+                    style={{
+                      fontSize: "0.75rem",
+                      color: C.neutral400,
+                      textDecoration: "none",
+                    }}
+                    onMouseEnter={(e) =>
+                      (e.currentTarget.style.color = C.primary)
+                    }
+                    onMouseLeave={(e) =>
+                      (e.currentTarget.style.color = C.neutral400)
+                    }
+                  >
+                    {text}
+                  </a>
+                ) : (
+                  <span style={{ fontSize: "0.75rem", color: C.neutral400 }}>
+                    {text}
+                  </span>
+                )}
+              </div>
+            ))}
+            {/* Socials */}
+            <div style={{ display: "flex", gap: 10, marginTop: 16 }}>
+              {SOCIALS.map(({ Icon, href, label }) => (
                 <a
                   key={label}
                   href={href}
+                  aria-label={label}
                   target='_blank'
                   rel='noopener noreferrer'
-                  aria-label={label}
-                  className='
-                    flex items-center justify-center w-8 h-8 rounded-md
-                    text-neutral-400 bg-neutral-800
-                    hover:text-white hover:bg-primary
-                    transition-all duration-150
-                  '
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    width: 32,
+                    height: 32,
+                    borderRadius: 6,
+                    background: C.bgAlt,
+                    color: C.neutral400,
+                    transition: "all 150ms",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = C.primary;
+                    e.currentTarget.style.color = "#fff";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = C.bgAlt;
+                    e.currentTarget.style.color = C.neutral400;
+                  }}
                 >
-                  <Icon size={15} />
+                  <Icon size={14} />
                 </a>
               ))}
             </div>
           </div>
 
           {/* Link columns */}
-          <FooterLinkColumn {...FOOTER_LINKS.platform} />
-          <FooterLinkColumn {...FOOTER_LINKS.company} />
-          <FooterLinkColumn {...FOOTER_LINKS.support} />
+          {COLS.map(({ title, links }) => (
+            <div key={title}>
+              <h4
+                style={{
+                  fontSize: "0.875rem",
+                  fontWeight: 600,
+                  color: C.white,
+                  marginBottom: 16,
+                }}
+              >
+                {title}
+              </h4>
+              <ul
+                style={{
+                  listStyle: "none",
+                  padding: 0,
+                  margin: 0,
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 10,
+                }}
+              >
+                {links.map((l) => (
+                  <FooterLink key={l.to} {...l} />
+                ))}
+              </ul>
+            </div>
+          ))}
         </div>
       </div>
 
-      {/* ── Bottom bar ─────────────────────────────────── */}
-      <div className='border-t border-neutral-800'>
-        <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 flex flex-col sm:flex-row items-center justify-between gap-3'>
-          {/* Copyright */}
-          <p className='text-xs text-neutral-500 text-center sm:text-left'>
-            © {currentYear} EcoFlow Technologies Ltd. All rights reserved.
+      {/* Bottom bar */}
+      <div style={{ borderTop: `1px solid #374151` }}>
+        <div
+          style={{
+            maxWidth: "80rem",
+            margin: "0 auto",
+            padding: "20px 24px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            flexWrap: "wrap",
+            gap: 12,
+          }}
+        >
+          <p style={{ fontSize: "0.75rem", color: C.neutral500 }}>
+            © {year} EcoFlow Technologies Ltd. All rights reserved.
           </p>
-
-          {/* Eco badge */}
-          <div className='flex items-center gap-1.5 text-xs text-primary'>
-            <Leaf size={13} />
-            <span>Built for the circular economy</span>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 6,
+              fontSize: "0.75rem",
+              color: C.primary,
+            }}
+          >
+            <Leaf size={13} /> Built for the circular economy
           </div>
-
-          {/* Legal links */}
-          <div className='flex items-center gap-4'>
+          <div style={{ display: "flex", gap: 16 }}>
             {[
-              { label: "Privacy", to: "/privacy" },
-              { label: "Terms", to: "/terms" },
-              { label: "Cookies", to: "/cookies" },
-            ].map((link) => (
+              ["Privacy", "/privacy"],
+              ["Terms", "/terms"],
+              ["Cookies", "/cookies"],
+            ].map(([label, to]) => (
               <Link
-                key={link.to}
-                to={link.to}
-                className='text-xs text-neutral-500 hover:text-neutral-300 transition-colors duration-150'
+                key={to}
+                to={to}
+                style={{
+                  fontSize: "0.75rem",
+                  color: C.neutral500,
+                  textDecoration: "none",
+                }}
+                onMouseEnter={(e) =>
+                  (e.currentTarget.style.color = C.neutral300)
+                }
+                onMouseLeave={(e) =>
+                  (e.currentTarget.style.color = C.neutral500)
+                }
               >
-                {link.label}
+                {label}
               </Link>
             ))}
           </div>
         </div>
       </div>
+
+      <style>{`
+        @media (max-width:900px) { .footer-grid { grid-template-columns: repeat(2,1fr) !important; } }
+        @media (max-width:600px) { .footer-grid { grid-template-columns: 1fr !important; } .stats-grid { grid-template-columns: repeat(2,1fr) !important; } }
+      `}</style>
     </footer>
   );
-};
-
-export default Footer;
+}

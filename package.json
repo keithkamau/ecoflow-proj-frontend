@@ -9,12 +9,16 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "jest --config jest.config.cjs",
-    "test:coverage": "jest --config jest.config.cjs --coverage"
+    "test:vitest": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "jest --config jest.config.cjs --coverage",
+    "test:vitest:coverage": "vitest run --coverage"
   },
   "dependencies": {
+    "@react-google-maps/api": "^2.20.8",
     "axios": "^1.17.0",
     "leaflet": "^1.9.4",
-    "lucide-react": "^1.17.0",
+    "lucide-react": "^1.18.0",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
     "react-leaflet": "^5.0.0",
@@ -34,6 +38,7 @@
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.1",
+    "@vitest/coverage-v8": "^4.1.8",
     "babel-jest": "^30.4.1",
     "babel-plugin-react-compiler": "^1.0.0",
     "eslint": "^10.3.0",
@@ -43,7 +48,9 @@
     "identity-obj-proxy": "^3.0.0",
     "jest": "^30.4.2",
     "jest-environment-jsdom": "^30.4.1",
+    "jsdom": "^29.1.1",
     "tailwindcss": "^4.3.0",
-    "vite": "^8.0.12"
+    "vite": "^8.0.12",
+    "vitest": "^4.1.8"
   }
 }

@@ -17,10 +17,9 @@ import {
   ChevronRight,
   Recycle,
 } from "lucide-react";
-import { NAV_ITEMS, ROLES } from "../../utils/constants";
 import { useAuth } from "../../hooks/useAuth";
+import { NAV_ITEMS, ROLES } from "../../utils/constants";
 
-// ─── Icon map — matches icon strings in constants.js ──────────
 const ICON_MAP = {
   LayoutDashboard,
   List,
@@ -36,56 +35,107 @@ const ICON_MAP = {
   AlertTriangle,
 };
 
-// ─── Single Nav Item ───────────────────────────────────────────
-const SidebarItem = ({ item, isActive, collapsed }) => {
+const C = {
+  primary: "var(--color-primary)",
+  primaryLight: "var(--color-primary-light)",
+  secondary: "var(--color-secondary)",
+  neutral50: "var(--color-neutral-50)",
+  neutral100: "var(--color-neutral-100)",
+  neutral200: "var(--color-neutral-200)",
+  neutral400: "var(--color-neutral-400)",
+  neutral500: "var(--color-neutral-500)",
+  neutral700: "var(--color-neutral-700)",
+  neutral900: "var(--color-neutral-900)",
+  errorLight: "var(--color-error-light)",
+  errorDark: "var(--color-error-dark)",
+  infoLight: "var(--color-info-light)",
+  infoDark: "var(--color-info-dark)",
+  white: "#ffffff",
+};
+
+/* ── Single nav item ─────────────────────────────────────────── */
+function SidebarItem({ item, active, collapsed }) {
   const Icon = ICON_MAP[item.icon] ?? LayoutDashboard;
+  const [hovered, setHovered] = useState(false);
+  const highlighted = active || hovered;
 
   return (
-    <li>
+    <li style={{ position: "relative", listStyle: "none" }}>
       <Link
         to={item.path}
         title={collapsed ? item.label : undefined}
-        className={`
-          group relative flex items-center gap-3 px-3 py-2.5 rounded-md
-          text-sm font-medium transition-all duration-150
-          ${
-            isActive
-              ? "bg-primary-light text-primary font-semibold"
-              : "text-neutral-500 hover:bg-primary-light hover:text-primary"
-          }
-          ${collapsed ? "justify-center" : ""}
-        `}
-        aria-current={isActive ? "page" : undefined}
+        aria-current={active ? "page" : undefined}
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: collapsed ? 0 : 12,
+          justifyContent: collapsed ? "center" : "flex-start",
+          padding: collapsed ? "10px 0" : "10px 12px",
+          borderRadius: 6,
+          background: highlighted ? C.primaryLight : "transparent",
+          color: highlighted ? C.primary : C.neutral500,
+          textDecoration: "none",
+          fontSize: "0.875rem",
+          fontWeight: active ? 600 : 500,
+          transition: "all 150ms",
+          position: "relative",
+        }}
       >
-        {/* Active indicator bar */}
-        {isActive && (
-          <span className='absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-primary rounded-r-full' />
+        {/* Active bar */}
+        {active && (
+          <span
+            style={{
+              position: "absolute",
+              left: 0,
+              top: "50%",
+              transform: "translateY(-50%)",
+              width: 3,
+              height: 24,
+              background: C.primary,
+              borderRadius: "0 4px 4px 0",
+            }}
+          />
         )}
-
-        {/* Icon */}
         <Icon
           size={18}
-          className={`shrink-0 transition-colors duration-150 ${
-            isActive
-              ? "text-primary"
-              : "text-neutral-400 group-hover:text-primary"
-          }`}
+          style={{
+            flexShrink: 0,
+            color: highlighted ? C.primary : C.neutral400,
+          }}
         />
-
-        {/* Label — hidden when collapsed */}
-        {!collapsed && <span className='truncate'>{item.label}</span>}
+        {!collapsed && (
+          <span
+            style={{
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+            }}
+          >
+            {item.label}
+          </span>
+        )}
 
         {/* Tooltip when collapsed */}
-        {collapsed && (
+        {collapsed && hovered && (
           <span
-            className='
-              absolute left-full ml-3 px-2.5 py-1.5 z-50
-              bg-neutral-900 text-white text-xs font-medium
-              rounded-md shadow-lg whitespace-nowrap pointer-events-none
-              opacity-0 group-hover:opacity-100
-              translate-x-1 group-hover:translate-x-0
-              transition-all duration-150
-            '
+            style={{
+              position: "absolute",
+              left: "calc(100% + 12px)",
+              top: "50%",
+              transform: "translateY(-50%)",
+              background: C.neutral900,
+              color: "#fff",
+              fontSize: "0.75rem",
+              fontWeight: 500,
+              padding: "6px 10px",
+              borderRadius: 6,
+              whiteSpace: "nowrap",
+              boxShadow: "var(--shadow-md)",
+              zIndex: 100,
+              pointerEvents: "none",
+            }}
           >
             {item.label}
           </span>
@@ -93,127 +143,185 @@ const SidebarItem = ({ item, isActive, collapsed }) => {
       </Link>
     </li>
   );
-};
+}
 
-// ─── Section Divider with label ───────────────────────────────
-const SidebarSection = ({ label, collapsed }) => (
-  <li className='pt-4 pb-1'>
-    {!collapsed ? (
-      <span className='overline px-3'>{label}</span>
-    ) : (
-      <div className='border-t border-neutral-200 mx-3' />
-    )}
-  </li>
-);
-
-// ─── Impact Summary (seller / recycler) ───────────────────────
-const ImpactSummary = ({ collapsed }) => {
-  if (collapsed) return null;
+/* ── Section label ───────────────────────────────────────────── */
+function SectionLabel({ label, collapsed }) {
+  if (collapsed)
+    return (
+      <div
+        style={{ borderTop: `1px solid ${C.neutral200}`, margin: "8px 12px" }}
+      />
+    );
   return (
-    <div className='mx-3 mb-4 p-3 bg-primary-light rounded-md border border-primary/20'>
-      <div className='flex items-center gap-2 mb-2'>
-        <Recycle size={14} className='text-primary' />
-        <span className='text-xs font-semibold text-primary'>Your Impact</span>
-      </div>
-      <div className='space-y-1'>
-        <div className='flex justify-between text-xs'>
-          <span className='text-neutral-500'>Recycled</span>
-          <span className='font-semibold text-primary'>0 kg</span>
-        </div>
-        <div className='flex justify-between text-xs'>
-          <span className='text-neutral-500'>CO₂ Saved</span>
-          <span className='font-semibold text-primary'>0 kg</span>
-        </div>
-      </div>
+    <div
+      style={{
+        padding: "16px 12px 4px",
+        fontSize: "0.7rem",
+        fontWeight: 700,
+        color: C.neutral400,
+        textTransform: "uppercase",
+        letterSpacing: "0.08em",
+      }}
+    >
+      {label}
     </div>
   );
-};
+}
 
-// ─── Main Sidebar ──────────────────────────────────────────────
-const Sidebar = ({ open }) => {
+/* ── Impact summary card ─────────────────────────────────────── */
+function ImpactCard() {
+  return (
+    <div
+      style={{
+        margin: "0 12px 12px",
+        padding: 12,
+        background: C.primaryLight,
+        borderRadius: 8,
+        border: `1px solid rgba(16,185,129,0.2)`,
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 6,
+          marginBottom: 8,
+        }}
+      >
+        <Recycle size={13} color={C.primary} />
+        <span
+          style={{ fontSize: "0.75rem", fontWeight: 600, color: C.primary }}
+        >
+          Your Impact
+        </span>
+      </div>
+      {[
+        ["Recycled", "0 kg"],
+        ["CO₂ Saved", "0 kg"],
+      ].map(([label, val]) => (
+        <div
+          key={label}
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            marginBottom: 4,
+          }}
+        >
+          <span style={{ fontSize: "0.75rem", color: C.neutral500 }}>
+            {label}
+          </span>
+          <span
+            style={{ fontSize: "0.75rem", fontWeight: 600, color: C.primary }}
+          >
+            {val}
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/* ── Main Sidebar ────────────────────────────────────────────── */
+export default function Sidebar({ open }) {
   const [collapsed, setCollapsed] = useState(false);
   const { user } = useAuth();
   const location = useLocation();
 
   const navItems = user?.role ? (NAV_ITEMS[user.role] ?? []) : [];
-
-  const isActive = (path) =>
-    path === "/dashboard"
+  const isActive = (p) =>
+    p === "/dashboard"
       ? location.pathname === "/dashboard"
-      : location.pathname.startsWith(path);
+      : location.pathname.startsWith(p);
+  const main = navItems.slice(0, 4);
+  const secondary = navItems.slice(4);
 
-  // ── Group items into sections ──────────────────────
-  const getGroupedItems = () => {
-    if (!user?.role) return { main: navItems, secondary: [] };
-
-    if (user.role === ROLES.ADMIN) {
-      return {
-        main: navItems.slice(0, 4),
-        secondary: navItems.slice(4),
-      };
-    }
-    return {
-      main: navItems.slice(0, 4),
-      secondary: navItems.slice(4),
-    };
-  };
-
-  const { main, secondary } = getGroupedItems();
+  const roleBg =
+    user?.role === ROLES.ADMIN
+      ? C.errorLight
+      : user?.role === ROLES.RECYCLER
+        ? C.infoLight
+        : C.primaryLight;
+  const roleText =
+    user?.role === ROLES.ADMIN
+      ? C.errorDark
+      : user?.role === ROLES.RECYCLER
+        ? C.infoDark
+        : C.primary;
 
   if (!open) return null;
 
+  const W = collapsed ? 72 : 240;
+
   return (
     <>
-      {/* ── Sidebar panel ──────────────────────────────── */}
       <aside
-        style={{ width: collapsed ? "72px" : "240px" }}
-        className={`
-          fixed top-16 left-0 bottom-0 z-30
-          bg-white border-r border-neutral-200
-          flex flex-col
-          transition-all duration-300 ease-in-out
-          hidden md:flex
-          overflow-hidden
-        `}
+        style={{
+          position: "fixed",
+          top: 64,
+          left: 0,
+          bottom: 0,
+          zIndex: 30,
+          width: W,
+          background: C.white,
+          borderRight: `1px solid ${C.neutral200}`,
+          display: "flex",
+          flexDirection: "column",
+          transition: "width 300ms ease",
+          overflowX: "hidden",
+        }}
         aria-label='Sidebar navigation'
+        className='hide-on-mobile'
       >
         {/* Collapse toggle */}
         <button
           onClick={() => setCollapsed((v) => !v)}
-          className='
-            absolute -right-3 top-6 z-10
-            flex items-center justify-center
-            w-6 h-6 rounded-full
-            bg-white border border-neutral-200 shadow-sm
-            text-neutral-400 hover:text-primary
-            transition-colors duration-150
-          '
+          style={{
+            position: "absolute",
+            right: -12,
+            top: 20,
+            zIndex: 10,
+            width: 24,
+            height: 24,
+            borderRadius: "50%",
+            background: C.white,
+            border: `1px solid ${C.neutral200}`,
+            boxShadow: "var(--shadow-sm)",
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            color: C.neutral400,
+          }}
           aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
         >
           {collapsed ? <ChevronRight size={12} /> : <ChevronLeft size={12} />}
         </button>
 
-        {/* Nav list */}
-        <div className='flex-1 overflow-y-auto overflow-x-hidden py-4 no-scrollbar'>
-          <nav aria-label='Sidebar navigation'>
-            <ul className='space-y-0.5 px-2'>
-              {/* Main items */}
-              {!collapsed && (
-                <SidebarSection label='Main' collapsed={collapsed} />
-              )}
+        {/* Nav */}
+        <div
+          style={{
+            flex: 1,
+            overflowY: "auto",
+            overflowX: "hidden",
+            padding: "12px 8px",
+          }}
+          className='no-scrollbar'
+        >
+          <nav>
+            <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
+              <SectionLabel label='Main' collapsed={collapsed} />
               {main.map((item) => (
                 <SidebarItem
                   key={item.path}
                   item={item}
-                  isActive={isActive(item.path)}
+                  active={isActive(item.path)}
                   collapsed={collapsed}
                 />
               ))}
-
-              {/* Secondary items */}
               {secondary.length > 0 && (
                 <>
-                  <SidebarSection
+                  <SectionLabel
                     label={
                       user?.role === ROLES.ADMIN ? "Management" : "Insights"
                     }
@@ -223,7 +331,7 @@ const Sidebar = ({ open }) => {
                     <SidebarItem
                       key={item.path}
                       item={item}
-                      isActive={isActive(item.path)}
+                      active={isActive(item.path)}
                       collapsed={collapsed}
                     />
                   ))}
@@ -233,27 +341,43 @@ const Sidebar = ({ open }) => {
           </nav>
         </div>
 
-        {/* Bottom: impact summary + role badge */}
-        <div className='border-t border-neutral-100 pb-4 pt-3'>
-          {(user?.role === ROLES.SELLER || user?.role === ROLES.RECYCLER) && (
-            <ImpactSummary collapsed={collapsed} />
-          )}
-
-          {/* Role pill */}
+        {/* Bottom */}
+        <div style={{ borderTop: `1px solid ${C.neutral100}`, paddingTop: 12 }}>
+          {!collapsed &&
+            (user?.role === ROLES.SELLER || user?.role === ROLES.RECYCLER) && (
+              <ImpactCard />
+            )}
           {!collapsed && (
-            <div className='flex items-center gap-2 px-4'>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+                padding: "0 16px 12px",
+              }}
+            >
               <span
-                className={`text-[11px] font-semibold px-2 py-0.5 rounded-full capitalize ${
-                  user?.role === ROLES.ADMIN
-                    ? "bg-error-light text-error-dark"
-                    : user?.role === ROLES.RECYCLER
-                      ? "bg-info-light text-info-dark"
-                      : "bg-primary-light text-primary-dark"
-                }`}
+                style={{
+                  fontSize: "0.65rem",
+                  fontWeight: 700,
+                  padding: "2px 8px",
+                  borderRadius: 9999,
+                  background: roleBg,
+                  color: roleText,
+                  textTransform: "capitalize",
+                }}
               >
                 {user?.role}
               </span>
-              <span className='text-xs text-neutral-400 truncate'>
+              <span
+                style={{
+                  fontSize: "0.75rem",
+                  color: C.neutral400,
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
+                }}
+              >
                 {user?.name}
               </span>
             </div>
@@ -261,14 +385,9 @@ const Sidebar = ({ open }) => {
         </div>
       </aside>
 
-      {/* ── Content offset — pushes main content right ── */}
-      <div
-        style={{ marginLeft: collapsed ? "72px" : "240px" }}
-        className='hidden md:block transition-all duration-300'
-        aria-hidden='true'
-      />
+      <style>{`
+        @media (max-width: 768px) { .hide-on-mobile { display:none !important; } }
+      `}</style>
     </>
   );
-};
-
-export default Sidebar;
+}

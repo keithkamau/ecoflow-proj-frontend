@@ -1,4 +1,3 @@
-// ─── Colors ────────────────────────────────────────────────────
 export const COLORS = {
   primary: {
     light: "#D1FAE5",
@@ -185,4 +184,4 @@ export const MATERIAL_TYPES = [
 
 // ─── API Base URL ─────────────────────────────────────────────────
 export const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:8000/api/v1";
+  import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000/api/v1";

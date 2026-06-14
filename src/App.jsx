@@ -1,4 +1,4 @@
-import { useState, lazy, Suspense } from "react";
+import { useState, lazy, Suspense, useEffect, useRef } from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -11,9 +11,22 @@ import Navbar from "./components/common/Navbar";
 import Sidebar from "./components/common/Sidebar";
 import Footer from "./components/common/Footer";
 import { PageLoader } from "./components/common/LoadingSpinner";
+import OfferPage from "./pages/offers/OfferPage";
+import OfferDetailPage from "./pages/offers/OfferDetailPage";
+import TransactionPage from "./pages/offers/TransactionPage";
+import TransactionDetailPage from "./pages/offers/TransactionDetailPage";
+import PaymentPage from "./pages/offers/PaymentPage";
+import { offerService } from "./services/offerService";
+import { messageService } from "./services/messageService";
+import CreateOfferPage from "./pages/offers/CreateOfferPage";
+import ListingsPage from './pages/listings/ListingsPage';
+import ListingDetailPage from './pages/listings/ListingDetailPage';
+import CreateListingPage from './pages/listings/CreateListingPage';
+import MyListingsPage from './pages/listings/MyListingsPage';
+import RecyclerInventoryPage from './pages/listings/RecyclerInventoryPage';
+import EditListingPage from './pages/listings/EditListingPage';
 import "./styles/globals.css";
 
-// ─── Member 4: Pickup & Analytics pages (lazy-loaded) ──────────
 const PickupPage             = lazy(() => import("./pages/pickup/PickupPage"));
 const TrackingPage           = lazy(() => import("./pages/pickup/TrackingPage"));
 const AnalyticsPage          = lazy(() => import("./pages/analytics/AnalyticsPage"));
@@ -21,102 +34,20 @@ const EnvironmentalImpactPage = lazy(() => import("./pages/analytics/Environment
 const DashboardPage          = lazy(() => import("./pages/DashboardPage"));
 const NearbyPage             = lazy(() => import("./pages/nearby/NearbyPage"));
 
-const PUBLIC_ROUTES = [
+const PUBLIC_PATHS = [
   "/",
   "/login",
   "/register",
   "/how-it-works",
   "/about",
   "/pricing",
-  "/mission",
-  "/blog",
   "/help",
   "/contact",
   "/privacy",
   "/terms",
-  "/cookies",
 ];
 
-// ─── Inner layout (consumes AuthContext) ──────────────────────
-const AppLayout = () => {
-  const { user, loading } = useAuth();
-  const location = useLocation();
-  const [sidebarOpen, setSidebarOpen] = useState(true);
-
-  const isPublicRoute = PUBLIC_ROUTES.some(
-    (r) => location.pathname === r || location.pathname.startsWith(r + "/"),
-  );
-
-  const showSidebar = !!user && !isPublicRoute;
-  const showFooter = !user || isPublicRoute;
-
-  if (loading) return <PageLoader message='Loading EcoFlow…' />;
-
-  return (
-    <div className='page-wrapper'>
-      {/* ── Fixed top navbar ─────────────────────── */}
-      <Navbar
-        onMenuToggle={() => setSidebarOpen((v) => !v)}
-        sidebarOpen={sidebarOpen}
-      />
-
-      {/* ── Sidebar (authenticated pages only) ───── */}
-      {showSidebar && <Sidebar open={sidebarOpen} />}
-
-      {/* ── Main content area ─────────────────────── */}
-      <main
-        className={`
-          min-h-[calc(100vh-64px)]
-          transition-all duration-300
-          ${showSidebar && sidebarOpen ? "md:ml-60" : ""}
-        `}
-      >
-        <Suspense fallback={<PageLoader message='Loading…' />}>
-          <Routes>
-            {/* ── Public pages ── */}
-            <Route path='/' element={<PlaceholderPage title='Home' />} />
-            <Route path='/login' element={<PlaceholderPage title='Login' />} />
-            <Route path='/register' element={<PlaceholderPage title='Register' />} />
-
-            {/* ── Member 1: Auth & Profile ── */}
-            <Route path='/profile'  element={<PlaceholderPage title='Profile' />} />
-            <Route path='/settings' element={<PlaceholderPage title='Settings' />} />
-
-            {/* ── Member 2: Listings ── */}
-            <Route path='/listings'     element={<PlaceholderPage title='My Listings' />} />
-            <Route path='/listings/new' element={<PlaceholderPage title='New Listing' />} />
-            <Route path='/browse'       element={<PlaceholderPage title='Browse Waste' />} />
-
-            {/* ── Member 3: Offers & Transactions ── */}
-            <Route path='/offers'       element={<PlaceholderPage title='Offers' />} />
-            <Route path='/transactions' element={<PlaceholderPage title='Transactions' />} />
-
-            {/* ── Member 4: Pickup & Analytics ── */}
-            <Route path='/dashboard'        element={<DashboardPage />} />
-            <Route path='/pickups'          element={<PickupPage />} />
-            <Route path='/pickups/:id'      element={<TrackingPage />} />
-            <Route path='/analytics'        element={<AnalyticsPage />} />
-            <Route path='/analytics/impact' element={<EnvironmentalImpactPage />} />
-            <Route path='/nearby'           element={<NearbyPage />} />
-
-            {/* ── Admin ── */}
-            <Route path='/admin'       element={<PlaceholderPage title='Admin Overview' />} />
-            <Route path='/admin/users' element={<PlaceholderPage title='Manage Users' />} />
-
-            {/* 404 */}
-            <Route path='*' element={<PlaceholderPage title='404 — Page not found' />} />
-          </Routes>
-        </Suspense>
-      </main>
-
-      {/* ── Footer (public/auth pages only) ──────── */}
-      {showFooter && <Footer />}
-    </div>
-  );
-};
-
-// ─── Temporary placeholder — replaced by each member's page ───
-const PlaceholderPage = ({ title }) => (
+const Placeholder = ({ title }) => (
   <div className='page-content animate-fade-in'>
     <div className='card-accent mt-6 max-w-lg'>
       <h1 className='text-h3 mb-2'>{title}</h1>
@@ -127,12 +58,116 @@ const PlaceholderPage = ({ title }) => (
   </div>
 );
 
-const App = () => (
-  <Router>
+function AppLayout() {
+  const { user, loading } = useAuth();
+  const location = useLocation();
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [notificationCount, setNotificationCount] = useState(0);
+  const intervalRef = useRef(null);
+
+  async function fetchPending() {
+    try {
+      const [offers, msgData] = await Promise.all([
+        offerService.getAll(),
+        messageService.getUnreadCount().catch(() => ({ count: 0 })),
+      ]);
+      const pending = Array.isArray(offers) ? offers.filter((o) => o.status === "pending").length : 0;
+      setNotificationCount(pending + (msgData.count || 0));
+    } catch {}
+  }
+
+  useEffect(() => {
+    if (!user) { setNotificationCount(0); return; }
+    fetchPending();
+    intervalRef.current = setInterval(fetchPending, 30000);
+    return () => clearInterval(intervalRef.current);
+  }, [user]);
+
+  const isPublic = PUBLIC_PATHS.some(
+    (p) => location.pathname === p || location.pathname.startsWith(p + "/"),
+  );
+  const showSidebar = !!user && !isPublic;
+  const showFooter = !user || isPublic;
+
+  if (loading) return <PageLoader message='Loading EcoFlow…' />;
+
+  return (
+    <div className='page-wrapper'>
+      <Navbar
+        onMenuToggle={() => setSidebarOpen((v) => !v)}
+        sidebarOpen={sidebarOpen}
+        notificationCount={notificationCount}
+      />
+      {showSidebar && <Sidebar open={sidebarOpen} />}
+      <main
+        className={
+          showSidebar
+            ? sidebarOpen
+              ? "ml-0 lg:ml-60"
+              : "ml-0 lg:ml-18"
+            : "ml-0"
+        }
+        style={{ transition: "margin-left 300ms ease" }}
+      >
+        <Suspense fallback={<PageLoader message='Loading…' />}>
+          <Routes>
+            {/* Public */}
+            <Route path='/' element={<Placeholder title='Home' />} />
+            <Route path='/login' element={<Placeholder title='Login' />} />
+            <Route path='/register' element={<Placeholder title='Register' />} />
+
+            {/* Member 1 — Auth & Profile */}
+            <Route path='/profile' element={<Placeholder title='Profile' />} />
+            <Route path='/settings' element={<Placeholder title='Settings' />} />
+
+            {/* Member 2 — Listings */}
+            <Route path='/listings' element={<ListingsPage />} />
+            <Route path='/listings/new' element={<CreateListingPage />} />
+            <Route path='/listings/:id' element={<ListingDetailPage />} />
+            <Route path='/listings/:id/edit' element={<EditListingPage />} />
+            <Route path='/my-listings' element={<MyListingsPage />} />
+            <Route path='/inventory' element={<RecyclerInventoryPage />} />
+            <Route path='/browse' element={<Placeholder title='Browse Waste' />} />
+
+            {/* Member 3 — Offers & Transactions */}
+            <Route path='/offers' element={<OfferPage />} />
+            <Route path='/offers/new' element={<CreateOfferPage />} />
+            <Route path='/offers/:id' element={<OfferDetailPage />} />
+            <Route path='/transactions' element={<TransactionPage />} />
+            <Route path='/transactions/:id' element={<TransactionDetailPage />} />
+            <Route path='/payments' element={<PaymentPage />} />
+
+            {/* Member 4 — Pickup & Analytics */}
+            <Route path='/dashboard'        element={<DashboardPage />} />
+            <Route path='/pickups'          element={<PickupPage />} />
+            <Route path='/pickups/:id'      element={<TrackingPage />} />
+            <Route path='/analytics'        element={<AnalyticsPage />} />
+            <Route path='/analytics/impact' element={<EnvironmentalImpactPage />} />
+            <Route path='/nearby'           element={<NearbyPage />} />
+
+            {/* Admin */}
+            <Route path='/admin' element={<Placeholder title='Admin Overview' />} />
+            <Route path='/admin/users' element={<Placeholder title='Users' />} />
+            <Route path='/admin/listings' element={<Placeholder title='All Listings' />} />
+
+            {/* 404 */}
+            <Route path='*' element={<Placeholder title='404 — Page not found' />} />
+          </Routes>
+        </Suspense>
+      </main>
+      {showFooter && <Footer />}
+    </div>
+  );
+}
+
+function App() {
+  return (
     <AuthProvider>
-      <AppLayout />
+      <Router>
+        <AppLayout />
+      </Router>
     </AuthProvider>
-  </Router>
-);
+  );
+}
 
 export default App;

@@ -2,15 +2,6 @@
 
 React + Tailwind CSS frontend for the EcoFlow waste management platform.
 
-## Features (Member 3 — Offers & Transactions)
-- Offer listing, creation, accept/reject/counter
-- Transaction history with visual timeline
-- Real-time M-Pesa payment via Daraja API
-- Chat messaging per offer
-- Notification badge (pending offers + unread messages)
-- Transaction state machine tracking
-- Fully responsive, mobile-first
-
 ## Tech Stack
 - **Framework:** React 18 + Vite
 - **Styling:** Tailwind CSS v4

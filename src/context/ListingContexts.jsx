@@ -26,7 +26,7 @@ export const ListingProvider = ({ children }) => {
     clearError();
     try {
       const response = await listingService.getMaterials();
-      setMaterials(response.data);
+      setMaterials(response);
     } catch (err) {
       setError(err.response?.data?.detail || 'Failed to load materials');
     } finally {
@@ -39,7 +39,7 @@ export const ListingProvider = ({ children }) => {
     clearError();
     try {
       const response = await listingService.getListings(filters);
-      setListings(response.data.listings || []);
+      setListings(response.listings || []);
     } catch (err) {
       setError(err.response?.data?.detail || 'Failed to load listings');
     } finally {
@@ -52,7 +52,7 @@ export const ListingProvider = ({ children }) => {
     clearError();
     try {
       const response = await listingService.getListing(id);
-      setCurrentListing(response.data);
+      setCurrentListing(response);
     } catch (err) {
       setError(err.response?.data?.detail || 'Failed to load listing');
     } finally {
@@ -65,8 +65,8 @@ export const ListingProvider = ({ children }) => {
     clearError();
     try {
       const response = await listingService.createListing(data);
-      setListings((prev) => [response.data, ...prev]);
-      return response.data;
+      setListings((prev) => [response, ...prev]);
+      return response;
     } catch (err) {
       setError(err.response?.data?.detail || 'Failed to create listing');
       throw err;
@@ -81,10 +81,10 @@ export const ListingProvider = ({ children }) => {
     try {
       const response = await listingService.updateListing(id, data);
       setListings((prev) =>
-        prev.map((item) => (item.id === id ? response.data : item))
+        prev.map((item) => (item.id === id ? response : item))
       );
-      if (currentListing?.id === id) setCurrentListing(response.data);
-      return response.data;
+      if (currentListing?.id === id) setCurrentListing(response);
+      return response;
     } catch (err) {
       setError(err.response?.data?.detail || 'Failed to update listing');
       throw err;
@@ -113,7 +113,7 @@ export const ListingProvider = ({ children }) => {
     clearError();
     try {
       const response = await listingService.getRecyclerInventory(recyclerId);
-      setInventory(response.data);
+      setInventory(response);
     } catch (err) {
       setError(err.response?.data?.detail || 'Failed to load inventory');
     } finally {

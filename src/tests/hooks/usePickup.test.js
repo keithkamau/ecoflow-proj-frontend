@@ -2,21 +2,21 @@ import { renderHook, act } from '@testing-library/react';
 import usePickup from '../../hooks/usePickup';
 
 // ── Mock pickupService ─────────────────────────────────────────
-jest.mock('../../services/pickupService', () => ({
-  getPickups: jest.fn().mockResolvedValue({
+vi.mock('../../services/pickupService', () => ({
+  getPickups: vi.fn().mockResolvedValue({
     data: [
       { id: 'p1', status: 'scheduled', material: { type: 'plastic', quantity: 50, unit: 'kg' } },
       { id: 'p2', status: 'completed', material: { type: 'metal',   quantity: 80, unit: 'kg' } },
     ],
   }),
-  getPickup: jest.fn().mockResolvedValue({
+  getPickup: vi.fn().mockResolvedValue({
     data: { id: 'p1', status: 'scheduled', material: { type: 'plastic' } },
   }),
-  schedulePickup: jest.fn().mockResolvedValue({
+  schedulePickup: vi.fn().mockResolvedValue({
     data: { id: 'p99', status: 'scheduled', material: { type: 'paper' } },
   }),
-  uploadProof: jest.fn().mockResolvedValue({ data: { success: true } }),
-  assignDriver: jest.fn().mockResolvedValue({ data: { success: true } }),
+  uploadProof: vi.fn().mockResolvedValue({ data: { success: true } }),
+  assignDriver: vi.fn().mockResolvedValue({ data: { success: true } }),
 }));
 
 // ── fetchPickups ───────────────────────────────────────────────

@@ -6,6 +6,7 @@ import {
   useLocation,
 } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
+import { ListingProvider } from "./context/ListingContexts";
 import { useAuth } from "./hooks/useAuth";
 import Navbar from "./components/common/Navbar";
 import Sidebar from "./components/common/Sidebar";
@@ -112,7 +113,7 @@ function AppLayout() {
         <Suspense fallback={<PageLoader message='Loading…' />}>
           <Routes>
             {/* Public */}
-            <Route path='/' element={<Placeholder title='Home' />} />
+            <Route path='/' element={<ListingsPage />} />
             <Route path='/login' element={<Placeholder title='Login' />} />
             <Route path='/register' element={<Placeholder title='Register' />} />
 
@@ -163,9 +164,11 @@ function AppLayout() {
 function App() {
   return (
     <AuthProvider>
-      <Router>
-        <AppLayout />
-      </Router>
+      <ListingProvider>
+        <Router>
+          <AppLayout />
+        </Router>
+      </ListingProvider>
     </AuthProvider>
   );
 }

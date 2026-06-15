@@ -22,13 +22,13 @@ React + Tailwind CSS web application for waste management platform.
 - **Testing:** Jest & React Testing Library
 - **Build:** Vite
 - **Maps:** Google Maps API
-- **Payments:** M-Pesa
+- **Payments:** M-Pesa & Stripe
 
 ## Prerequisites
 
 - Node.js 16+
 - npm or yarn
-- Docker
+- Docker (optional)
 
 ## Installation
 
@@ -36,29 +36,29 @@ React + Tailwind CSS web application for waste management platform.
 
 1. **Clone repository**
 
-```bash
+   ```bash
    git clone https://github.com/yourusername/waste-management-frontend.git
    cd waste-management-frontend
-```
+   ```
 
 2. **Install dependencies**
 
-```bash
+   ```bash
    npm install
-```
+   ```
 
 3. **Configure environment**
 
-```bash
+   ```bash
    cp .env.example .env
    # Edit .env with your API base URL
-```
+   ```
 
 4. **Start development server**
 
-```bash
+   ```bash
    npm start
-```
+   ```
 
 App will open at `http://localhost:3000`
 
@@ -70,6 +70,7 @@ docker-compose up -d
 
 ## Project Structure
 
+```
 src/
 ├── components/      # Reusable components
 ├── pages/          # Page components
@@ -79,6 +80,7 @@ src/
 ├── utils/          # Helper functions
 ├── styles/         # CSS & Tailwind config
 └── tests/          # Jest tests
+```
 
 ## Responsive Design
 
@@ -128,41 +130,22 @@ Releases follow semantic versioning: `v1.0.0`
 - Push tags: `git push origin --tags`
 - DockerHub image: `yourusername/waste-frontend:v1.0.0`
 
-## Deployment
+## Docker Deployment
 
-### Production Build
+### Build image
 
-```bash
-npm run build
+docker build -t keithkibe/ecoflow-frontend:v0.1.0 .
+
+### Run locally
+
+docker run -p 8080:80 keithkibe/ecoflow-frontend:v0.1.0
+
+### Open http://localhost:8080
+
+### Push to Docker Hub
+
 ```
-
-### Docker Deployment
-
-```bash
-# Build image
-docker build -t yourusername/waste-frontend:v1.0.0 .
-
-# Run container
-docker run -p 80:80 yourusername/waste-frontend:v1.0.0
-
-# Push to DockerHub
-docker push yourusername/waste-frontend:v1.0.0
-```
-
-### Deploy to AWS/Vercel
-
-**Vercel:**
-
-```bash
-npm i -g vercel
-vercel deploy --prod
-```
-
-**AWS S3 + CloudFront:**
-
-```bash
-aws s3 sync build/ s3://your-bucket/
-aws cloudfront create-invalidation --distribution-id <ID> --paths "/*"
+docker push keithkibe/ecoflow-frontend:v0.1.0
 ```
 
 ## Environment Variables
@@ -203,11 +186,3 @@ rm -rf node_modules package-lock.json
 npm install
 npm run build
 ```
-
-## Support & Issues
-
-Open issues: [GitHub Issues](https://github.com/yourusername/waste-management-frontend/issues)
-
-## License
-
-MIT License

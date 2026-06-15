@@ -22,13 +22,13 @@ React + Tailwind CSS web application for waste management platform.
 - **Testing:** Jest & React Testing Library
 - **Build:** Vite
 - **Maps:** Google Maps API
-- **Payments:** M-Pesa & Stripe
+- **Payments:** M-Pesa
 
 ## Prerequisites
 
 - Node.js 16+
 - npm or yarn
-- Docker (optional)
+- Docker
 
 ## Installation
 
@@ -85,12 +85,6 @@ src/
 - **Mobile:** 320px+ (primary focus)
 - **Tablet:** 768px+
 - **Desktop:** 1024px+
-
-All components tested on:
-
-- iPhone 12/Pro
-- iPad Air
-- Desktop browsers (Chrome, Firefox, Safari)
 
 ## Testing
 

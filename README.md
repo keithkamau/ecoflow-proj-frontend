@@ -1,28 +1,24 @@
 # Waste Management & Recycling Hub — Frontend
 
-React + Tailwind CSS web application for waste management platform.
+React + Tailwind CSS frontend for the EcoFlow waste management platform.
 
-## Features
-
-- User registration & KYC verification
-- Browse & manage waste listings
-- Offer negotiation
-- Payment integration
-- Pickup scheduling & tracking
-- Environmental impact dashboard
-- Real-time messaging
-- Responsive mobile-first design
+## Features (Member 3 — Offers & Transactions)
+- Offer listing, creation, accept/reject/counter
+- Transaction history with visual timeline
+- Real-time M-Pesa payment via Daraja API
+- Chat messaging per offer
+- Notification badge (pending offers + unread messages)
+- Transaction state machine tracking
+- Fully responsive, mobile-first
 
 ## Tech Stack
-
-- **Framework:** React 18
-- **Styling:** Tailwind CSS
-- **HTTP Client:** Axios
-- **State Management:** React Context API
-- **Testing:** Jest & React Testing Library
-- **Build:** Vite
-- **Maps:** Google Maps API
-- **Payments:** M-Pesa & Stripe
+- **Framework:** React 18 + Vite
+- **Styling:** Tailwind CSS v4
+- **HTTP Client:** Fetch (custom `api.js` wrapper)
+- **State:** React Context + hooks
+- **Testing:** Vitest + Testing Library
+- **Payments:** M-Pesa Daraja (primary)
+- **Build:** Vite + Rolldown
 
 ## Prerequisites
 
@@ -60,57 +56,35 @@ React + Tailwind CSS web application for waste management platform.
    npm start
    ```
 
-App will open at `http://localhost:3000`
+App at http://localhost:5173
 
-### Docker Setup
-
+### Docker
 ```bash
-docker-compose up -d
+docker compose up -d
 ```
-
-## Project Structure
-
-```
-src/
-├── components/      # Reusable components
-├── pages/          # Page components
-├── hooks/          # Custom React hooks
-├── services/       # API client functions
-├── context/        # React Context
-├── utils/          # Helper functions
-├── styles/         # CSS & Tailwind config
-└── tests/          # Jest tests
-```
-
-## Responsive Design
-
-- **Mobile:** 320px+ (primary focus)
-- **Tablet:** 768px+
-- **Desktop:** 1024px+
 
 ## Testing
-
 ```bash
-# Run all tests
-npm test
-
-# Run with coverage
-npm test -- --coverage
-
-# Run specific test
-npm test auth.test.jsx
-
-# Watch mode
-npm test -- --watch
+npm test              # Run all
+npm test -- --coverage # With coverage
 ```
 
-**Current Coverage:** 30%+ (Target: 70%+)
+## Routes (Offers & Transactions)
+| Path | Page |
+|------|------|
+| /offers | Offer list + inline chat |
+| /offers/new | Create offer |
+| /offers/:id | Offer detail + chat |
+| /transactions | Transaction history |
+| /transactions/:id | Transaction detail + timeline |
+| /payments | M-Pesa payment form |
 
-## Building for Production
+## Color Scheme
+- **Primary Green:** `#10B981` (actions, success)
+- **Secondary Orange:** `#F97316` (warnings, notifications)
+- **Neutral:** Tailwind gray scale
 
-```bash
-npm run build
-```
+## Environment
 
 Creates optimized build in `build/` folder.
 

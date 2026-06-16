@@ -26,6 +26,7 @@ export default function RegisterPage() {
   });
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [devOtp, setDevOtp] = useState("");
   const { register } = useAuth();
   const navigate = useNavigate();
 
@@ -49,6 +50,7 @@ export default function RegisterPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setDevOtp("");
 
     if (form.password.length < 6) {
       setError("Password must be at least 6 characters");
@@ -57,7 +59,10 @@ export default function RegisterPage() {
 
     setSubmitting(true);
     try {
-      await register({ ...form, role });
+      const res = await register({ ...form, role });
+      if (res.data?.otp) {
+        setDevOtp(res.data.otp);
+      }
       navigate("/otp", { state: { phone: form.phone } });
     } catch (err) {
       setError(err.response?.data?.detail || "Registration failed");
@@ -67,28 +72,44 @@ export default function RegisterPage() {
   };
 
   return (
-    <div
-      className='min-h-screen flex items-center justify-center px-4'
-      style={{ backgroundColor: "var(--color-primary-light)" }}
-    >
-      <div className='w-full max-w-[60%]'>
-        <div className='card'>
-          <div className='text-center mb-6'>
+    <div className='min-h-screen flex flex-col lg:flex-row'>
+      <div
+        className='hidden lg:flex lg:w-1/2 items-center justify-center p-12'
+        style={{ backgroundColor: "var(--color-primary)" }}
+      >
+        <div className='max-w-lg text-white'>
+          <h1 className='text-5xl font-bold mb-6 tracking-tight'>EcoFlow</h1>
+          <p className='text-lg leading-relaxed opacity-90'>
+            Turn waste into value. Join the marketplace connecting sellers and
+            recyclers across Kenya.
+          </p>
+        </div>
+      </div>
+
+      <div className='flex-1 flex items-center justify-center px-6 py-12 bg-white lg:bg-transparent'>
+        <div className='w-full max-w-md'>
+          <div className='lg:hidden text-center mb-8'>
             <h1
-              className='text-2xl font-bold'
-              style={{ color: "var(--color-primary-dark)" }}
+              className='text-3xl font-bold'
+              style={{ color: "var(--color-primary)" }}
+            >
+              EcoFlow
+            </h1>
+          </div>
+
+          <div className='mb-8'>
+            <h2
+              className='text-2xl font-bold mb-2'
+              style={{ color: "var(--color-neutral-900)" }}
             >
               Create Account
-            </h1>
-            <p
-              className='text-sm mt-1'
-              style={{ color: "var(--color-neutral-500)" }}
-            >
+            </h2>
+            <p style={{ color: "var(--color-neutral-500)" }}>
               Join EcoFlow today
             </p>
           </div>
 
-          {error && <div className='alert alert-error mb-4'>{error}</div>}
+          {error && <div className='alert alert-error mb-6'>{error}</div>}
 
           {step === 0 && (
             <>
@@ -107,7 +128,7 @@ export default function RegisterPage() {
                     className={`w-full p-4 rounded-lg border-2 text-left transition-colors ${
                       role === r.value
                         ? "border-primary bg-primary-light"
-                        : "border-neutral-200 hover:border-primary"
+                        : "border-neutral-200"
                     }`}
                     style={{
                       borderColor:
@@ -147,65 +168,54 @@ export default function RegisterPage() {
                 className='text-sm mb-4 flex items-center gap-1'
                 style={{ color: "var(--color-primary)" }}
               >
-                &larr; Back
+                ← Back
               </button>
 
               <div className='space-y-4'>
                 <div>
-                  <label className='block text-sm font-medium mb-1'>
-                    Full Name
-                  </label>
+                  <label className='label'>Full Name</label>
                   <input
                     type='text'
                     name='name'
                     value={form.name}
                     onChange={handleChange}
                     required
-                    className='input w-full'
+                    className='input'
                     placeholder='Jane Mwangi'
                   />
                 </div>
-
                 <div>
-                  <label className='block text-sm font-medium mb-1'>
-                    Phone Number
-                  </label>
+                  <label className='label'>Phone Number</label>
                   <input
                     type='tel'
                     name='phone'
                     value={form.phone}
                     onChange={handleChange}
                     required
-                    className='input w-full'
+                    className='input'
                     placeholder='+254700000000'
                   />
                 </div>
-
                 <div>
-                  <label className='block text-sm font-medium mb-1'>
-                    Email (optional)
-                  </label>
+                  <label className='label'>Email (optional)</label>
                   <input
                     type='email'
                     name='email'
                     value={form.email}
                     onChange={handleChange}
-                    className='input w-full'
+                    className='input'
                     placeholder='jane@example.com'
                   />
                 </div>
-
                 <div>
-                  <label className='block text-sm font-medium mb-1'>
-                    Password
-                  </label>
+                  <label className='label'>Password</label>
                   <input
                     type='password'
                     name='password'
                     value={form.password}
                     onChange={handleChange}
                     required
-                    className='input w-full'
+                    className='input'
                     placeholder='At least 6 characters'
                   />
                 </div>
@@ -222,16 +232,38 @@ export default function RegisterPage() {
           )}
 
           <p
-            className='text-sm text-center mt-6'
+            className='text-sm text-center mt-8'
             style={{ color: "var(--color-neutral-500)" }}
           >
             Already have an account?{" "}
-            <Link to='/login' style={{ color: "var(--color-primary)" }}>
+            <Link
+              to='/login'
+              className='font-semibold'
+              style={{ color: "var(--color-primary)" }}
+            >
               Sign in
             </Link>
           </p>
         </div>
       </div>
+
+      {devOtp && (
+        <div className='fixed bottom-4 left-4 bg-neutral-900 text-white px-5 py-3 rounded-lg shadow-lg z-50 text-sm font-mono'>
+          OTP:{" "}
+          <span
+            className='font-bold tracking-wider'
+            style={{ color: "var(--color-primary-light)" }}
+          >
+            {devOtp}
+          </span>
+          <button
+            onClick={() => setDevOtp("")}
+            className='ml-3 text-neutral-400 hover:text-white'
+          >
+            ✕
+          </button>
+        </div>
+      )}
     </div>
   );
 }

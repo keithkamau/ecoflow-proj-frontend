@@ -37,7 +37,8 @@ export function AuthProvider({ children }) {
   };
 
   const register = async (data) => {
-    await authService.register(data);
+    const res = await authService.register(data);
+    return res;
   };
 
   const logout = () => {

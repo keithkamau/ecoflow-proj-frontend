@@ -1,173 +1,103 @@
-import { useState, lazy, Suspense, useEffect, useRef } from "react";
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  useLocation,
-} from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
-import { useAuth } from "./hooks/useAuth";
+import ProtectedRoute from "./components/auth/ProtectedRoute";
+import RoleGuard from "./components/auth/RoleGuard";
 import Navbar from "./components/common/Navbar";
 import Sidebar from "./components/common/Sidebar";
 import Footer from "./components/common/Footer";
-import { PageLoader } from "./components/common/LoadingSpinner";
-import OfferPage from "./pages/offers/OfferPage";
-import OfferDetailPage from "./pages/offers/OfferDetailPage";
-import TransactionPage from "./pages/offers/TransactionPage";
-import TransactionDetailPage from "./pages/offers/TransactionDetailPage";
-import PaymentPage from "./pages/offers/PaymentPage";
-import { offerService } from "./services/offerService";
-import { messageService } from "./services/messageService";
-import CreateOfferPage from "./pages/offers/CreateOfferPage";
-import ListingsPage from './pages/listings/ListingsPage';
-import ListingDetailPage from './pages/listings/ListingDetailPage';
-import CreateListingPage from './pages/listings/CreateListingPage';
-import MyListingsPage from './pages/listings/MyListingsPage';
-import RecyclerInventoryPage from './pages/listings/RecyclerInventoryPage';
-import EditListingPage from './pages/listings/EditListingPage';
-import "./styles/globals.css";
+import RegisterPage from "./pages/auth/RegisterPage";
+import LoginPage from "./pages/auth/LoginPage";
+import OTPPage from "./pages/auth/OTPPage";
+import KYCPage from "./pages/auth/KYCPage";
+import ProfilePage from "./pages/ProfilePage";
+import SettingsPage from "./pages/SettingsPage";
 
-const PickupPage             = lazy(() => import("./pages/pickup/PickupPage"));
-const TrackingPage           = lazy(() => import("./pages/pickup/TrackingPage"));
-const AnalyticsPage          = lazy(() => import("./pages/analytics/AnalyticsPage"));
-const EnvironmentalImpactPage = lazy(() => import("./pages/analytics/EnvironmentalImpactPage"));
-const DashboardPage          = lazy(() => import("./pages/DashboardPage"));
-const NearbyPage             = lazy(() => import("./pages/nearby/NearbyPage"));
-
-const PUBLIC_PATHS = [
-  "/",
-  "/login",
-  "/register",
-  "/how-it-works",
-  "/about",
-  "/pricing",
-  "/help",
-  "/contact",
-  "/privacy",
-  "/terms",
-];
-
-const Placeholder = ({ title }) => (
-  <div className='page-content animate-fade-in'>
-    <div className='card-accent mt-6 max-w-lg'>
-      <h1 className='text-h3 mb-2'>{title}</h1>
-      <p className='text-body text-neutral-500'>
-        This page is reserved. The assigned team member will implement it.
-      </p>
-    </div>
-  </div>
-);
-
-function AppLayout() {
-  const { user, loading } = useAuth();
-  const location = useLocation();
-  const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [notificationCount, setNotificationCount] = useState(0);
-  const intervalRef = useRef(null);
-
-  async function fetchPending() {
-    try {
-      const [offers, msgData] = await Promise.all([
-        offerService.getAll(),
-        messageService.getUnreadCount().catch(() => ({ count: 0 })),
-      ]);
-      const pending = Array.isArray(offers) ? offers.filter((o) => o.status === "pending").length : 0;
-      setNotificationCount(pending + (msgData.count || 0));
-    } catch {}
-  }
-
-  useEffect(() => {
-    if (!user) { setNotificationCount(0); return; }
-    fetchPending();
-    intervalRef.current = setInterval(fetchPending, 30000);
-    return () => clearInterval(intervalRef.current);
-  }, [user]);
-
-  const isPublic = PUBLIC_PATHS.some(
-    (p) => location.pathname === p || location.pathname.startsWith(p + "/"),
-  );
-  const showSidebar = !!user && !isPublic;
-  const showFooter = !user || isPublic;
-
-  if (loading) return <PageLoader message='Loading EcoFlow…' />;
-
+export default function App() {
   return (
-    <div className='page-wrapper'>
-      <Navbar
-        onMenuToggle={() => setSidebarOpen((v) => !v)}
-        sidebarOpen={sidebarOpen}
-        notificationCount={notificationCount}
-      />
-      {showSidebar && <Sidebar open={sidebarOpen} />}
-      <main
-        className={
-          showSidebar
-            ? sidebarOpen
-              ? "ml-0 lg:ml-60"
-              : "ml-0 lg:ml-18"
-            : "ml-0"
-        }
-        style={{ transition: "margin-left 300ms ease" }}
-      >
-        <Suspense fallback={<PageLoader message='Loading…' />}>
-          <Routes>
-            {/* Public */}
-            <Route path='/' element={<Placeholder title='Home' />} />
-            <Route path='/login' element={<Placeholder title='Login' />} />
-            <Route path='/register' element={<Placeholder title='Register' />} />
+    <BrowserRouter>
+      <AuthProvider>
+        <Routes>
+          {/* Public routes */}
+          <Route path='/register' element={<RegisterPage />} />
+          <Route path='/login' element={<LoginPage />} />
+          <Route path='/otp' element={<OTPPage />} />
 
-            {/* Member 1 — Auth & Profile */}
-            <Route path='/profile' element={<Placeholder title='Profile' />} />
-            <Route path='/settings' element={<Placeholder title='Settings' />} />
+          {/* Protected routes */}
+          <Route
+            path='/kyc'
+            element={
+              <ProtectedRoute>
+                <KYCPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path='/profile'
+            element={
+              <ProtectedRoute>
+                <ProfilePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path='/settings'
+            element={
+              <ProtectedRoute>
+                <SettingsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path='/dashboard'
+            element={
+              <ProtectedRoute>
+                <LayoutWrapper>
+                  <DashboardPage />
+                </LayoutWrapper>
+              </ProtectedRoute>
+            }
+          />
 
-            {/* Member 2 — Listings */}
-            <Route path='/listings' element={<ListingsPage />} />
-            <Route path='/listings/new' element={<CreateListingPage />} />
-            <Route path='/listings/:id' element={<ListingDetailPage />} />
-            <Route path='/listings/:id/edit' element={<EditListingPage />} />
-            <Route path='/my-listings' element={<MyListingsPage />} />
-            <Route path='/inventory' element={<RecyclerInventoryPage />} />
-            <Route path='/browse' element={<Placeholder title='Browse Waste' />} />
+          {/* Admin routes */}
+          <Route
+            path='/admin'
+            element={
+              <ProtectedRoute>
+                <RoleGuard roles={["admin"]}>
+                  <LayoutWrapper>
+                    <AdminDashboard />
+                  </LayoutWrapper>
+                </RoleGuard>
+              </ProtectedRoute>
+            }
+          />
 
-            {/* Member 3 — Offers & Transactions */}
-            <Route path='/offers' element={<OfferPage />} />
-            <Route path='/offers/new' element={<CreateOfferPage />} />
-            <Route path='/offers/:id' element={<OfferDetailPage />} />
-            <Route path='/transactions' element={<TransactionPage />} />
-            <Route path='/transactions/:id' element={<TransactionDetailPage />} />
-            <Route path='/payments' element={<PaymentPage />} />
+          {/* Default redirect to login */}
+          <Route path='/' element={<Navigate to='/login' replace />} />
+          <Route path='*' element={<Navigate to='/login' replace />} />
+        </Routes>
+      </AuthProvider>
+    </BrowserRouter>
+  );
+}
 
-            {/* Member 4 — Pickup & Analytics */}
-            <Route path='/dashboard'        element={<DashboardPage />} />
-            <Route path='/pickups'          element={<PickupPage />} />
-            <Route path='/pickups/:id'      element={<TrackingPage />} />
-            <Route path='/analytics'        element={<AnalyticsPage />} />
-            <Route path='/analytics/impact' element={<EnvironmentalImpactPage />} />
-            <Route path='/nearby'           element={<NearbyPage />} />
-
-            {/* Admin */}
-            <Route path='/admin' element={<Placeholder title='Admin Overview' />} />
-            <Route path='/admin/users' element={<Placeholder title='Users' />} />
-            <Route path='/admin/listings' element={<Placeholder title='All Listings' />} />
-
-            {/* 404 */}
-            <Route path='*' element={<Placeholder title='404 — Page not found' />} />
-          </Routes>
-        </Suspense>
-      </main>
-      {showFooter && <Footer />}
+function LayoutWrapper({ children }) {
+  return (
+    <div className='min-h-screen flex'>
+      <Sidebar />
+      <div className='flex-1 flex flex-col'>
+        <Navbar />
+        <main className='flex-1 p-6'>{children}</main>
+        <Footer />
+      </div>
     </div>
   );
 }
 
-function App() {
-  return (
-    <AuthProvider>
-      <Router>
-        <AppLayout />
-      </Router>
-    </AuthProvider>
-  );
+function DashboardPage() {
+  return <h1 className='text-2xl font-bold'>Dashboard</h1>;
 }
 
-export default App;
+function AdminDashboard() {
+  return <h1 className='text-2xl font-bold'>Admin Dashboard</h1>;
+}

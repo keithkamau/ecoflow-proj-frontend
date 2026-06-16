@@ -29,8 +29,8 @@ export function AuthProvider({ children }) {
     hydrateUser();
   }, [hydrateUser]);
 
-  const login = async (phone, otp) => {
-    const res = await authService.verifyOTP(phone, otp);
+  const login = async (email, password) => {
+    const res = await authService.login(email, password);
     localStorage.setItem("access_token", res.data.access_token);
     localStorage.setItem("refresh_token", res.data.refresh_token);
     await hydrateUser();

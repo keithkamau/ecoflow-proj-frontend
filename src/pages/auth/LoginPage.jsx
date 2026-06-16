@@ -1,28 +1,28 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { authService } from "../../services/authService";
+import { useAuth } from "../../hooks/useAuth";
 
 export default function LoginPage() {
-  const [phone, setPhone] = useState("");
+  const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [devOtp, setDevOtp] = useState("");
+  const { login } = useAuth();
   const navigate = useNavigate();
+
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-    setDevOtp("");
     setLoading(true);
 
     try {
-      const res = await authService.sendOTP(phone);
-      if (res.data.otp) {
-        setDevOtp(res.data.otp);
-      }
-      navigate("/otp", { state: { phone } });
+      await login(form.email, form.password);
+      navigate("/dashboard");
     } catch (err) {
-      setError(err.response?.data?.detail || "Failed to send OTP");
+      setError(err.response?.data?.detail || "Login failed");
     } finally {
       setLoading(false);
     }
@@ -62,7 +62,7 @@ export default function LoginPage() {
               Welcome back
             </h2>
             <p style={{ color: "var(--color-neutral-500)" }}>
-              Enter your phone number to sign in
+              Sign in to your account
             </p>
           </div>
 
@@ -70,14 +70,27 @@ export default function LoginPage() {
 
           <form onSubmit={handleSubmit} className='space-y-5'>
             <div>
-              <label className='label'>Phone number</label>
+              <label className='label'>Email</label>
               <input
-                type='tel'
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
+                type='email'
+                name='email'
+                value={form.email}
+                onChange={handleChange}
                 required
                 className='input'
-                placeholder='+254 700 000 000'
+                placeholder='jane@example.com'
+              />
+            </div>
+            <div>
+              <label className='label'>Password</label>
+              <input
+                type='password'
+                name='password'
+                value={form.password}
+                onChange={handleChange}
+                required
+                className='input'
+                placeholder='Your password'
               />
             </div>
 
@@ -86,7 +99,7 @@ export default function LoginPage() {
               disabled={loading}
               className='btn btn-primary w-full'
             >
-              {loading ? "Sending code..." : "Send verification code"}
+              {loading ? "Signing in..." : "Sign in"}
             </button>
           </form>
 
@@ -105,21 +118,6 @@ export default function LoginPage() {
           </p>
         </div>
       </div>
-
-      {devOtp && (
-        <div className='fixed bottom-4 left-4 bg-neutral-900 text-white px-5 py-3 rounded-lg shadow-lg z-50 text-sm font-mono'>
-          OTP:{" "}
-          <span className='font-bold tracking-wider text-primary-light'>
-            {devOtp}
-          </span>
-          <button
-            onClick={() => setDevOtp("")}
-            className='ml-3 text-neutral-400 hover:text-white'
-          >
-            ✕
-          </button>
-        </div>
-      )}
     </div>
   );
 }

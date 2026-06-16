@@ -7,7 +7,6 @@ import Sidebar from "./components/common/Sidebar";
 import Footer from "./components/common/Footer";
 import RegisterPage from "./pages/auth/RegisterPage";
 import LoginPage from "./pages/auth/LoginPage";
-import OTPPage from "./pages/auth/OTPPage";
 import KYCPage from "./pages/auth/KYCPage";
 import ProfilePage from "./pages/ProfilePage";
 import SettingsPage from "./pages/SettingsPage";
@@ -20,7 +19,6 @@ export default function App() {
           {/* Public routes */}
           <Route path='/register' element={<RegisterPage />} />
           <Route path='/login' element={<LoginPage />} />
-          <Route path='/otp' element={<OTPPage />} />
 
           {/* Protected routes */}
           <Route

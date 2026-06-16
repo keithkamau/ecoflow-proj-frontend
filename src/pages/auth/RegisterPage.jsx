@@ -63,7 +63,7 @@ export default function RegisterPage() {
       if (res.data?.otp) {
         setDevOtp(res.data.otp);
       }
-      navigate("/otp", { state: { phone: form.phone } });
+      navigate("/login");
     } catch (err) {
       setError(err.response?.data?.detail || "Registration failed");
     } finally {

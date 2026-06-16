@@ -1,14 +1,12 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { authService } from "../../services/authService";
-import { useAuth } from "../../hooks/useAuth";
 
 export default function KYCPage() {
   const [file, setFile] = useState(null);
   const [docType, setDocType] = useState("national_id");
   const [error, setError] = useState("");
   const [uploading, setUploading] = useState(false);
-  const { user } = useAuth();
   const navigate = useNavigate();
 
   const handleFileChange = (e) => {
@@ -32,7 +30,6 @@ export default function KYCPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!file) {
       setError("Please select a document");
       return;
@@ -55,9 +52,7 @@ export default function KYCPage() {
     }
   };
 
-  const handleSkip = () => {
-    navigate("/dashboard");
-  };
+  const handleSkip = () => navigate("/dashboard");
 
   return (
     <div
@@ -85,13 +80,11 @@ export default function KYCPage() {
 
           <form onSubmit={handleSubmit}>
             <div className='mb-4'>
-              <label className='block text-sm font-medium mb-1'>
-                Document Type
-              </label>
+              <label className='label'>Document Type</label>
               <select
                 value={docType}
                 onChange={(e) => setDocType(e.target.value)}
-                className='input w-full'
+                className='input'
               >
                 <option value='national_id'>National ID</option>
                 <option value='passport'>Passport</option>
@@ -100,9 +93,7 @@ export default function KYCPage() {
             </div>
 
             <div className='mb-6'>
-              <label className='block text-sm font-medium mb-1'>
-                Upload Document
-              </label>
+              <label className='label'>Upload Document</label>
               <div
                 className='border-2 border-dashed rounded-lg p-6 text-center cursor-pointer hover:border-primary transition-colors'
                 style={{

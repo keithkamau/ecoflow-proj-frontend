@@ -51,17 +51,13 @@ export default function SettingsPage() {
           <div className='alert alert-error mb-4'>{passwordError}</div>
         )}
         {passwordSuccess && (
-          <div className='alert bg-green-100 text-green-800 mb-4'>
-            {passwordSuccess}
-          </div>
+          <div className='alert alert-success mb-4'>{passwordSuccess}</div>
         )}
 
         <form onSubmit={handlePasswordChange}>
           <div className='space-y-4'>
             <div>
-              <label className='block text-sm font-medium mb-1'>
-                Current Password
-              </label>
+              <label className='label'>Current Password</label>
               <input
                 type='password'
                 value={passwordForm.current}
@@ -69,13 +65,11 @@ export default function SettingsPage() {
                   setPasswordForm({ ...passwordForm, current: e.target.value })
                 }
                 required
-                className='input w-full'
+                className='input'
               />
             </div>
             <div>
-              <label className='block text-sm font-medium mb-1'>
-                New Password
-              </label>
+              <label className='label'>New Password</label>
               <input
                 type='password'
                 value={passwordForm.newPassword}
@@ -86,14 +80,12 @@ export default function SettingsPage() {
                   })
                 }
                 required
-                className='input w-full'
+                className='input'
                 placeholder='At least 6 characters'
               />
             </div>
             <div>
-              <label className='block text-sm font-medium mb-1'>
-                Confirm New Password
-              </label>
+              <label className='label'>Confirm New Password</label>
               <input
                 type='password'
                 value={passwordForm.confirm}
@@ -101,7 +93,7 @@ export default function SettingsPage() {
                   setPasswordForm({ ...passwordForm, confirm: e.target.value })
                 }
                 required
-                className='input w-full'
+                className='input'
               />
             </div>
           </div>

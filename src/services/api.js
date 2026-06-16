@@ -45,3 +45,4 @@ export const api = {
   put: (url, data, config) => request(url, { method: "PUT", body: JSON.stringify(data), ...config }),
   delete: (url, config) => request(url, { method: "DELETE", ...config }),
 };
+export default api;

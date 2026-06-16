@@ -31,7 +31,7 @@ export default function ProfilePage() {
     setSaving(true);
 
     try {
-      const res = await authService.updateMe(form);
+      await authService.updateMe(form);
       setSuccess("Profile updated");
       setEditing(false);
     } catch (err) {
@@ -54,20 +54,18 @@ export default function ProfilePage() {
   if (loading) return null;
 
   const kycBadge = {
-    none: "bg-neutral-200 text-neutral-500",
-    pending: "bg-yellow-100 text-yellow-800",
-    verified: "bg-green-100 text-green-800",
-    rejected: "bg-red-100 text-red-800",
+    none: "badge-neutral",
+    pending: "badge-pending",
+    verified: "badge-active",
+    rejected: "badge-error",
   };
 
   return (
-    <div className='max-w-[80%] mx-auto px-4 py-8'>
+    <div className='max-w-2xl mx-auto px-4 py-8'>
       <h1 className='text-2xl font-bold mb-6'>Profile</h1>
 
       {error && <div className='alert alert-error mb-4'>{error}</div>}
-      {success && (
-        <div className='alert bg-green-100 text-green-800 mb-4'>{success}</div>
-      )}
+      {success && <div className='alert alert-success mb-4'>{success}</div>}
 
       <div className='card mb-6'>
         <div className='flex items-center gap-4 mb-6'>
@@ -80,7 +78,7 @@ export default function ProfilePage() {
           <div>
             <h2 className='text-lg font-semibold'>{user.name}</h2>
             <span
-              className={`badge text-xs ${kycBadge[user.kyc_status] || kycBadge.none}`}
+              className={`badge text-xs ${kycBadge[user.kyc_status] || "badge-neutral"}`}
             >
               KYC: {user.kyc_status}
             </span>
@@ -158,37 +156,35 @@ export default function ProfilePage() {
           <form onSubmit={handleSubmit}>
             <div className='space-y-4'>
               <div>
-                <label className='block text-sm font-medium mb-1'>Name</label>
+                <label className='label'>Name</label>
                 <input
                   type='text'
                   name='name'
                   value={form.name}
                   onChange={handleChange}
                   required
-                  className='input w-full'
+                  className='input'
                 />
               </div>
               <div>
-                <label className='block text-sm font-medium mb-1'>Email</label>
+                <label className='label'>Email</label>
                 <input
                   type='email'
                   name='email'
                   value={form.email}
                   onChange={handleChange}
-                  className='input w-full'
+                  className='input'
                   placeholder='you@example.com'
                 />
               </div>
               <div>
-                <label className='block text-sm font-medium mb-1'>
-                  Location
-                </label>
+                <label className='label'>Location</label>
                 <input
                   type='text'
                   name='location'
                   value={form.location}
                   onChange={handleChange}
-                  className='input w-full'
+                  className='input'
                   placeholder='Nairobi'
                 />
               </div>
@@ -204,8 +200,7 @@ export default function ProfilePage() {
               <button
                 type='button'
                 onClick={handleCancel}
-                className='btn'
-                style={{ backgroundColor: "var(--color-neutral-200)" }}
+                className='btn btn-tertiary'
               >
                 Cancel
               </button>

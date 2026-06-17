@@ -15,11 +15,9 @@ export function AuthProvider({ children }) {
     }
 
     try {
-      const res = await authService.getMe();
-      console.log("getMe success:", res.data);
-      setUser(res.data);
-    } catch (err) {
-      console.log("getMe failed:", err);
+      const user = await authService.getMe();
+      setUser(user);
+    } catch {
       localStorage.removeItem("access_token");
       localStorage.removeItem("refresh_token");
     } finally {
@@ -33,8 +31,8 @@ export function AuthProvider({ children }) {
 
   const login = async (email, password) => {
     const res = await authService.login(email, password);
-    localStorage.setItem("access_token", res.data.access_token);
-    localStorage.setItem("refresh_token", res.data.refresh_token);
+    localStorage.setItem("access_token", res.access_token);
+    localStorage.setItem("refresh_token", res.refresh_token);
     await hydrateUser();
   };
 

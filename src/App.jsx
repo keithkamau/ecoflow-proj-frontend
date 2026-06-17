@@ -143,8 +143,8 @@ export default function App() {
               path='/browse'
               element={<ProtectedRoute><LayoutWrapper><ListingsPage /></LayoutWrapper></ProtectedRoute>}
             />
-            <Route path='/' element={<Navigate to='/login' replace />} />
-            <Route path='*' element={<Navigate to='/login' replace />} />
+            <Route path='/' element={<Navigate to='/login' />} />
+            <Route path='*' element={<Navigate to='/login' />} />
           </Routes>
         </ListingProvider>
       </AuthProvider>

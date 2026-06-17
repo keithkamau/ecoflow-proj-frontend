@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 
 export default function LoginPage() {
@@ -8,6 +8,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -20,7 +21,8 @@ export default function LoginPage() {
 
     try {
       await login(form.email, form.password);
-      navigate("/dashboard");
+      const redirect = searchParams.get("redirect") || "/dashboard";
+      navigate(redirect);
     } catch (err) {
       console.log("Login error:", err);
       setError(err.response?.data?.detail || "Login failed");

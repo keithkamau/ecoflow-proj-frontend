@@ -1,19 +1,23 @@
-name: Build and Push
+name: Build and Push to Docker Hub
 
 on:
   push:
     branches: [main]
 
 jobs:
-  docker:
+  build-and-push:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: docker/login-action@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
         with:
           username: keithkibe
           password: ${{ secrets.DOCKER_PASSWORD }}
-      - uses: docker/build-push-action@v6
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
         with:
           context: .
           push: true

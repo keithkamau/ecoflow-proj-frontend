@@ -10,6 +10,14 @@ import LoginPage from "./pages/auth/LoginPage";
 import KYCPage from "./pages/auth/KYCPage";
 import ProfilePage from "./pages/ProfilePage";
 import SettingsPage from "./pages/SettingsPage";
+import ListingsPage from "./pages/ListingsPage";
+import OffersPage from "./pages/OffersPage";
+import TransactionsPage from "./pages/TransactionsPage";
+import PickupsPage from "./pages/PickupsPage";
+import AnalyticsPage from "./pages/AnalyticsPage";
+import BrowsePage from "./pages/BrowsePage";
+import NearbyPage from "./pages/NearbyPage";
+import InventoryPage from "./pages/InventoryPage";
 
 export default function App() {
   return (
@@ -51,6 +59,106 @@ export default function App() {
               <ProtectedRoute>
                 <LayoutWrapper>
                   <DashboardPage />
+                </LayoutWrapper>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path='/listings'
+            element={
+              <ProtectedRoute>
+                <LayoutWrapper>
+                  <ListingsPage />
+                </LayoutWrapper>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path='/listings/new'
+            element={
+              <ProtectedRoute>
+                <LayoutWrapper>
+                  <ListingsPage />
+                </LayoutWrapper>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path='/offers'
+            element={
+              <ProtectedRoute>
+                <LayoutWrapper>
+                  <OffersPage />
+                </LayoutWrapper>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path='/transactions'
+            element={
+              <ProtectedRoute>
+                <LayoutWrapper>
+                  <TransactionsPage />
+                </LayoutWrapper>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path='/pickups'
+            element={
+              <ProtectedRoute>
+                <LayoutWrapper>
+                  <PickupsPage />
+                </LayoutWrapper>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path='/analytics'
+            element={
+              <ProtectedRoute>
+                <LayoutWrapper>
+                  <AnalyticsPage />
+                </LayoutWrapper>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path='/analytics/impact'
+            element={
+              <ProtectedRoute>
+                <LayoutWrapper>
+                  <AnalyticsPage />
+                </LayoutWrapper>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path='/browse'
+            element={
+              <ProtectedRoute>
+                <LayoutWrapper>
+                  <BrowsePage />
+                </LayoutWrapper>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path='/nearby'
+            element={
+              <ProtectedRoute>
+                <LayoutWrapper>
+                  <NearbyPage />
+                </LayoutWrapper>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path='/inventory'
+            element={
+              <ProtectedRoute>
+                <LayoutWrapper>
+                  <InventoryPage />
                 </LayoutWrapper>
               </ProtectedRoute>
             }

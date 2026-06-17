@@ -1,4 +1,3 @@
-// src/hooks/useListing.js
 import { useState, useCallback } from 'react';
 import listingService from '../services/listingService';
 
@@ -12,32 +11,30 @@ export const useListing = () => {
 
   const clearError = () => setError(null);
 
-  // Materials
   const fetchMaterials = useCallback(async () => {
     setLoading(true);
     clearError();
     try {
       const response = await listingService.getMaterials();
-      setMaterials(response.data);
-      return response.data;
+      setMaterials(Array.isArray(response) ? response : []);
+      return response;
     } catch (err) {
-      setError(err.response?.data?.detail || 'Failed to fetch materials');
+      setError(err.message || 'Failed to fetch materials');
       throw err;
     } finally {
       setLoading(false);
     }
   }, []);
 
-  // Listings
   const fetchListings = useCallback(async (filters = {}) => {
     setLoading(true);
     clearError();
     try {
       const response = await listingService.getListings(filters);
-      setListings(response.data.listings || []);
-      return response.data;
+      setListings(response?.listings || []);
+      return response;
     } catch (err) {
-      setError(err.response?.data?.detail || 'Failed to fetch listings');
+      setError(err.message || 'Failed to fetch listings');
       throw err;
     } finally {
       setLoading(false);
@@ -49,10 +46,10 @@ export const useListing = () => {
     clearError();
     try {
       const response = await listingService.getListing(id);
-      setListing(response.data);
-      return response.data;
+      setListing(response);
+      return response;
     } catch (err) {
-      setError(err.response?.data?.detail || 'Failed to fetch listing');
+      setError(err.message || 'Failed to fetch listing');
       throw err;
     } finally {
       setLoading(false);
@@ -64,10 +61,10 @@ export const useListing = () => {
     clearError();
     try {
       const response = await listingService.createListing(data);
-      setListings((prev) => [response.data, ...prev]);
-      return response.data;
+      setListings((prev) => [response, ...prev]);
+      return response;
     } catch (err) {
-      setError(err.response?.data?.detail || 'Failed to create listing');
+      setError(err.message || 'Failed to create listing');
       throw err;
     } finally {
       setLoading(false);
@@ -80,12 +77,12 @@ export const useListing = () => {
     try {
       const response = await listingService.updateListing(id, data);
       setListings((prev) =>
-        prev.map((item) => (item.id === id ? response.data : item))
+        prev.map((item) => (item.id === id ? response : item))
       );
-      if (listing?.id === id) setListing(response.data);
-      return response.data;
+      if (listing?.id === id) setListing(response);
+      return response;
     } catch (err) {
-      setError(err.response?.data?.detail || 'Failed to update listing');
+      setError(err.message || 'Failed to update listing');
       throw err;
     } finally {
       setLoading(false);
@@ -100,39 +97,37 @@ export const useListing = () => {
       setListings((prev) => prev.filter((item) => item.id !== id));
       if (listing?.id === id) setListing(null);
     } catch (err) {
-      setError(err.response?.data?.detail || 'Failed to delete listing');
+      setError(err.message || 'Failed to delete listing');
       throw err;
     } finally {
       setLoading(false);
     }
   }, [listing]);
 
-  // Search
   const searchListings = useCallback(async (filters = {}) => {
     setLoading(true);
     clearError();
     try {
       const response = await listingService.searchListings(filters);
-      setListings(response.data.listings || []);
-      return response.data;
+      setListings(response?.listings || []);
+      return response;
     } catch (err) {
-      setError(err.response?.data?.detail || 'Search failed');
+      setError(err.message || 'Search failed');
       throw err;
     } finally {
       setLoading(false);
     }
   }, []);
 
-  // Inventory
   const fetchInventory = useCallback(async (recyclerId) => {
     setLoading(true);
     clearError();
     try {
       const response = await listingService.getRecyclerInventory(recyclerId);
-      setInventory(response.data);
-      return response.data;
+      setInventory(response);
+      return response;
     } catch (err) {
-      setError(err.response?.data?.detail || 'Failed to fetch inventory');
+      setError(err.message || 'Failed to fetch inventory');
       throw err;
     } finally {
       setLoading(false);

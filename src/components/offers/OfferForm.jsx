@@ -48,6 +48,21 @@ export default function OfferForm({ listingId, onSubmit, onClose }) {
         </div>
 
         <form onSubmit={handleSubmit} className="p-4 space-y-4">
+          {!listingId && (
+            <div>
+              <label className="label">Listing ID</label>
+              <input
+                name="listing_id"
+                type="number"
+                min="1"
+                value={form.listing_id}
+                onChange={handleChange}
+                className={`input ${errors.listing_id ? "input-error" : ""}`}
+                placeholder="Enter the listing ID"
+              />
+              {errors.listing_id && <p className="error-text">{errors.listing_id}</p>}
+            </div>
+          )}
           <div>
             <label className="label">Price (KSh per unit)</label>
             <input

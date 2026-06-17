@@ -1,7 +1,7 @@
-// src/pages/listings/ListingDetailPage.jsx
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useListingContext } from '../../context/ListingContexts';
+import { offerService } from '../../services/offerService';
 import ListingStatusBadge from '../../components/listings/ListingStatusBadge';
 import StatusTimeline from '../../components/listings/StatusTimeline';
 import MakeOfferModal from '../../components/listings/MakeOfferModal';
@@ -13,22 +13,28 @@ const ListingDetailPage = () => {
   
   const [offers, setOffers] = useState([]);
   const [showOfferModal, setShowOfferModal] = useState(false);
-  const [isSeller, setIsSeller] = useState(true); // Hardcoded - replace with auth check
+  const [isSeller, setIsSeller] = useState(true);
 
   useEffect(() => {
     fetchListing(id);
-    fetchOffers();
   }, [id, fetchListing]);
+
+  useEffect(() => {
+    fetchOffers();
+  }, [id]);
 
   const fetchOffers = async () => {
     try {
-      const response = await fetch(`http://localhost:8000/api/v1/listings/${id}/offers`);
-      if (response.ok) {
-        const data = await response.json();
+      const data = await offerService.getAll({ listing_id: id });
+      if (Array.isArray(data)) {
         setOffers(data);
+      } else if (data?.offers) {
+        setOffers(data.offers);
+      } else {
+        setOffers([]);
       }
     } catch {
-      // Silently fail
+      setOffers([]);
     }
   };
 
@@ -44,14 +50,9 @@ const ListingDetailPage = () => {
 
   const handleAcceptOffer = async (offerId) => {
     try {
-      const response = await fetch(`http://localhost:8000/api/v1/offers/${offerId}/accept`, {
-        method: 'POST',
-      });
-      
-      if (response.ok) {
-        fetchListing(id); // Refresh listing to show new status
-        fetchOffers(); // Refresh offers
-      }
+      await offerService.update(offerId, { status: "accepted" });
+      fetchListing(id);
+      fetchOffers();
     } catch {
       alert('Failed to accept offer');
     }

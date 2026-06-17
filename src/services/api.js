@@ -26,7 +26,12 @@ async function request(url, options = {}) {
   Object.assign(headers, options.headers);
 
   const query = buildQuery(options.params);
-  const res = await fetch(`${API_BASE}${url}${query}`, { ...options, headers });
+  let res;
+  try {
+    res = await fetch(`${API_BASE}${url}${query}`, { ...options, headers });
+  } catch (err) {
+    throw new Error(`Network error: unable to reach server. Check your connection.`);
+  }
 
   if (res.status === 204) return null;
   if (!res.ok) {

@@ -1,11 +1,13 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { ArrowLeft, Plus } from "lucide-react";
 import { offerService } from "../../services/offerService";
 import OfferForm from "../../components/offers/OfferForm";
 
 export default function CreateOfferPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const listingId = searchParams.get("listing_id");
   const [success, setSuccess] = useState(false);
 
   async function handleCreate(data) {
@@ -48,6 +50,7 @@ export default function CreateOfferPage() {
 
       <div className="max-w-lg mx-auto mt-6">
         <OfferForm
+          listingId={listingId}
           onSubmit={handleCreate}
           onClose={() => navigate("/offers")}
         />

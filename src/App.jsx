@@ -1,12 +1,9 @@
+import { useState } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
-<<<<<<< HEAD
 import { ListingProvider } from "./context/ListingContexts";
-import { useAuth } from "./hooks/useAuth";
-=======
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import RoleGuard from "./components/auth/RoleGuard";
->>>>>>> origin/main
 import Navbar from "./components/common/Navbar";
 import Sidebar from "./components/common/Sidebar";
 import Footer from "./components/common/Footer";
@@ -42,296 +39,133 @@ import NearbyPage from "./pages/nearby/NearbyPage";
 
 export default function App() {
   return (
-
-    <div className='page-wrapper'>
-      <Navbar
-        onMenuToggle={() => setSidebarOpen((v) => !v)}
-        sidebarOpen={sidebarOpen}
-        notificationCount={notificationCount}
-      />
-      {showSidebar && <Sidebar open={sidebarOpen} />}
-      <main
-        className={
-          showSidebar
-            ? sidebarOpen
-              ? "ml-0 lg:ml-60"
-              : "ml-0 lg:ml-18"
-            : "ml-0"
-        }
-        style={{ transition: "margin-left 300ms ease" }}
-      >
-        <Suspense fallback={<PageLoader message='Loading…' />}>
-          <Routes>
-            {/* Public */}
-            <Route path='/' element={<ListingsPage />} />
-            <Route path='/login' element={<Placeholder title='Login' />} />
-            <Route path='/register' element={<Placeholder title='Register' />} />
-
     <BrowserRouter>
       <AuthProvider>
-        <Routes>
-          <Route path='/register' element={<RegisterPage />} />   
-          <Route path='/login' element={<LoginPage />} />
-
-
-          <Route
-            path='/kyc'
-            element={
-              <ProtectedRoute>
-                <KYCPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path='/profile'
-            element={
-              <ProtectedRoute>
-                <ProfilePage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path='/settings'
-            element={
-              <ProtectedRoute>
-                <SettingsPage />
-              </ProtectedRoute>
-            }
-          />
-
-          <Route
-            path='/dashboard'
-            element={
-              <ProtectedRoute>
-                <LayoutWrapper>
-                  <DashboardPage />
-                </LayoutWrapper>
-              </ProtectedRoute>
-            }
-          />
-
-          <Route
-            path='/listings'
-            element={
-              <ProtectedRoute>
-                <LayoutWrapper>
-                  <ListingsPage />
-                </LayoutWrapper>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path='/listings/new'
-            element={
-              <ProtectedRoute>
-                <LayoutWrapper>
-                  <CreateListingPage />
-                </LayoutWrapper>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path='/listings/mine'
-            element={
-              <ProtectedRoute>
-                <LayoutWrapper>
-                  <MyListingsPage />
-                </LayoutWrapper>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path='/listings/:id'
-            element={
-              <ProtectedRoute>
-                <LayoutWrapper>
-                  <ListingDetailPage />
-                </LayoutWrapper>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path='/listings/:id/edit'
-            element={
-              <ProtectedRoute>
-                <LayoutWrapper>
-                  <EditListingPage />
-                </LayoutWrapper>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path='/inventory'
-            element={
-              <ProtectedRoute>
-                <LayoutWrapper>
-                  <RecyclerInventoryPage />
-                </LayoutWrapper>
-              </ProtectedRoute>
-            }
-          />
-
-          <Route
-            path='/offers'
-            element={
-              <ProtectedRoute>
-                <LayoutWrapper>
-                  <OfferPage />
-                </LayoutWrapper>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path='/offers/new'
-            element={
-              <ProtectedRoute>
-                <LayoutWrapper>
-                  <CreateOfferPage />
-                </LayoutWrapper>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path='/offers/:id'
-            element={
-              <ProtectedRoute>
-                <LayoutWrapper>
-                  <OfferDetailPage />
-                </LayoutWrapper>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path='/transactions'
-            element={
-              <ProtectedRoute>
-                <LayoutWrapper>
-                  <TransactionPage />
-                </LayoutWrapper>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path='/transactions/:id'
-            element={
-              <ProtectedRoute>
-                <LayoutWrapper>
-                  <TransactionDetailPage />
-                </LayoutWrapper>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path='/payments/:id'
-            element={
-              <ProtectedRoute>
-                <LayoutWrapper>
-                  <PaymentPage />
-                </LayoutWrapper>
-              </ProtectedRoute>
-            }
-          />
-
-          <Route
-            path='/pickups'
-            element={
-              <ProtectedRoute>
-                <LayoutWrapper>
-                  <PickupPage />
-                </LayoutWrapper>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path='/pickups/:id/track'
-            element={
-              <ProtectedRoute>
-                <LayoutWrapper>
-                  <TrackingPage />
-                </LayoutWrapper>
-              </ProtectedRoute>
-            }
-          />
-
-          <Route
-            path='/analytics'
-            element={
-              <ProtectedRoute>
-                <LayoutWrapper>
-                  <AnalyticsPage />
-                </LayoutWrapper>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path='/analytics/impact'
-            element={
-              <ProtectedRoute>
-                <LayoutWrapper>
-                  <EnvironmentalImpactPage />
-                </LayoutWrapper>
-              </ProtectedRoute>
-            }
-          />
-
-          <Route
-            path='/nearby'
-            element={
-              <ProtectedRoute>
-                <LayoutWrapper>
-                  <NearbyPage />
-                </LayoutWrapper>
-              </ProtectedRoute>
-            }
-          />
-
-          <Route
-            path='/admin'
-            element={
-              <ProtectedRoute>
-                <RoleGuard roles={["admin"]}>
-                  <LayoutWrapper>
-                    <AdminDashboard />
-                  </LayoutWrapper>
-                </RoleGuard>
-              </ProtectedRoute>
-            }
-          />
-
-          <Route path='/' element={<Navigate to='/login' replace />} />
-          <Route path='*' element={<Navigate to='/login' replace />} />
-        </Routes>
+        <ListingProvider>
+          <Routes>
+            <Route path='/register' element={<RegisterPage />} />
+            <Route path='/login' element={<LoginPage />} />
+            <Route
+              path='/kyc'
+              element={<ProtectedRoute><KYCPage /></ProtectedRoute>}
+            />
+            <Route
+              path='/profile'
+              element={<ProtectedRoute><ProfilePage /></ProtectedRoute>}
+            />
+            <Route
+              path='/settings'
+              element={<ProtectedRoute><SettingsPage /></ProtectedRoute>}
+            />
+            <Route
+              path='/dashboard'
+              element={<ProtectedRoute><LayoutWrapper><DashboardPage /></LayoutWrapper></ProtectedRoute>}
+            />
+            <Route
+              path='/listings'
+              element={<ProtectedRoute><LayoutWrapper><ListingsPage /></LayoutWrapper></ProtectedRoute>}
+            />
+            <Route
+              path='/listings/new'
+              element={<ProtectedRoute><LayoutWrapper><CreateListingPage /></LayoutWrapper></ProtectedRoute>}
+            />
+            <Route
+              path='/listings/mine'
+              element={<ProtectedRoute><LayoutWrapper><MyListingsPage /></LayoutWrapper></ProtectedRoute>}
+            />
+            <Route
+              path='/listings/:id'
+              element={<ProtectedRoute><LayoutWrapper><ListingDetailPage /></LayoutWrapper></ProtectedRoute>}
+            />
+            <Route
+              path='/listings/:id/edit'
+              element={<ProtectedRoute><LayoutWrapper><EditListingPage /></LayoutWrapper></ProtectedRoute>}
+            />
+            <Route
+              path='/inventory'
+              element={<ProtectedRoute><LayoutWrapper><RecyclerInventoryPage /></LayoutWrapper></ProtectedRoute>}
+            />
+            <Route
+              path='/offers'
+              element={<ProtectedRoute><LayoutWrapper><OfferPage /></LayoutWrapper></ProtectedRoute>}
+            />
+            <Route
+              path='/offers/new'
+              element={<ProtectedRoute><LayoutWrapper><CreateOfferPage /></LayoutWrapper></ProtectedRoute>}
+            />
+            <Route
+              path='/offers/:id'
+              element={<ProtectedRoute><LayoutWrapper><OfferDetailPage /></LayoutWrapper></ProtectedRoute>}
+            />
+            <Route
+              path='/transactions'
+              element={<ProtectedRoute><LayoutWrapper><TransactionPage /></LayoutWrapper></ProtectedRoute>}
+            />
+            <Route
+              path='/transactions/:id'
+              element={<ProtectedRoute><LayoutWrapper><TransactionDetailPage /></LayoutWrapper></ProtectedRoute>}
+            />
+            <Route
+              path='/payments/:id'
+              element={<ProtectedRoute><LayoutWrapper><PaymentPage /></LayoutWrapper></ProtectedRoute>}
+            />
+            <Route
+              path='/pickups'
+              element={<ProtectedRoute><LayoutWrapper><PickupPage /></LayoutWrapper></ProtectedRoute>}
+            />
+            <Route
+              path='/pickups/:id/track'
+              element={<ProtectedRoute><LayoutWrapper><TrackingPage /></LayoutWrapper></ProtectedRoute>}
+            />
+            <Route
+              path='/analytics'
+              element={<ProtectedRoute><LayoutWrapper><AnalyticsPage /></LayoutWrapper></ProtectedRoute>}
+            />
+            <Route
+              path='/analytics/impact'
+              element={<ProtectedRoute><LayoutWrapper><EnvironmentalImpactPage /></LayoutWrapper></ProtectedRoute>}
+            />
+            <Route
+              path='/nearby'
+              element={<ProtectedRoute><LayoutWrapper><NearbyPage /></LayoutWrapper></ProtectedRoute>}
+            />
+            <Route
+              path='/admin'
+              element={
+                <ProtectedRoute>
+                  <RoleGuard roles={["admin"]}>
+                    <LayoutWrapper><AdminDashboard /></LayoutWrapper>
+                  </RoleGuard>
+                </ProtectedRoute>
+              }
+            />
+            <Route path='/' element={<Navigate to='/login' replace />} />
+            <Route path='*' element={<Navigate to='/login' replace />} />
+          </Routes>
+        </ListingProvider>
       </AuthProvider>
     </BrowserRouter>
   );
 }
 
+function AdminDashboard() {
+  return <h1 className='text-2xl font-bold'>Admin Dashboard</h1>;
+}
+
 function LayoutWrapper({ children }) {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
   return (
     <div className='min-h-screen flex'>
-      <Sidebar />
+      <Sidebar open={sidebarOpen} />
       <div className='flex-1 flex flex-col'>
-        <Navbar />
+        <Navbar
+          onMenuToggle={() => setSidebarOpen(v => !v)}
+          sidebarOpen={sidebarOpen}
+        />
         <main className='flex-1 p-6'>{children}</main>
         <Footer />
       </div>
     </div>
   );
-}
-
-<<<<<<< HEAD
-function App() {
-  return (
-    <AuthProvider>
-      <ListingProvider>
-        <Router>
-          <AppLayout />
-        </Router>
-      </ListingProvider>
-    </AuthProvider>
-  );
-=======
-function AdminDashboard() {
-  return <h1 className='text-2xl font-bold'>Admin Dashboard</h1>;
->>>>>>> origin/main
 }

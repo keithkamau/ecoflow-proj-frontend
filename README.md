@@ -2,6 +2,8 @@
 
 React + Tailwind CSS frontend for the EcoFlow waste management platform.
 
+Front-end link: https://ecoflow-frontend.onrender.com
+
 ## Tech Stack
 - **Framework:** React 18 + Vite
 - **Styling:** Tailwind CSS v4

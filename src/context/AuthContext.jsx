@@ -15,11 +15,13 @@ export function AuthProvider({ children }) {
     }
 
     try {
-      const user = await authService.getMe();
-      setUser(user);
-    } catch {
+      const userData = await authService.getMe();
+      setUser(userData);
+    } catch (err) {
+      console.error("Hydrate failed:", err);
       localStorage.removeItem("access_token");
       localStorage.removeItem("refresh_token");
+      setUser(null);
     } finally {
       setLoading(false);
     }
@@ -46,6 +48,8 @@ export function AuthProvider({ children }) {
     localStorage.removeItem("refresh_token");
     setUser(null);
   };
+
+  if (loading) return null;
 
   return (
     <AuthContext.Provider value={{ user, loading, login, register, logout }}>

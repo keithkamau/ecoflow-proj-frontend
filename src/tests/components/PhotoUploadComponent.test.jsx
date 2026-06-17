@@ -1,6 +1,6 @@
+import { describe, it, expect, vi, beforeAll } from "vitest";
 
 import { render, screen, fireEvent } from '@testing-library/react';
-import { describe, it, expect, vi, beforeAll } from 'vitest';
 
 import PhotoUploadComponent from '../../components/listings/PhotoUploadComponent';
 

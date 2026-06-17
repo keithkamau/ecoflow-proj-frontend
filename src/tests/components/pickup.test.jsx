@@ -3,22 +3,24 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 
 // ── Mock PickupMap entirely (avoids Leaflet dynamic-import issues in jsdom) ──
-jest.mock('../../components/pickup/PickupMap', () => {
-  return function MockPickupMap({ pickupLocation }) {
-    return (
-      <div data-testid='pickup-map'>
-        {pickupLocation?.address && <p>{pickupLocation.address}</p>}
-      </div>
-    );
+vi.mock('../../components/pickup/PickupMap', () => {
+  return {
+    default: function MockPickupMap({ pickupLocation }) {
+      return (
+        <div data-testid='pickup-map'>
+          {pickupLocation?.address && <p>{pickupLocation.address}</p>}
+        </div>
+      );
+    }
   };
 });
 
-jest.mock('../../services/pickupService', () => ({
-  getPickups:     jest.fn().mockResolvedValue({ data: [] }),
-  getDrivers:     jest.fn().mockResolvedValue({ data: [] }),
-  schedulePickup: jest.fn().mockResolvedValue({ data: { id: 'p99', status: 'scheduled' } }),
-  uploadProof:    jest.fn().mockResolvedValue({ data: { success: true } }),
-  assignDriver:   jest.fn().mockResolvedValue({ data: { success: true } }),
+vi.mock('../../services/pickupService', () => ({
+  getPickups:     vi.fn().mockResolvedValue({ data: [] }),
+  getDrivers:     vi.fn().mockResolvedValue({ data: [] }),
+  schedulePickup: vi.fn().mockResolvedValue({ data: { id: 'p99', status: 'scheduled' } }),
+  uploadProof:    vi.fn().mockResolvedValue({ data: { success: true } }),
+  assignDriver:   vi.fn().mockResolvedValue({ data: { success: true } }),
 }));
 
 import PickupCard       from '../../components/pickup/PickupCard';
@@ -123,7 +125,7 @@ describe('PickupScheduler', () => {
   });
 
   it('calls onScheduled with correct payload on valid submit', async () => {
-    const onScheduled = jest.fn();
+    const onScheduled = vi.fn();
     render(<PickupScheduler onScheduled={onScheduled} />);
 
     fireEvent.change(screen.getByLabelText(/Pickup Date/i),    { target: { value: '2026-12-01' } });
@@ -162,8 +164,8 @@ describe('PickupMap', () => {
 // ── ProofUpload ────────────────────────────────────────────────
 describe('ProofUpload', () => {
   beforeEach(() => {
-    global.URL.createObjectURL = jest.fn().mockReturnValue('blob:mock-url');
-    global.URL.revokeObjectURL = jest.fn();
+    global.URL.createObjectURL = vi.fn().mockReturnValue('blob:mock-url');
+    global.URL.revokeObjectURL = vi.fn();
   });
 
   it('renders weight input and drop zone', () => {
@@ -202,14 +204,14 @@ describe('ProofUpload', () => {
   it('updates drag-over state on drag events', () => {
     render(<ProofUpload />);
     const dropZone = screen.getByTestId('drop-zone');
-    fireEvent.dragOver(dropZone, { preventDefault: jest.fn() });
+    fireEvent.dragOver(dropZone, { preventDefault: vi.fn() });
     fireEvent.dragLeave(dropZone);
     // No throw = pass — state changes are internal
     expect(dropZone).toBeInTheDocument();
   });
 
   it('shows success state after submit with onSubmit callback', async () => {
-    const onSubmit = jest.fn().mockResolvedValue({});
+    const onSubmit = vi.fn().mockResolvedValue({});
     render(<ProofUpload pickupId='p1' onSubmit={onSubmit} />);
 
     const fileInput = document.querySelector('input[type="file"]');
@@ -270,7 +272,7 @@ describe('DriverAssignment', () => {
   it('shows assigned state after successful assignment', async () => {
     const { getDrivers } = require('../../services/pickupService');
     getDrivers.mockResolvedValueOnce({ data: MOCK_DRIVERS });
-    const onAssigned = jest.fn();
+    const onAssigned = vi.fn();
     render(<DriverAssignment pickupId='p1' onAssigned={onAssigned} />);
     await waitFor(() => expect(screen.getByText('John Mwangi')).toBeInTheDocument());
 

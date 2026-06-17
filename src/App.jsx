@@ -1,7 +1,12 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
+<<<<<<< HEAD
+import { ListingProvider } from "./context/ListingContexts";
+import { useAuth } from "./hooks/useAuth";
+=======
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import RoleGuard from "./components/auth/RoleGuard";
+>>>>>>> origin/main
 import Navbar from "./components/common/Navbar";
 import Sidebar from "./components/common/Sidebar";
 import Footer from "./components/common/Footer";
@@ -37,11 +42,37 @@ import NearbyPage from "./pages/nearby/NearbyPage";
 
 export default function App() {
   return (
+
+    <div className='page-wrapper'>
+      <Navbar
+        onMenuToggle={() => setSidebarOpen((v) => !v)}
+        sidebarOpen={sidebarOpen}
+        notificationCount={notificationCount}
+      />
+      {showSidebar && <Sidebar open={sidebarOpen} />}
+      <main
+        className={
+          showSidebar
+            ? sidebarOpen
+              ? "ml-0 lg:ml-60"
+              : "ml-0 lg:ml-18"
+            : "ml-0"
+        }
+        style={{ transition: "margin-left 300ms ease" }}
+      >
+        <Suspense fallback={<PageLoader message='Loading…' />}>
+          <Routes>
+            {/* Public */}
+            <Route path='/' element={<ListingsPage />} />
+            <Route path='/login' element={<Placeholder title='Login' />} />
+            <Route path='/register' element={<Placeholder title='Register' />} />
+
     <BrowserRouter>
       <AuthProvider>
         <Routes>
-          <Route path='/register' element={<RegisterPage />} />
+          <Route path='/register' element={<RegisterPage />} />   
           <Route path='/login' element={<LoginPage />} />
+
 
           <Route
             path='/kyc'
@@ -288,6 +319,19 @@ function LayoutWrapper({ children }) {
   );
 }
 
+<<<<<<< HEAD
+function App() {
+  return (
+    <AuthProvider>
+      <ListingProvider>
+        <Router>
+          <AppLayout />
+        </Router>
+      </ListingProvider>
+    </AuthProvider>
+  );
+=======
 function AdminDashboard() {
   return <h1 className='text-2xl font-bold'>Admin Dashboard</h1>;
+>>>>>>> origin/main
 }

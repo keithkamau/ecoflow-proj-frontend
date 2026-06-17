@@ -1,1 +1,7 @@
-import { describe, it } from 'vitest'; describe('placeholder', () => { it('skip', () => {}); });
+import { describe, it, expect } from "vitest";
+
+describe('auth placeholder', () => {
+  it('passes', () => {
+    expect(true).toBe(true);
+  });
+});

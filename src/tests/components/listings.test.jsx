@@ -1,6 +1,6 @@
+import { describe, it, expect, vi } from "vitest";
 
 import { render, screen, fireEvent } from '@testing-library/react';
-import { describe, it, expect, vi } from 'vitest';
 
 import ListingCard from '../../components/listings/ListingCard';
 import SearchBar from '../../components/listings/SearchBar';

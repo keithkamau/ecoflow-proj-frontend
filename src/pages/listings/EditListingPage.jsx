@@ -30,7 +30,7 @@ const EditListingPage = () => {
     const loadListing = async () => {
       try {
         const response = await listingService.getListing(id);
-        const listing = response.data;
+        const listing = response;
         setFormData({
           material_id: listing.material_id.toString(),
           quantity: listing.quantity.toString(),
@@ -64,7 +64,7 @@ const EditListingPage = () => {
     setSubmitError(null);
 
     try {
-      const selectedMaterial = materials.find(m => m.id === parseInt(formData.material_id));
+      const selectedMaterial = materials?.find(m => m.id === parseInt(formData.material_id));
 
       const data = {
         ...formData,
@@ -86,11 +86,11 @@ const EditListingPage = () => {
 
       navigate(`/listings/${id}`);
     } catch (err) {
-      setSubmitError(err.response?.data?.detail || 'Failed to update listing');
+      setSubmitError(err.message || 'Failed to update listing');
     }
   };
 
-  const selectedMaterial = materials.find(m => m.id === parseInt(formData.material_id));
+  const selectedMaterial = materials?.find(m => m.id === parseInt(formData.material_id));
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -121,7 +121,7 @@ const EditListingPage = () => {
               className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
             >
               <option value="">Select material</option>
-              {materials.map((m) => (
+              {materials?.map((m) => (
                 <option key={m.id} value={m.id}>
                   {m.type} ({m.unit}) {m.reference_price ? `- KES ${m.reference_price}` : ''}
                 </option>

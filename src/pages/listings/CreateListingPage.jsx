@@ -37,7 +37,7 @@ const CreateListingPage = () => {
     setSubmitError(null);
 
     try {
-      const selectedMaterial = materials.find(m => m.id === parseInt(formData.material_id));
+      const selectedMaterial = materials?.find(m => m.id === parseInt(formData.material_id));
 
       const data = {
         ...formData,
@@ -63,7 +63,7 @@ const CreateListingPage = () => {
     }
   };
 
-  const selectedMaterial = materials.find(m => m.id === parseInt(formData.material_id));
+  const selectedMaterial = materials?.find(m => m.id === parseInt(formData.material_id));
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -95,7 +95,7 @@ const CreateListingPage = () => {
               className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
             >
               <option value="">Select material</option>
-              {materials.map((m) => (
+              {materials?.map((m) => (
                 <option key={m.id} value={m.id}>
                   {m.type} ({m.unit}) {m.reference_price ? `- KES ${m.reference_price}` : ''}
                 </option>

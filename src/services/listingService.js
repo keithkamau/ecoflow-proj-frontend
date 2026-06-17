@@ -16,7 +16,7 @@ export const listingService = {
     const formData = new FormData();
     formData.append('file', file);
     return api.post(`/listings/listings/${listingId}/photos`, formData, {
-      headers: { 'Content-Type': 'multipart/form-data' }
+      headers: {}
     });
   }
 };

@@ -125,7 +125,7 @@ export const DURATION = {
 export const NAV_ITEMS = {
   seller: [
     { label: "Dashboard", path: "/dashboard", icon: "LayoutDashboard" },
-    { label: "My Listings", path: "/listings", icon: "List" },
+    { label: "My Listings", path: "/listings/mine", icon: "List" },
     { label: "New Listing", path: "/listings/new", icon: "PlusCircle" },
     { label: "Offers", path: "/offers", icon: "Tag" },
     { label: "Transactions", path: "/transactions", icon: "ArrowLeftRight" },

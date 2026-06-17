@@ -5,30 +5,44 @@ import RoleGuard from "./components/auth/RoleGuard";
 import Navbar from "./components/common/Navbar";
 import Sidebar from "./components/common/Sidebar";
 import Footer from "./components/common/Footer";
+
 import RegisterPage from "./pages/auth/RegisterPage";
 import LoginPage from "./pages/auth/LoginPage";
 import KYCPage from "./pages/auth/KYCPage";
 import ProfilePage from "./pages/ProfilePage";
 import SettingsPage from "./pages/SettingsPage";
-import ListingsPage from "./pages/ListingsPage";
-import OffersPage from "./pages/OffersPage";
-import TransactionsPage from "./pages/TransactionsPage";
-import PickupsPage from "./pages/PickupsPage";
-import AnalyticsPage from "./pages/AnalyticsPage";
-import BrowsePage from "./pages/BrowsePage";
-import NearbyPage from "./pages/NearbyPage";
-import InventoryPage from "./pages/InventoryPage";
+import DashboardPage from "./pages/DashboardPage";
+
+import ListingsPage from "./pages/listings/ListingsPage";
+import MyListingsPage from "./pages/listings/MyListingsPage";
+import CreateListingPage from "./pages/listings/CreateListingPage";
+import EditListingPage from "./pages/listings/EditListingPage";
+import ListingDetailPage from "./pages/listings/ListingDetailPage";
+import RecyclerInventoryPage from "./pages/listings/RecyclerInventoryPage";
+
+import OfferPage from "./pages/offers/OfferPage";
+import CreateOfferPage from "./pages/offers/CreateOfferPage";
+import OfferDetailPage from "./pages/offers/OfferDetailPage";
+import TransactionPage from "./pages/offers/TransactionPage";
+import TransactionDetailPage from "./pages/offers/TransactionDetailPage";
+import PaymentPage from "./pages/offers/PaymentPage";
+
+import PickupPage from "./pages/pickup/PickupPage";
+import TrackingPage from "./pages/pickup/TrackingPage";
+
+import AnalyticsPage from "./pages/analytics/AnalyticsPage";
+import EnvironmentalImpactPage from "./pages/analytics/EnvironmentalImpactPage";
+
+import NearbyPage from "./pages/nearby/NearbyPage";
 
 export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
         <Routes>
-          {/* Public routes */}
           <Route path='/register' element={<RegisterPage />} />
           <Route path='/login' element={<LoginPage />} />
 
-          {/* Protected routes */}
           <Route
             path='/kyc'
             element={
@@ -53,6 +67,7 @@ export default function App() {
               </ProtectedRoute>
             }
           />
+
           <Route
             path='/dashboard'
             element={
@@ -63,6 +78,7 @@ export default function App() {
               </ProtectedRoute>
             }
           />
+
           <Route
             path='/listings'
             element={
@@ -78,17 +94,78 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <LayoutWrapper>
-                  <ListingsPage />
+                  <CreateListingPage />
                 </LayoutWrapper>
               </ProtectedRoute>
             }
           />
           <Route
+            path='/listings/mine'
+            element={
+              <ProtectedRoute>
+                <LayoutWrapper>
+                  <MyListingsPage />
+                </LayoutWrapper>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path='/listings/:id'
+            element={
+              <ProtectedRoute>
+                <LayoutWrapper>
+                  <ListingDetailPage />
+                </LayoutWrapper>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path='/listings/:id/edit'
+            element={
+              <ProtectedRoute>
+                <LayoutWrapper>
+                  <EditListingPage />
+                </LayoutWrapper>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path='/inventory'
+            element={
+              <ProtectedRoute>
+                <LayoutWrapper>
+                  <RecyclerInventoryPage />
+                </LayoutWrapper>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
             path='/offers'
             element={
               <ProtectedRoute>
                 <LayoutWrapper>
-                  <OffersPage />
+                  <OfferPage />
+                </LayoutWrapper>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path='/offers/new'
+            element={
+              <ProtectedRoute>
+                <LayoutWrapper>
+                  <CreateOfferPage />
+                </LayoutWrapper>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path='/offers/:id'
+            element={
+              <ProtectedRoute>
+                <LayoutWrapper>
+                  <OfferDetailPage />
                 </LayoutWrapper>
               </ProtectedRoute>
             }
@@ -98,21 +175,53 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <LayoutWrapper>
-                  <TransactionsPage />
+                  <TransactionPage />
                 </LayoutWrapper>
               </ProtectedRoute>
             }
           />
           <Route
-            path='/pickups'
+            path='/transactions/:id'
             element={
               <ProtectedRoute>
                 <LayoutWrapper>
-                  <PickupsPage />
+                  <TransactionDetailPage />
                 </LayoutWrapper>
               </ProtectedRoute>
             }
           />
+          <Route
+            path='/payments/:id'
+            element={
+              <ProtectedRoute>
+                <LayoutWrapper>
+                  <PaymentPage />
+                </LayoutWrapper>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path='/pickups'
+            element={
+              <ProtectedRoute>
+                <LayoutWrapper>
+                  <PickupPage />
+                </LayoutWrapper>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path='/pickups/:id/track'
+            element={
+              <ProtectedRoute>
+                <LayoutWrapper>
+                  <TrackingPage />
+                </LayoutWrapper>
+              </ProtectedRoute>
+            }
+          />
+
           <Route
             path='/analytics'
             element={
@@ -128,21 +237,12 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <LayoutWrapper>
-                  <AnalyticsPage />
+                  <EnvironmentalImpactPage />
                 </LayoutWrapper>
               </ProtectedRoute>
             }
           />
-          <Route
-            path='/browse'
-            element={
-              <ProtectedRoute>
-                <LayoutWrapper>
-                  <BrowsePage />
-                </LayoutWrapper>
-              </ProtectedRoute>
-            }
-          />
+
           <Route
             path='/nearby'
             element={
@@ -153,18 +253,7 @@ export default function App() {
               </ProtectedRoute>
             }
           />
-          <Route
-            path='/inventory'
-            element={
-              <ProtectedRoute>
-                <LayoutWrapper>
-                  <InventoryPage />
-                </LayoutWrapper>
-              </ProtectedRoute>
-            }
-          />
 
-          {/* Admin routes */}
           <Route
             path='/admin'
             element={
@@ -178,7 +267,6 @@ export default function App() {
             }
           />
 
-          {/* Default redirect to login */}
           <Route path='/' element={<Navigate to='/login' replace />} />
           <Route path='*' element={<Navigate to='/login' replace />} />
         </Routes>
@@ -198,10 +286,6 @@ function LayoutWrapper({ children }) {
       </div>
     </div>
   );
-}
-
-function DashboardPage() {
-  return <h1 className='text-2xl font-bold'>Dashboard</h1>;
 }
 
 function AdminDashboard() {

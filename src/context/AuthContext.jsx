@@ -16,8 +16,10 @@ export function AuthProvider({ children }) {
 
     try {
       const res = await authService.getMe();
+      console.log("getMe success:", res.data);
       setUser(res.data);
-    } catch {
+    } catch (err) {
+      console.log("getMe failed:", err);
       localStorage.removeItem("access_token");
       localStorage.removeItem("refresh_token");
     } finally {

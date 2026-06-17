@@ -22,6 +22,7 @@ export default function LoginPage() {
       await login(form.email, form.password);
       navigate("/dashboard");
     } catch (err) {
+      console.log("Login error:", err);
       setError(err.response?.data?.detail || "Login failed");
     } finally {
       setLoading(false);

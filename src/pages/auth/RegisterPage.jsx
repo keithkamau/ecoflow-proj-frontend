@@ -197,7 +197,7 @@ export default function RegisterPage() {
                   />
                 </div>
                 <div>
-                  <label className='label'>Email (optional)</label>
+                  <label className='label'>Email</label>
                   <input
                     type='email'
                     name='email'

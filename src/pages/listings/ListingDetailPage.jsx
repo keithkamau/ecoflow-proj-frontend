@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useListingContext } from '../../context/ListingContexts';
 import { offerService } from '../../services/offerService';
+import { useAuth } from '../../hooks/useAuth';
 import ListingStatusBadge from '../../components/listings/ListingStatusBadge';
 import StatusTimeline from '../../components/listings/StatusTimeline';
 import MakeOfferModal from '../../components/listings/MakeOfferModal';
@@ -9,11 +10,13 @@ import MakeOfferModal from '../../components/listings/MakeOfferModal';
 const ListingDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { currentListing, loading, error, fetchListing, deleteListing, updateListing } = useListingContext();
-  
+  const { user } = useAuth();
+  const { currentListing, loading, error, fetchListing, deleteListing } = useListingContext();
+
   const [offers, setOffers] = useState([]);
   const [showOfferModal, setShowOfferModal] = useState(false);
-  const [isSeller, setIsSeller] = useState(true);
+
+  const isSeller = user?.id === currentListing?.seller_id;
 
   useEffect(() => {
     fetchListing(id);
@@ -26,13 +29,7 @@ const ListingDetailPage = () => {
   const fetchOffers = async () => {
     try {
       const data = await offerService.getAll({ listing_id: id });
-      if (Array.isArray(data)) {
-        setOffers(data);
-      } else if (data?.offers) {
-        setOffers(data.offers);
-      } else {
-        setOffers([]);
-      }
+      setOffers(Array.isArray(data) ? data : []);
     } catch {
       setOffers([]);
     }
@@ -43,9 +40,7 @@ const ListingDetailPage = () => {
     try {
       await deleteListing(id);
       navigate('/listings');
-    } catch {
-      // error handled in context
-    }
+    } catch {}
   };
 
   const handleAcceptOffer = async (offerId) => {
@@ -55,15 +50,6 @@ const ListingDetailPage = () => {
       fetchOffers();
     } catch {
       alert('Failed to accept offer');
-    }
-  };
-
-  const handleStatusChange = async (newStatus) => {
-    try {
-      await updateListing(id, { status: newStatus });
-      fetchListing(id);
-    } catch {
-      alert('Failed to update status');
     }
   };
 
@@ -93,6 +79,8 @@ const ListingDetailPage = () => {
 
   const { material, quantity, condition, location_address, location_lat, location_lng, price_expectation, status, photos, created_at } = currentListing;
 
+  const pendingOffers = offers.filter(o => o.status === "pending");
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-4xl mx-auto px-4 py-6">
@@ -112,19 +100,15 @@ const ListingDetailPage = () => {
             <ListingStatusBadge status={status} />
           </div>
 
-          {/* Status Timeline - Interactive */}
+          {/* Status Timeline */}
           <div className="mt-6 mb-8 pb-6 border-b border-gray-100">
             <h3 className="text-base font-medium text-gray-700 mb-3">Status Timeline</h3>
-            <StatusTimeline 
-              currentStatus={status} 
-              onStatusChange={handleStatusChange}
-              isEditable={isSeller}
-            />
+            <StatusTimeline currentStatus={status} />
           </div>
 
           {/* Action Buttons */}
           <div className="flex gap-3 mb-6">
-            {!isSeller && status === 'active' && (
+            {!isSeller && status === 'waiting' && (
               <button
                 onClick={() => setShowOfferModal(true)}
                 className="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
@@ -132,41 +116,47 @@ const ListingDetailPage = () => {
                 Make Offer
               </button>
             )}
-            
-            {isSeller && status === 'matched' && offers.length > 0 && (
-              <button
-                onClick={() => handleAcceptOffer(offers[0].id)}
-                className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
-              >
-                Accept Offer & Mark Completed
-              </button>
-            )}
           </div>
 
           {/* Offers List */}
           {offers.length > 0 && (
             <div className="mb-6 p-4 bg-gray-50 rounded-lg">
-              <h3 className="text-sm font-medium text-gray-700 mb-3">Offers ({offers.length})</h3>
+              <h3 className="text-sm font-medium text-gray-700 mb-3">
+                Offers ({offers.length})
+                {isSeller && pendingOffers.length > 0 && (
+                  <span className="text-amber-600 ml-1">
+                    · {pendingOffers.length} pending
+                  </span>
+                )}
+              </h3>
               <div className="space-y-2">
-                {offers.map((offer) => (
-                  <div key={offer.id} className="flex items-center justify-between bg-white p-3 rounded-lg">
-                    <div>
-                      <p className="text-sm font-medium text-gray-900">Recycler #{offer.recycler_id}</p>
-                      {offer.offered_price && (
-                        <p className="text-sm text-emerald-600">KES {offer.offered_price.toLocaleString()}</p>
+                {offers.map((offer) => {
+                  const isPending = offer.status === "pending";
+                  const isAccepted = offer.status === "accepted";
+                  const isRejected = offer.status === "rejected";
+                  return (
+                    <div key={offer.id} className={`flex items-center justify-between bg-white p-3 rounded-lg border ${isAccepted ? 'border-emerald-300 bg-emerald-50' : isRejected ? 'border-red-100 bg-red-50' : 'border-transparent'}`}>
+                      <div>
+                        <p className="text-sm font-medium text-gray-900">Recycler #{offer.recycler_id?.slice(0, 8)}</p>
+                        {offer.offered_price && (
+                          <p className="text-sm text-emerald-600">KES {offer.offered_price.toLocaleString()} / unit</p>
+                        )}
+                        <p className="text-xs text-gray-500">{offer.status.replace('_', ' ')}</p>
+                      </div>
+                      {isSeller && isPending && (
+                        <button
+                          onClick={() => handleAcceptOffer(offer.id)}
+                          className="bg-emerald-500 hover:bg-emerald-600 text-white px-3 py-1.5 rounded text-xs font-medium transition-colors"
+                        >
+                          Accept
+                        </button>
                       )}
-                      <p className="text-xs text-gray-500">{offer.status}</p>
+                      {isAccepted && (
+                        <span className="text-xs font-semibold text-emerald-600 bg-emerald-100 px-2 py-1 rounded">Selected</span>
+                      )}
                     </div>
-                    {isSeller && offer.status === 'pending' && (
-                      <button
-                        onClick={() => handleAcceptOffer(offer.id)}
-                        className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1.5 rounded text-xs font-medium transition-colors"
-                      >
-                        Accept
-                      </button>
-                    )}
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           )}
@@ -221,24 +211,25 @@ const ListingDetailPage = () => {
             </div>
           </div>
 
-          <div className="flex gap-4 mt-10 pt-8 border-t border-gray-100">
-            <button
-              onClick={() => navigate(`/listings/${id}/edit`)}
-              className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white py-3 rounded-lg text-base font-medium transition-colors"
-            >
-              Edit
-            </button>
-            <button
-              onClick={handleDelete}
-              className="flex-1 bg-red-50 hover:bg-red-100 text-red-600 py-3 rounded-lg text-base font-medium transition-colors"
-            >
-              Delete
-            </button>
-          </div>
+          {isSeller && (
+            <div className="flex gap-4 mt-10 pt-8 border-t border-gray-100">
+              <button
+                onClick={() => navigate(`/listings/${id}/edit`)}
+                className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white py-3 rounded-lg text-base font-medium transition-colors"
+              >
+                Edit
+              </button>
+              <button
+                onClick={handleDelete}
+                className="flex-1 bg-red-50 hover:bg-red-100 text-red-600 py-3 rounded-lg text-base font-medium transition-colors"
+              >
+                Delete
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Offer Modal */}
       {showOfferModal && (
         <MakeOfferModal
           listingId={id}

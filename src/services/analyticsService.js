@@ -1,5 +1,9 @@
 import api from './api';
 
+export const getGlobalStats = async () => {
+  return api.get('/analytics/global-stats');
+};
+
 export const getImpact = async () => {
   return api.get('/analytics/impact');
 };

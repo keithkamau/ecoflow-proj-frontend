@@ -358,7 +358,7 @@ export default function Navbar({ onMenuToggle, sidebarOpen, notificationCount = 
             </button>
           )}
           <Link
-            to='/'
+            to={user ? '/dashboard' : '/'}
             style={{
               display: "flex",
               alignItems: "center",

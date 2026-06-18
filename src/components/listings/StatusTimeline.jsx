@@ -1,67 +1,58 @@
-import React from 'react';
+import { Clock, CheckCircle, Truck, Package } from "lucide-react";
 
-const statusSteps = [
-  { key: 'active', label: 'Active', description: 'Listing is live' },
-  { key: 'completed', label: 'Completed', description: 'Waste collected and processed' },
+const STEPS = [
+  { key: "waiting", label: "Waiting", icon: Clock, desc: "Listing created, awaiting offers" },
+  { key: "offer_accepted", label: "Offer Accepted", icon: CheckCircle, desc: "Seller accepted a recycler's offer" },
+  { key: "awaiting_pickup", label: "Awaiting Pickup", icon: Truck, desc: "Recycler scheduled to collect" },
+  { key: "pickup_complete", label: "Pickup Complete", icon: Package, desc: "Waste collected and transaction completed" },
 ];
 
-const StatusTimeline = ({ currentStatus, onStatusChange, isEditable }) => {
-  const currentIndex = statusSteps.findIndex(s => s.key === currentStatus);
+const ORDER = STEPS.map(s => s.key);
+
+export default function StatusTimeline({ currentStatus }) {
+  const currentIdx = ORDER.indexOf(currentStatus);
 
   return (
-    <div className="w-full py-4">
-      <div className="relative">
-        <div className="absolute top-5 left-0 right-0 h-1 bg-gray-200 rounded">
-          <div
-            className="h-full bg-green-500 rounded transition-all duration-500"
-            style={{ width: currentIndex === 1 ? '100%' : '0%' }}
-          />
-        </div>
+    <div className="space-y-0">
+      {STEPS.map((step, idx) => {
+        const Icon = step.icon;
+        const done = idx <= currentIdx;
+        const active = idx === currentIdx;
 
-        <div className="relative flex justify-between">
-          {statusSteps.map((step, index) => {
-            const isCompleted = index <= currentIndex;
-            const isCurrent = index === currentIndex;
-            const canClick = isEditable && index === 0 && currentStatus === 'active';
-
-            return (
+        return (
+          <div key={step.key} className="flex gap-4">
+            <div className="flex flex-col items-center">
               <div
-                key={step.key}
-                className={`flex flex-col items-center ${canClick ? 'cursor-pointer' : 'cursor-default'}`}
-                onClick={() => canClick && onStatusChange?.('completed')}
+                className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${
+                  done
+                    ? "bg-primary text-white"
+                    : "bg-neutral-100 text-neutral-400"
+                }`}
               >
-                <div
-                  className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold border-2 transition-all duration-300 ${
-                    isCompleted
-                      ? isCurrent
-                        ? 'bg-green-600 border-green-600 text-white scale-110 shadow-lg shadow-green-200'
-                        : 'bg-green-500 border-green-500 text-white'
-                      : 'bg-white border-gray-300 text-gray-400'
-                  }`}
-                >
-                  {isCompleted ? (
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                  ) : (
-                    index + 1
-                  )}
-                </div>
-                <div className="mt-2 text-center">
-                  <p className={`text-xs font-semibold ${isCompleted ? 'text-green-700' : 'text-gray-400'}`}>
-                    {step.label}
-                  </p>
-                  {index === 0 && currentStatus === 'active' && isEditable && (
-                    <p className="text-[10px] text-green-600 mt-1 font-medium">Mark Completed</p>
-                  )}
-                </div>
+                {done && idx < currentIdx ? <CheckCircle size={16} /> : <Icon size={16} />}
               </div>
-            );
-          })}
-        </div>
-      </div>
+              {idx < STEPS.length - 1 && (
+                <div
+                  className={`w-0.5 h-8 ${
+                    done && idx < currentIdx ? "bg-primary" : "bg-neutral-200"
+                  }`}
+                />
+              )}
+            </div>
+
+            <div className={`pb-8 ${active ? "" : ""}`}>
+              <p
+                className={`text-sm font-medium ${
+                  active ? "text-primary-darker" : done ? "text-neutral-900" : "text-neutral-400"
+                }`}
+              >
+                {step.label}
+              </p>
+              <p className="text-xs text-neutral-500 mt-0.5">{step.desc}</p>
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
-};
-
-export default StatusTimeline;
+}

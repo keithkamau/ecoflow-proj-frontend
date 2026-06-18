@@ -3,7 +3,6 @@ import {
   MapPin, Navigation, Phone, Star, Filter,
   Recycle, ShoppingBag, ChevronRight, Locate,
 } from 'lucide-react';
-import { getNearby } from '../../services/pickupService';
 import { PageLoader } from '../../components/common/LoadingSpinner';
 
 // ── Constants ─────────────────────────────────────────────────
@@ -130,7 +129,6 @@ const LocationCard = ({ location, active, onClick }) => (
 const NearbyPage = () => {
   const [locations,  setLocations]  = useState([]);
   const [loading,    setLoading]    = useState(true);
-  const [loadError,  setLoadError]  = useState(null);
   const [filter,     setFilter]     = useState('all');
   const [activeId,   setActiveId]   = useState(null);
   const [userCoords, setUserCoords] = useState(null);
@@ -142,18 +140,53 @@ const NearbyPage = () => {
   const userMarker  = useRef(null);
   const mapReady    = useRef(false);
 
-  // ── Load nearby data ───────────────────────────────────────
+  // ── Mock data ──────────────────────────────────────────────
+  const MOCK_LOCATIONS = [
+    {
+      id: 1, type: 'recycler', name: 'GreenCycle Kenya', address: 'Mombasa Rd, Nairobi',
+      lat: -1.3086, lng: 36.8719, open: true, distance_km: 2.3, rating: 4.5,
+      phone: '+254 712 345 678', materials: ['plastic', 'metal', 'paper'],
+    },
+    {
+      id: 2, type: 'recycler', name: 'EcoTaka Waste Solutions', address: 'Thika Rd, Nairobi',
+      lat: -1.2685, lng: 36.8474, open: true, distance_km: 5.1, rating: 4.2,
+      phone: '+254 723 456 789', materials: ['e_waste', 'metal'],
+    },
+    {
+      id: 3, type: 'seller', name: 'Kibra Waste Pickers', address: 'Kibra, Nairobi',
+      lat: -1.3150, lng: 36.8150, open: true, distance_km: 3.8, rating: 4.0,
+      phone: '+254 734 567 890', materials: ['plastic', 'glass', 'organic'],
+    },
+    {
+      id: 4, type: 'recycler', name: 'TakaTaka Solutions', address: 'Industrial Area, Nairobi',
+      lat: -1.3175, lng: 36.8590, open: false, distance_km: 4.2, rating: 4.7,
+      phone: '+254 745 678 901', materials: ['paper', 'plastic', 'metal', 'mixed'],
+    },
+    {
+      id: 5, type: 'seller', name: 'Dandora Dumpsite Collectors', address: 'Dandora, Nairobi',
+      lat: -1.2570, lng: 36.8910, open: true, distance_km: 7.5, rating: 3.8,
+      phone: '+254 756 789 012', materials: ['metal', 'e_waste', 'organic'],
+    },
+    {
+      id: 6, type: 'recycler', name: 'Mr. Green Africa', address: 'Ruiru, Kiambu Rd',
+      lat: -1.2755, lng: 36.8940, open: true, distance_km: 6.0, rating: 4.8,
+      phone: '+254 767 890 123', materials: ['plastic'],
+    },
+    {
+      id: 7, type: 'seller', name: 'Gikomba Waste Traders', address: 'Gikomba Market, Nairobi',
+      lat: -1.2840, lng: 36.8320, open: false, distance_km: 1.9, rating: 4.1,
+      phone: '+254 778 901 234', materials: ['paper', 'mixed'],
+    },
+    {
+      id: 8, type: 'recycler', name: 'Waste Warriors Ltd', address: 'Ngong Rd, Nairobi',
+      lat: -1.2980, lng: 36.7710, open: true, distance_km: 6.8, rating: 4.3,
+      phone: '+254 789 012 345', materials: ['glass', 'plastic', 'organic'],
+    },
+  ];
+
   useEffect(() => {
-    getNearby({ lat: NAIROBI[0], lng: NAIROBI[1], radius_km: 50 })
-      .then((response) => {
-        const data = response.data ?? response;
-        setLocations(data);
-        setLoading(false);
-      })
-      .catch((err) => {
-        setLoadError(err.message || 'Failed to load nearby locations');
-        setLoading(false);
-      });
+    setLocations(MOCK_LOCATIONS);
+    setLoading(false);
   }, []);
 
   // ── Build map once data is loaded ──────────────────────────

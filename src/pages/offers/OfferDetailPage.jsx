@@ -35,7 +35,11 @@ export default function OfferDetailPage() {
   useEffect(() => { fetch(); }, [fetch]);
 
   async function handleAccept(offerId) {
-    await offerService.update(offerId, { status: "accepted" });
+    try {
+      await offerService.update(offerId, { status: "accepted" });
+    } catch {
+      // refetch to sync with backend state
+    }
     fetch();
   }
 

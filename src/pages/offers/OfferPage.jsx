@@ -44,17 +44,27 @@ export default function OfferPage() {
 
   async function handleAccept(offer) {
     const id = typeof offer === "object" ? offer.id : offer;
-    const updated = await offerService.update(id, { status: "accepted" });
-    await transactionService.create({
-      offer_id: updated.id,
-      listing_id: updated.listing_id,
-      seller_id: user?.id,
-      recycler_id: updated.recycler_id,
-      agreed_price: updated.offered_price,
-      final_quantity: updated.quantity,
-      final_price: updated.offered_price * updated.quantity,
-    });
-    navigate("/transactions");
+    try {
+      const updated = await offerService.update(id, { status: "accepted" });
+      setOffers(prev => prev.map(o => o.id === id ? { ...o, status: "accepted" } : o));
+      if (!updated.listing_id) {
+        setError("This offer has no listing — cannot create a transaction");
+        return;
+      }
+      await transactionService.create({
+        offer_id: updated.id,
+        listing_id: updated.listing_id,
+        seller_id: user?.id,
+        recycler_id: updated.recycler_id,
+        agreed_price: updated.offered_price,
+        final_quantity: updated.quantity,
+        final_price: updated.offered_price * updated.quantity,
+      });
+      navigate("/transactions");
+    } catch (err) {
+      setError(err.message);
+      fetchOffers();
+    }
   }
 
   async function handleReject(id) {

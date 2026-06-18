@@ -1,18 +1,23 @@
 import { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, ArrowLeftRight, CreditCard, CheckCircle, Lock } from "lucide-react";
+import { ArrowLeft, ArrowLeftRight, CreditCard, CheckCircle, Lock, Calendar, Truck } from "lucide-react";
 import { transactionService } from "../../services/transactionService";
 import { paymentService } from "../../services/paymentService";
 import TransactionTimeline from "../../components/offers/TransactionTimeline";
 import { PageLoader } from "../../components/common/LoadingSpinner";
 import { formatCurrency, formatDateTime, statusLabel } from "../../utils/formatters";
+import { useAuth } from "../../hooks/useAuth";
 
 export default function TransactionDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [tx, setTx] = useState(null);
   const [payment, setPayment] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [updating, setUpdating] = useState(false);
+
+  const isRecycler = user?.id === tx?.recycler_id;
 
   const fetch = useCallback(async () => {
     setLoading(true);
@@ -33,6 +38,18 @@ export default function TransactionDetailPage() {
   }, [id]);
 
   useEffect(() => { fetch(); }, [fetch]);
+
+  const handleStatusUpdate = async (newStatus) => {
+    setUpdating(true);
+    try {
+      await transactionService.update(id, { status: newStatus });
+      fetch();
+    } catch {
+      alert("Failed to update transaction");
+    } finally {
+      setUpdating(false);
+    }
+  };
 
   if (loading) return <PageLoader message="Loading transaction..." />;
 
@@ -87,7 +104,18 @@ export default function TransactionDetailPage() {
             </div>
 
             <div className="mt-4 pt-4 border-t border-neutral-200">
-              {tx.status === "completed" || tx.status === "cancelled" || tx.status === "disputed" ? (
+              {tx.status === "completed" ? (
+                <div className="bg-success-light border border-success/20 rounded-lg p-4">
+                  <div className="flex items-center gap-2 text-success-dark font-medium mb-3">
+                    <CheckCircle size={18} />
+                    Transaction Completed
+                  </div>
+                  <div className="flex items-baseline justify-between">
+                    <span className="text-sm text-success-dark/70">Total Paid</span>
+                    <span className="text-2xl font-bold text-success-dark">{formatCurrency(tx.final_price)}</span>
+                  </div>
+                </div>
+              ) : tx.status === "cancelled" || tx.status === "disputed" ? (
                 <div className="flex items-center gap-2 text-neutral-500 bg-neutral-100 rounded-lg p-3 text-sm font-medium">
                   <Lock size={16} />
                   Transaction {statusLabel(tx.status)} — Locked
@@ -97,6 +125,24 @@ export default function TransactionDetailPage() {
                   <CheckCircle size={18} />
                   Paid — Ref: {payment.mpesa_receipt || payment.reference || payment.id}
                 </div>
+              ) : isRecycler && tx.status === "offer_accepted" ? (
+                <button
+                  className="btn btn-primary w-full"
+                  onClick={() => handleStatusUpdate("pickup_scheduled")}
+                  disabled={updating}
+                >
+                  <Calendar size={16} />
+                  {updating ? "Updating..." : "Schedule Pickup"}
+                </button>
+              ) : isRecycler && tx.status === "pickup_scheduled" ? (
+                <button
+                  className="btn btn-primary w-full"
+                  onClick={() => handleStatusUpdate("pickup_completed")}
+                  disabled={updating}
+                >
+                  <Truck size={16} />
+                  {updating ? "Updating..." : "Confirm Collection"}
+                </button>
               ) : (
                 <button
                   className="btn btn-primary w-full"

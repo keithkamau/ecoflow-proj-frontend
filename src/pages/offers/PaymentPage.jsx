@@ -102,11 +102,11 @@ export default function PaymentPage() {
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-neutral-500">Amount</span>
-              <span className="font-medium">{formatCurrency(payment.amount)}</span>
+              <span className="font-medium">{payment.amount ? formatCurrency(payment.amount) : "—"}</span>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-neutral-500">Commission</span>
-              <span className="font-medium">{formatCurrency(payment.commission_amount)}</span>
+              <span className="font-medium">{payment.commission_amount ? formatCurrency(payment.commission_amount) : "—"}</span>
             </div>
           </div>
 

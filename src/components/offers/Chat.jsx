@@ -29,10 +29,11 @@ export default function Chat({ offerId, recipientId, currentUserId, offer }) {
     const token = localStorage.getItem("access_token");
     if (!token) { loadHistory(); return; }
 
-    const wsUrl = `${getWsBaseUrl()}/ws/chat/${offerIdentifier}?token=${token}`;
     let reconnectTimer = null;
 
     function connect() {
+      const freshToken = localStorage.getItem("access_token");
+      const wsUrl = `${getWsBaseUrl()}/ws/chat/${offerIdentifier}?token=${freshToken}`;
       const ws = new WebSocket(wsUrl);
       wsRef.current = ws;
 

@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import {
   Globe,
@@ -9,6 +10,7 @@ import {
   MapPin,
   Leaf,
 } from "lucide-react";
+import { getGlobalStats } from "../../services/analyticsService";
 
 const C = {
   primary: "var(--color-primary)",
@@ -90,6 +92,13 @@ function FooterLink({ label, to }) {
 
 export default function Footer() {
   const year = new Date().getFullYear();
+  const [stats, setStats] = useState(null);
+
+  useEffect(() => {
+    getGlobalStats().then(setStats).catch(() => {});
+  }, []);
+
+  const s = stats || {};
 
   return (
     <footer style={{ background: C.bg, color: C.white }}>
@@ -107,7 +116,12 @@ export default function Footer() {
             }}
             className='stats-grid'
           >
-            {STATS.map(({ value, label }) => (
+            {[
+              { value: `${Math.round(s.total_kg_recycled || 0)}+`, label: "kg Recycled" },
+              { value: `${s.total_transactions || 0}+`, label: "Transactions" },
+              { value: `${s.total_members || 0}+`, label: "Members" },
+              { value: `${Math.round(s.co2_saved_kg || 0)} kg`, label: "CO\u2082 Saved" },
+            ].map(({ value, label }) => (
               <div key={label}>
                 <p
                   style={{

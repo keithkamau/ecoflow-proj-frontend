@@ -14,6 +14,7 @@ import {
   Users,
   AlertTriangle,
   MapPin,
+  MessageCircle,
   ChevronLeft,
   ChevronRight,
   Recycle,
@@ -35,6 +36,7 @@ const ICON_MAP = {
   Users,
   AlertTriangle,
   MapPin,
+  MessageCircle,
 };
 
 const C = {

@@ -134,6 +134,7 @@ export const NAV_ITEMS = {
   recycler: [
     { label: "Dashboard", path: "/dashboard", icon: "LayoutDashboard" },
     { label: "Browse Waste", path: "/browse", icon: "Search" },
+    { label: "Messages", path: "/offers", icon: "MessageCircle" },
     { label: "Inventory", path: "/inventory", icon: "Package" },
     { label: "Pickups", path: "/pickups", icon: "Truck" },
     { label: "Transactions", path: "/transactions", icon: "ArrowLeftRight" },

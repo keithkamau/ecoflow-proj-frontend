@@ -52,6 +52,8 @@ export default function OfferDetailPage() {
     ? (user?.id === listing.seller_id ? offer.recycler_id : listing.seller_id)
     : null;
 
+  const isRecycler = user?.role === 'recycler';
+
   if (loading) return <PageLoader message="Loading offer..." />;
 
   if (!offer) {
@@ -75,6 +77,17 @@ export default function OfferDetailPage() {
         Back
       </button>
 
+      {isRecycler ? (
+        <div className="card">
+          <h2 className="text-sm font-semibold text-neutral-700 mb-3 flex items-center gap-2">
+            <Tag size={16} />
+            Messages
+          </h2>
+          <div className="min-h-[300px] sm:h-[400px]">
+            <Chat offerId={offer.id} recipientId={recipientId} currentUserId={user?.id} />
+          </div>
+        </div>
+      ) : (
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
           <OfferCard
@@ -94,6 +107,7 @@ export default function OfferDetailPage() {
           </div>
         </div>
       </div>
+      )}
     </div>
   );
 }

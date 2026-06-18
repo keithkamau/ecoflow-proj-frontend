@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  LayoutDashboard, Truck, Package,
+  LayoutDashboard, Truck, Package, Leaf,
   ArrowRight, PlusCircle, Search,
 } from 'lucide-react';
 import PickupCard from '../components/pickup/PickupCard';

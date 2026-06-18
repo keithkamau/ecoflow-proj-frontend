@@ -24,7 +24,7 @@ const PickupScheduler = ({ transactionId: initialTransactionId, onScheduled }) =
     if (!initialTransactionId) {
       transactionService.getAll().then((data) => {
         const list = Array.isArray(data) ? data : data?.transactions || [];
-        setTransactions(list.filter((t) => t.status === 'completed' || t.status === 'active'));
+        setTransactions(list.filter((t) => t.status === 'offer_accepted' || t.status === 'pickup_scheduled'));
       }).catch(() => {});
     }
   }, [initialTransactionId]);

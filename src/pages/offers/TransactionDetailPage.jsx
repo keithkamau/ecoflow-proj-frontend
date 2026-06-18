@@ -143,7 +143,7 @@ export default function TransactionDetailPage() {
                   <Truck size={16} />
                   {updating ? "Updating..." : "Confirm Collection"}
                 </button>
-              ) : (
+              ) : tx.status === "pickup_completed" || tx.status === "payment_pending" ? (
                 <button
                   className="btn btn-primary w-full"
                   onClick={() => navigate(`/payments?transaction_id=${tx.id}&amount=${tx.final_price}`)}
@@ -151,6 +151,11 @@ export default function TransactionDetailPage() {
                   <CreditCard size={16} />
                   Pay Now
                 </button>
+              ) : (
+                <div className="flex items-center gap-2 text-neutral-500 bg-neutral-100 rounded-lg p-3 text-sm font-medium">
+                  <Calendar size={16} />
+                  Awaiting pickup schedule from recycler
+                </div>
               )}
             </div>
           </div>

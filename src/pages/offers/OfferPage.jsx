@@ -89,6 +89,51 @@ export default function OfferPage() {
 
   if (loading && !offers.length) return <PageLoader message="Loading offers..." />;
 
+  const isRecycler = user?.role === 'recycler';
+
+  if (isRecycler) {
+    return (
+      <div className="page-content">
+        <div className="flex items-center justify-between mb-4">
+          <h1 className="text-xl font-bold text-neutral-900">Messages</h1>
+          <button className="btn btn-ghost btn-sm" onClick={fetchOffers} disabled={loading}>
+            <RefreshCw size={16} className={loading ? "animate-spin" : ""} />
+          </button>
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="space-y-2">
+            <h2 className="text-sm font-semibold text-neutral-500 uppercase tracking-wide mb-2">Your Offers</h2>
+            {filteredOffers.length === 0 ? (
+              <p className="text-sm text-neutral-400">No offers yet</p>
+            ) : (
+              filteredOffers.map((o) => (
+                <div
+                  key={o.id}
+                  onClick={() => setSelectedOffer(selectedOffer?.id === o.id ? null : o)}
+                  className={`cursor-pointer rounded-lg border p-3 text-sm transition-colors ${
+                    selectedOffer?.id === o.id
+                      ? 'border-primary bg-primary-light/10'
+                      : 'border-neutral-200 hover:border-neutral-300'
+                  }`}
+                >
+                  <p className="font-medium text-neutral-800">Offer #{o.id}</p>
+                  <p className="text-xs text-neutral-500 mt-0.5 capitalize">{o.status?.replace('_', ' ')}</p>
+                </div>
+              ))
+            )}
+          </div>
+          <div className="lg:col-span-2">
+            <div className="card">
+              <div className="min-h-[400px] sm:h-[500px] lg:h-[600px]">
+                <Chat offerId={selectedOffer?.id} offer={selectedOffer} currentUserId={user?.id} />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="page-content">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">

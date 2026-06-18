@@ -48,7 +48,7 @@ const EditListingPage = () => {
         }
         setPhotos(listing.photos?.map(p => ({ ...p, isNew: false })) || []);
       } catch (err) {
-        setSubmitError('Failed to load listing');
+        setSubmitError(err?.message || 'Failed to load listing');
       }
     };
     loadListing();

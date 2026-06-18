@@ -1,13 +1,16 @@
 // src/pages/listings/ListingsPage.jsx
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../hooks/useAuth';
 import { useListingContext } from '../../context/ListingContexts';
 import ListingCard from '../../components/listings/ListingCard';
 import SearchBar from '../../components/listings/SearchBar';
 
 const ListingsPage = () => {
+  const { user } = useAuth();
   const { listings, loading, error, fetchListings } = useListingContext();
   const navigate = useNavigate();
+  const isSeller = user?.role === 'seller';
 
   useEffect(() => {
     fetchListings();
@@ -26,12 +29,14 @@ const ListingsPage = () => {
       <div className="max-w-7xl mx-auto px-4 py-6">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold text-gray-900">Browse Listings</h1>
+          {isSeller && (
           <button
             onClick={() => navigate('/listings/new')}
             className="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
           >
             + New Listing
           </button>
+          )}
         </div>
 
         <SearchBar onSearch={handleSearch} />

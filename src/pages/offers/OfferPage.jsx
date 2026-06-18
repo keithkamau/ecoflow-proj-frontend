@@ -24,7 +24,8 @@ export default function OfferPage() {
     setLoading(true);
     setError(null);
     try {
-      const data = await offerService.getAll();
+      const params = user?.role === 'recycler' ? { recycler_id: user.id } : {};
+      const data = await offerService.getAll(params);
       setOffers(Array.isArray(data) ? data : []);
     } catch (err) {
       setError(err.message);
@@ -32,7 +33,7 @@ export default function OfferPage() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [user]);
 
   useEffect(() => { fetchOffers(); }, [fetchOffers]);
 
@@ -91,6 +92,17 @@ export default function OfferPage() {
 
   const isRecycler = user?.role === 'recycler';
 
+  const myAccepted = useMemo(
+    () => offers.filter((o) => o.recycler_id === user?.id && o.status === "accepted"),
+    [offers, user?.id]
+  );
+
+  useEffect(() => {
+    if (isRecycler && myAccepted.length > 0 && !selectedOffer) {
+      setSelectedOffer(myAccepted[0]);
+    }
+  }, [isRecycler, myAccepted, selectedOffer]);
+
   if (isRecycler) {
     return (
       <div className="page-content">
@@ -100,29 +112,28 @@ export default function OfferPage() {
             <RefreshCw size={16} className={loading ? "animate-spin" : ""} />
           </button>
         </div>
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="space-y-2">
-            <h2 className="text-sm font-semibold text-neutral-500 uppercase tracking-wide mb-2">Your Offers</h2>
-            {filteredOffers.length === 0 ? (
-              <p className="text-sm text-neutral-400">No offers yet</p>
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          <div className="space-y-1">
+            <h2 className="text-xs font-semibold text-neutral-400 uppercase tracking-wide mb-2">Conversations</h2>
+            {myAccepted.length === 0 ? (
+              <p className="text-sm text-neutral-400">No accepted offers yet</p>
             ) : (
-              filteredOffers.map((o) => (
+              myAccepted.map((o) => (
                 <div
                   key={o.id}
-                  onClick={() => setSelectedOffer(selectedOffer?.id === o.id ? null : o)}
-                  className={`cursor-pointer rounded-lg border p-3 text-sm transition-colors ${
+                  onClick={() => setSelectedOffer(o)}
+                  className={`cursor-pointer rounded-lg px-3 py-2 text-sm transition-colors ${
                     selectedOffer?.id === o.id
-                      ? 'border-primary bg-primary-light/10'
-                      : 'border-neutral-200 hover:border-neutral-300'
+                      ? 'bg-primary text-white'
+                      : 'text-neutral-700 hover:bg-neutral-100'
                   }`}
                 >
-                  <p className="font-medium text-neutral-800">Offer #{o.id}</p>
-                  <p className="text-xs text-neutral-500 mt-0.5 capitalize">{o.status?.replace('_', ' ')}</p>
+                  <p className="font-medium">Conversation #{o.id}</p>
                 </div>
               ))
             )}
           </div>
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-3">
             <div className="card">
               <div className="min-h-[400px] sm:h-[500px] lg:h-[600px]">
                 <Chat offerId={selectedOffer?.id} offer={selectedOffer} currentUserId={user?.id} />

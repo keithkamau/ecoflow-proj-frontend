@@ -15,7 +15,8 @@ const MATERIAL_FILTERS = [
   { value: 'metal',   label: 'Metal' },
   { value: 'paper',   label: 'Paper' },
   { value: 'glass',   label: 'Glass' },
-  { value: 'ewaste',  label: 'E-Waste' },
+  { value: 'e_waste', label: 'E-Waste' },
+  { value: 'organic', label: 'Organic' },
   { value: 'mixed',   label: 'Mixed' },
 ];
 
@@ -129,6 +130,7 @@ const LocationCard = ({ location, active, onClick }) => (
 const NearbyPage = () => {
   const [locations,  setLocations]  = useState([]);
   const [loading,    setLoading]    = useState(true);
+  const [loadError,  setLoadError]  = useState(null);
   const [filter,     setFilter]     = useState('all');
   const [activeId,   setActiveId]   = useState(null);
   const [userCoords, setUserCoords] = useState(null);
@@ -142,11 +144,16 @@ const NearbyPage = () => {
 
   // ── Load nearby data ───────────────────────────────────────
   useEffect(() => {
-    getNearby({ lat: NAIROBI[0], lng: NAIROBI[1], radius_km: 50 }).then((response) => {
-      const data = response.data ?? response;
-      setLocations(data);
-      setLoading(false);
-    });
+    getNearby({ lat: NAIROBI[0], lng: NAIROBI[1], radius_km: 50 })
+      .then((response) => {
+        const data = response.data ?? response;
+        setLocations(data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        setLoadError(err.message || 'Failed to load nearby locations');
+        setLoading(false);
+      });
   }, []);
 
   // ── Build map once data is loaded ──────────────────────────
@@ -170,10 +177,14 @@ const NearbyPage = () => {
         document.head.appendChild(s);
       }
 
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      const tiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
         maxZoom: 19,
       }).addTo(map);
+
+      tiles.on('tileerror', (e) => {
+        e.tile.style.display = 'none';
+      });
 
       // Place markers for each location
       locations.forEach((loc) => {
@@ -307,7 +318,7 @@ const NearbyPage = () => {
       <div className='flex flex-col lg:flex-row gap-4'>
 
         {/* Map */}
-        <div className='lg:flex-1 card p-0 overflow-hidden'>
+        <div className='lg:flex-1 card p-0 overflow-hidden' style={{ zIndex: 0 }}>
           <div
             ref={mapRef}
             style={{ height: '520px', width: '100%' }}

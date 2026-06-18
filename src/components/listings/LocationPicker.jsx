@@ -93,6 +93,10 @@ const LocationPicker = ({ onLocationSelect, initialLocation }) => {
       </div>
 
       <div className="relative rounded-xl overflow-hidden border border-gray-200" style={{ zIndex: 0 }}>
+        <style>{'.leaflet-tile-loaded { display: block } .leaflet-tile { display: none } .leaflet-tile.leaflet-tile-loaded { display: block } img.leaflet-tile[src*="tile.openstreetmap"]:not([src]) { display: none }'}</style>
+        <span className="absolute inset-0 flex items-center justify-center text-xs text-gray-400 z-[-1]">
+          Loading map tiles…
+        </span>
         <MapContainer
           center={markerPosition || defaultCenter}
           zoom={markerPosition ? 15 : 12}

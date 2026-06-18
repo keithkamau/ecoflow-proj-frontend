@@ -1,32 +1,48 @@
-import  { useState, useCallback } from 'react';
-import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
-import L from 'leaflet';
-
-// Fix Leaflet default marker icon
-delete L.Icon.Default.prototype._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
-  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
-});
+import { useState, useCallback, useEffect } from 'react';
 
 const defaultCenter = [-1.2921, 36.8219]; // Nairobi
-
-const MapClickHandler = ({ onClick }) => {
-  useMapEvents({
-    click: (e) => {
-      onClick(e.latlng.lat, e.latlng.lng);
-    },
-  });
-  return null;
-};
 
 const LocationPicker = ({ onLocationSelect, initialLocation }) => {
   const [markerPosition, setMarkerPosition] = useState(
     initialLocation ? [initialLocation.lat, initialLocation.lng] : null
   );
   const [address, setAddress] = useState(initialLocation?.address || '');
+  const [ready, setReady] = useState(false);
+  const [MapContainer, setMapContainer] = useState(null);
+  const [TileLayer, setTileLayer] = useState(null);
+  const [Marker, setMarker] = useState(null);
+  const [MapClickHandler, setMapClickHandler] = useState(null);
+
+  useEffect(() => {
+    Promise.all([
+      import('leaflet'),
+      import('react-leaflet'),
+      import('leaflet/dist/leaflet.css'),
+    ]).then(([leaflet, reactLeaflet]) => {
+      const L = leaflet.default;
+      delete L.Icon.Default.prototype._getIconUrl;
+      L.Icon.Default.mergeOptions({
+        iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
+        iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
+        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+      });
+
+      const MapClickHandlerComponent = ({ onClick }) => {
+        reactLeaflet.useMapEvents({
+          click: (e) => {
+            onClick(e.latlng.lat, e.latlng.lng);
+          },
+        });
+        return null;
+      };
+
+      setMapContainer(() => reactLeaflet.MapContainer);
+      setTileLayer(() => reactLeaflet.TileLayer);
+      setMarker(() => reactLeaflet.Marker);
+      setMapClickHandler(() => MapClickHandlerComponent);
+      setReady(true);
+    });
+  }, []);
 
   const reverseGeocode = async (lat, lng) => {
     try {
@@ -92,24 +108,27 @@ const LocationPicker = ({ onLocationSelect, initialLocation }) => {
         </button>
       </div>
 
-      <div className="relative rounded-xl overflow-hidden border border-gray-200" style={{ zIndex: 0 }}>
-        <style>{'.leaflet-tile-loaded { display: block } .leaflet-tile { display: none } .leaflet-tile.leaflet-tile-loaded { display: block } img.leaflet-tile[src*="tile.openstreetmap"]:not([src]) { display: none }'}</style>
-        <span className="absolute inset-0 flex items-center justify-center text-xs text-gray-400 z-[-1]">
-          Loading map tiles…
-        </span>
-        <MapContainer
-          center={markerPosition || defaultCenter}
-          zoom={markerPosition ? 15 : 12}
-          style={{ height: '300px', width: '100%' }}
-        >
-          <TileLayer
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          />
-          <MapClickHandler onClick={handleMapClick} />
-          {markerPosition && <Marker position={markerPosition} />}
-        </MapContainer>
-      </div>
+      {!ready ? (
+        <div className="flex items-center justify-center h-[300px] rounded-xl border border-gray-200 bg-neutral-50 text-sm text-neutral-400">
+          Loading map...
+        </div>
+      ) : (
+        <div className="relative rounded-xl overflow-hidden border border-gray-200" style={{ zIndex: 0 }}>
+          <style>{'.leaflet-tile-loaded { display: block } .leaflet-tile { display: none } .leaflet-tile.leaflet-tile-loaded { display: block } img.leaflet-tile[src*="tile.openstreetmap"]:not([src]) { display: none }'}</style>
+          <MapContainer
+            center={markerPosition || defaultCenter}
+            zoom={markerPosition ? 15 : 12}
+            style={{ height: '300px', width: '100%' }}
+          >
+            <TileLayer
+              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            />
+            <MapClickHandler onClick={handleMapClick} />
+            {markerPosition && <Marker position={markerPosition} />}
+          </MapContainer>
+        </div>
+      )}
 
       {markerPosition && (
         <p className="text-xs text-gray-600">

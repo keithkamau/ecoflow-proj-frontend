@@ -1,13 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, Phone, Truck, Clock } from 'lucide-react';
+import { ArrowLeft, Phone, Truck, Clock, CheckCircle, Package } from 'lucide-react';
 import usePickup from '../../hooks/usePickup';
 import PickupTracker from '../../components/pickup/PickupTracker';
 import PickupMap from '../../components/pickup/PickupMap';
 import ProofUpload from '../../components/pickup/ProofUpload';
-import DriverAssignment from '../../components/pickup/DriverAssignment';
 import { useAuth } from '../../hooks/useAuth';
-import LoadingSpinner from '../../components/common/LoadingSpinner';
+import LoadingSpinner, { ButtonSpinner } from '../../components/common/LoadingSpinner';
 
 const fmt = (iso) =>
   new Date(iso).toLocaleString('en-KE', {
@@ -18,14 +17,21 @@ const fmt = (iso) =>
 const TrackingPage = () => {
   const { id }                      = useParams();
   const { user }                    = useAuth();
-  const { currentPickup, loading, error, fetchPickup, uploadProof } = usePickup();
+  const { currentPickup, loading, error, fetchPickup, uploadProof, selfCompletePickup } = usePickup();
   const [proofDone, setProofDone]   = useState(false);
+  const [completing, setCompleting] = useState(false);
 
   useEffect(() => { if (id) fetchPickup(id); }, [id, fetchPickup]);
 
   const handleProof = async (pickupId, formData) => {
     const res = await uploadProof(pickupId, formData);
     if (res.success) setProofDone(true);
+  };
+
+  const handleSelfComplete = async () => {
+    setCompleting(true);
+    const res = await selfCompletePickup(id);
+    if (!res.success) setCompleting(false);
   };
 
   if (loading) {
@@ -50,9 +56,9 @@ const TrackingPage = () => {
   const p            = currentPickup;
   const isRecycler   = user?.role === 'recycler';
   const showProof    = p.status === 'arrived' && !proofDone;
-  const showAssign   = isRecycler && !p.driver_id;
   const driver       = p.driver || null;
   const pickupLoc    = p.pickup_location || { address: p.pickup_address, lat: p.pickup_lat, lng: p.pickup_lng };
+  const canConfirm   = !['completed', 'cancelled'].includes(p.status);
 
   return (
     <div className='page-content animate-fade-in'>
@@ -110,12 +116,40 @@ const TrackingPage = () => {
                 <Phone size={14} />{driver.phone}
               </a>
             </div>
-          ) : showAssign ? (
-            <DriverAssignment pickupId={p.id} />
+          ) : canConfirm ? (
+            <div className='card space-y-4'>
+              <div className='flex items-center gap-3'>
+                <span className='w-11 h-11 rounded-full bg-primary-light flex items-center justify-center shrink-0'>
+                  <Package size={18} className='text-primary' />
+                </span>
+                <div>
+                  <p className='text-sm font-semibold text-neutral-700'>Confirm Completion</p>
+                  <p className='text-xs text-neutral-500'>
+                    {isRecycler
+                      ? 'Confirm you have collected the materials'
+                      : 'Mark this pickup as complete'}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={handleSelfComplete}
+                disabled={completing}
+                className='btn-primary w-full'
+              >
+                {completing ? (
+                  <><ButtonSpinner />Completing...</>
+                ) : (
+                  <><CheckCircle size={16} />{isRecycler ? 'Materials Collected' : 'Confirm Complete'}</>
+                )}
+              </button>
+            </div>
           ) : (
             <div className='card'>
               <p className='text-sm text-neutral-500 text-center py-4'>
-                No driver assigned yet. The recycler will assign one shortly.
+                {p.status === 'completed'
+                  ? 'Pickup completed successfully.'
+                  : 'Pickup is scheduled.'
+                }
               </p>
             </div>
           )}

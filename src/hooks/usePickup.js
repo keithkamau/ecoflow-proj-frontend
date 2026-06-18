@@ -72,6 +72,23 @@ const usePickup = () => {
     }
   }, []);
 
+  const selfCompletePickup = useCallback(async (id) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await pickupService.selfCompletePickup(id);
+      const data = response.data ?? response;
+      setCurrentPickup(data);
+      return { success: true, data };
+    } catch (err) {
+      const message = err.message || 'Failed to complete pickup';
+      setError(message);
+      return { success: false, error: message };
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   const assignDriver = useCallback(async (assignmentData) => {
     setLoading(true);
     setError(null);
@@ -97,6 +114,7 @@ const usePickup = () => {
     fetchPickup,
     schedulePickup,
     uploadProof,
+    selfCompletePickup,
     assignDriver,
   };
 };

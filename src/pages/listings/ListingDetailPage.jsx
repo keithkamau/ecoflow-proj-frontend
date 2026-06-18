@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useListingContext } from '../../context/ListingContexts';
 import { offerService } from '../../services/offerService';
+import { transactionService } from '../../services/transactionService';
 import { useAuth } from '../../hooks/useAuth';
 import ListingStatusBadge from '../../components/listings/ListingStatusBadge';
 import StatusTimeline from '../../components/listings/StatusTimeline';
@@ -48,7 +49,20 @@ const ListingDetailPage = () => {
 
   const handleAcceptOffer = async (offerId) => {
     try {
-      await offerService.update(offerId, { status: "accepted" });
+      const updated = await offerService.update(offerId, { status: "accepted" });
+      if (!updated?.listing_id) {
+        alert('This offer has no listing — cannot create a transaction');
+        return;
+      }
+      await transactionService.create({
+        offer_id: updated.id,
+        listing_id: updated.listing_id,
+        seller_id: user?.id,
+        recycler_id: updated.recycler_id,
+        agreed_price: updated.offered_price,
+        final_quantity: updated.quantity,
+        final_price: updated.offered_price * updated.quantity,
+      });
       fetchListing(id);
       fetchOffers();
     } catch (err) {

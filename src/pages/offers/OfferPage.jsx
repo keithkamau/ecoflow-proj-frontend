@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { Plus, RefreshCw, Tag, ExternalLink, Filter, ArrowUpDown } from "lucide-react";
+import { RefreshCw, Tag, ExternalLink, Filter, ArrowUpDown } from "lucide-react";
 import { useAuth } from "../../hooks/useAuth";
 import { offerService } from "../../services/offerService";
 import { transactionService } from "../../services/transactionService";
@@ -75,6 +75,19 @@ export default function OfferPage() {
 
   const pendingCount = offers.filter((o) => o.status === "pending").length;
 
+  const isRecycler = user?.role === 'recycler';
+
+  const myAccepted = useMemo(
+    () => offers.filter((o) => o.recycler_id === user?.id && o.status === "accepted"),
+    [offers, user?.id]
+  );
+
+  useEffect(() => {
+    if (isRecycler && myAccepted.length > 0 && !selectedOffer) {
+      setSelectedOffer(myAccepted[0]);
+    }
+  }, [isRecycler, myAccepted, selectedOffer]);
+
   const filteredOffers = useMemo(() => {
     let result = [...offers];
     if (statusFilter !== "all") {
@@ -89,19 +102,6 @@ export default function OfferPage() {
   }, [offers, statusFilter, sortOrder]);
 
   if (loading && !offers.length) return <PageLoader message="Loading offers..." />;
-
-  const isRecycler = user?.role === 'recycler';
-
-  const myAccepted = useMemo(
-    () => offers.filter((o) => o.recycler_id === user?.id && o.status === "accepted"),
-    [offers, user?.id]
-  );
-
-  useEffect(() => {
-    if (isRecycler && myAccepted.length > 0 && !selectedOffer) {
-      setSelectedOffer(myAccepted[0]);
-    }
-  }, [isRecycler, myAccepted, selectedOffer]);
 
   if (isRecycler) {
     return (
@@ -157,10 +157,6 @@ export default function OfferPage() {
         <div className="flex items-center gap-2">
           <button className="btn btn-ghost btn-sm" onClick={fetchOffers} disabled={loading}>
             <RefreshCw size={16} className={loading ? "animate-spin" : ""} />
-          </button>
-          <button className="btn btn-primary btn-sm" onClick={() => setShowForm(true)}>
-            <Plus size={16} />
-            New Offer
           </button>
         </div>
       </div>

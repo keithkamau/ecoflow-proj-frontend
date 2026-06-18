@@ -1,13 +1,12 @@
-import { Clock, Truck, MapPin, CheckCircle } from 'lucide-react';
+import { Clock, Truck, CheckCircle } from 'lucide-react';
 
 const STEPS = [
-  { key: 'scheduled',  label: 'Scheduled',  desc: 'Pickup confirmed & queued',   Icon: Clock       },
-  { key: 'on_the_way', label: 'On the Way',  desc: 'Driver is en route to you',  Icon: Truck       },
-  { key: 'arrived',    label: 'Arrived',     desc: 'Driver is at your location', Icon: MapPin      },
-  { key: 'completed',  label: 'Completed',   desc: 'Pickup successfully done',   Icon: CheckCircle },
+  { key: 'scheduled',   label: 'Scheduled',          desc: 'Pickup confirmed & queued',  Icon: Clock       },
+  { key: 'in_progress', label: 'Pickup in Progress', desc: 'Collecting the materials',   Icon: Truck       },
+  { key: 'completed',   label: 'Pickup Complete',    desc: 'Pickup successfully done',   Icon: CheckCircle },
 ];
 
-const ORDER = ['scheduled', 'on_the_way', 'arrived', 'completed'];
+const ORDER = ['scheduled', 'in_progress', 'completed'];
 
 const PickupTracker = ({ status = 'scheduled' }) => {
   const currentIdx = ORDER.indexOf(status);

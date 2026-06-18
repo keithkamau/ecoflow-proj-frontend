@@ -30,6 +30,10 @@ export const getDrivers = async () => {
   return api.get('/pickups/drivers');
 };
 
+export const selfCompletePickup = async (id) => {
+  return api.post(`/pickups/${id}/self-complete`);
+};
+
 export const getNearby = async (coords) => {
   const res = await api.get('/locations/nearby', { params: coords });
   const data = res.data ?? res;

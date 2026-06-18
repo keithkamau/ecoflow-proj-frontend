@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, lazy, Suspense } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import { ListingProvider } from "./context/ListingContexts";
@@ -7,145 +7,156 @@ import RoleGuard from "./components/auth/RoleGuard";
 import Navbar from "./components/common/Navbar";
 import Sidebar from "./components/common/Sidebar";
 import Footer from "./components/common/Footer";
+import LoadingSpinner from "./components/common/LoadingSpinner";
 
-import RegisterPage from "./pages/auth/RegisterPage";
-import LoginPage from "./pages/auth/LoginPage";
-import KYCPage from "./pages/auth/KYCPage";
-import ProfilePage from "./pages/ProfilePage";
-import SettingsPage from "./pages/SettingsPage";
-import DashboardPage from "./pages/DashboardPage";
+const RegisterPage = lazy(() => import("./pages/auth/RegisterPage"));
+const LoginPage = lazy(() => import("./pages/auth/LoginPage"));
+const KYCPage = lazy(() => import("./pages/auth/KYCPage"));
+const ProfilePage = lazy(() => import("./pages/ProfilePage"));
+const SettingsPage = lazy(() => import("./pages/SettingsPage"));
+const DashboardPage = lazy(() => import("./pages/DashboardPage"));
 
-import ListingsPage from "./pages/listings/ListingsPage";
-import MyListingsPage from "./pages/listings/MyListingsPage";
-import CreateListingPage from "./pages/listings/CreateListingPage";
-import EditListingPage from "./pages/listings/EditListingPage";
-import ListingDetailPage from "./pages/listings/ListingDetailPage";
-import RecyclerInventoryPage from "./pages/listings/RecyclerInventoryPage";
+const ListingsPage = lazy(() => import("./pages/listings/ListingsPage"));
+const MyListingsPage = lazy(() => import("./pages/listings/MyListingsPage"));
+const CreateListingPage = lazy(() => import("./pages/listings/CreateListingPage"));
+const EditListingPage = lazy(() => import("./pages/listings/EditListingPage"));
+const ListingDetailPage = lazy(() => import("./pages/listings/ListingDetailPage"));
+const RecyclerInventoryPage = lazy(() => import("./pages/listings/RecyclerInventoryPage"));
 
-import OfferPage from "./pages/offers/OfferPage";
-import CreateOfferPage from "./pages/offers/CreateOfferPage";
-import OfferDetailPage from "./pages/offers/OfferDetailPage";
-import TransactionPage from "./pages/offers/TransactionPage";
-import TransactionDetailPage from "./pages/offers/TransactionDetailPage";
-import PaymentPage from "./pages/offers/PaymentPage";
+const OfferPage = lazy(() => import("./pages/offers/OfferPage"));
+const CreateOfferPage = lazy(() => import("./pages/offers/CreateOfferPage"));
+const OfferDetailPage = lazy(() => import("./pages/offers/OfferDetailPage"));
+const TransactionPage = lazy(() => import("./pages/offers/TransactionPage"));
+const TransactionDetailPage = lazy(() => import("./pages/offers/TransactionDetailPage"));
+const PaymentPage = lazy(() => import("./pages/offers/PaymentPage"));
 
-import PickupPage from "./pages/pickup/PickupPage";
-import TrackingPage from "./pages/pickup/TrackingPage";
+const PickupPage = lazy(() => import("./pages/pickup/PickupPage"));
+const TrackingPage = lazy(() => import("./pages/pickup/TrackingPage"));
 
-import AnalyticsPage from "./pages/analytics/AnalyticsPage";
-import EnvironmentalImpactPage from "./pages/analytics/EnvironmentalImpactPage";
+const AnalyticsPage = lazy(() => import("./pages/analytics/AnalyticsPage"));
+const EnvironmentalImpactPage = lazy(() => import("./pages/analytics/EnvironmentalImpactPage"));
 
-import NearbyPage from "./pages/nearby/NearbyPage";
+const NearbyPage = lazy(() => import("./pages/nearby/NearbyPage"));
+
+function PageLoader() {
+  return (
+    <div className="flex items-center justify-center min-h-[60vh]">
+      <LoadingSpinner variant="eco" size="xl" />
+    </div>
+  );
+}
 
 export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
         <ListingProvider>
-          <Routes>
-            <Route path='/register' element={<RegisterPage />} />
-            <Route path='/login' element={<LoginPage />} />
-            <Route
-              path='/kyc'
-              element={<ProtectedRoute><KYCPage /></ProtectedRoute>}
-            />
-            <Route
-              path='/profile'
-              element={<ProtectedRoute><ProfilePage /></ProtectedRoute>}
-            />
-            <Route
-              path='/settings'
-              element={<ProtectedRoute><SettingsPage /></ProtectedRoute>}
-            />
-            <Route
-              path='/dashboard'
-              element={<ProtectedRoute><LayoutWrapper><DashboardPage /></LayoutWrapper></ProtectedRoute>}
-            />
-            <Route
-              path='/listings'
-              element={<ProtectedRoute><LayoutWrapper><ListingsPage /></LayoutWrapper></ProtectedRoute>}
-            />
-            <Route
-              path='/listings/new'
-              element={<ProtectedRoute><LayoutWrapper><CreateListingPage /></LayoutWrapper></ProtectedRoute>}
-            />
-            <Route
-              path='/listings/mine'
-              element={<ProtectedRoute><LayoutWrapper><MyListingsPage /></LayoutWrapper></ProtectedRoute>}
-            />
-            <Route
-              path='/listings/:id'
-              element={<ProtectedRoute><LayoutWrapper><ListingDetailPage /></LayoutWrapper></ProtectedRoute>}
-            />
-            <Route
-              path='/listings/:id/edit'
-              element={<ProtectedRoute><LayoutWrapper><EditListingPage /></LayoutWrapper></ProtectedRoute>}
-            />
-            <Route
-              path='/inventory'
-              element={<ProtectedRoute><LayoutWrapper><RecyclerInventoryPage /></LayoutWrapper></ProtectedRoute>}
-            />
-            <Route
-              path='/offers'
-              element={<ProtectedRoute><LayoutWrapper><OfferPage /></LayoutWrapper></ProtectedRoute>}
-            />
-            <Route
-              path='/offers/new'
-              element={<ProtectedRoute><LayoutWrapper><CreateOfferPage /></LayoutWrapper></ProtectedRoute>}
-            />
-            <Route
-              path='/offers/:id'
-              element={<ProtectedRoute><LayoutWrapper><OfferDetailPage /></LayoutWrapper></ProtectedRoute>}
-            />
-            <Route
-              path='/transactions'
-              element={<ProtectedRoute><LayoutWrapper><TransactionPage /></LayoutWrapper></ProtectedRoute>}
-            />
-            <Route
-              path='/transactions/:id'
-              element={<ProtectedRoute><LayoutWrapper><TransactionDetailPage /></LayoutWrapper></ProtectedRoute>}
-            />
-            <Route
-              path='/payments'
-              element={<ProtectedRoute><LayoutWrapper><PaymentPage /></LayoutWrapper></ProtectedRoute>}
-            />
-            <Route
-              path='/pickups'
-              element={<ProtectedRoute><LayoutWrapper><PickupPage /></LayoutWrapper></ProtectedRoute>}
-            />
-            <Route
-              path='/pickups/:id/track'
-              element={<ProtectedRoute><LayoutWrapper><TrackingPage /></LayoutWrapper></ProtectedRoute>}
-            />
-            <Route
-              path='/analytics'
-              element={<ProtectedRoute><LayoutWrapper><AnalyticsPage /></LayoutWrapper></ProtectedRoute>}
-            />
-            <Route
-              path='/analytics/impact'
-              element={<ProtectedRoute><LayoutWrapper><EnvironmentalImpactPage /></LayoutWrapper></ProtectedRoute>}
-            />
-            <Route
-              path='/nearby'
-              element={<ProtectedRoute><LayoutWrapper><NearbyPage /></LayoutWrapper></ProtectedRoute>}
-            />
-            <Route
-              path='/admin'
-              element={
-                <ProtectedRoute>
-                  <RoleGuard roles={["admin"]}>
-                    <LayoutWrapper><AdminDashboard /></LayoutWrapper>
-                  </RoleGuard>
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path='/browse'
-              element={<ProtectedRoute><LayoutWrapper><ListingsPage /></LayoutWrapper></ProtectedRoute>}
-            />
-            <Route path='/' element={<Navigate to='/login' />} />
-            <Route path='*' element={<Navigate to='/login' />} />
-          </Routes>
+          <Suspense fallback={<PageLoader />}>
+            <Routes>
+              <Route path='/register' element={<RegisterPage />} />
+              <Route path='/login' element={<LoginPage />} />
+              <Route
+                path='/kyc'
+                element={<ProtectedRoute><KYCPage /></ProtectedRoute>}
+              />
+              <Route
+                path='/profile'
+                element={<ProtectedRoute><ProfilePage /></ProtectedRoute>}
+              />
+              <Route
+                path='/settings'
+                element={<ProtectedRoute><SettingsPage /></ProtectedRoute>}
+              />
+              <Route
+                path='/dashboard'
+                element={<ProtectedRoute><LayoutWrapper><DashboardPage /></LayoutWrapper></ProtectedRoute>}
+              />
+              <Route
+                path='/listings'
+                element={<ProtectedRoute><LayoutWrapper><ListingsPage /></LayoutWrapper></ProtectedRoute>}
+              />
+              <Route
+                path='/listings/new'
+                element={<ProtectedRoute><LayoutWrapper><CreateListingPage /></LayoutWrapper></ProtectedRoute>}
+              />
+              <Route
+                path='/listings/mine'
+                element={<ProtectedRoute><LayoutWrapper><MyListingsPage /></LayoutWrapper></ProtectedRoute>}
+              />
+              <Route
+                path='/listings/:id'
+                element={<ProtectedRoute><LayoutWrapper><ListingDetailPage /></LayoutWrapper></ProtectedRoute>}
+              />
+              <Route
+                path='/listings/:id/edit'
+                element={<ProtectedRoute><LayoutWrapper><EditListingPage /></LayoutWrapper></ProtectedRoute>}
+              />
+              <Route
+                path='/inventory'
+                element={<ProtectedRoute><LayoutWrapper><RecyclerInventoryPage /></LayoutWrapper></ProtectedRoute>}
+              />
+              <Route
+                path='/offers'
+                element={<ProtectedRoute><LayoutWrapper><OfferPage /></LayoutWrapper></ProtectedRoute>}
+              />
+              <Route
+                path='/offers/new'
+                element={<ProtectedRoute><LayoutWrapper><CreateOfferPage /></LayoutWrapper></ProtectedRoute>}
+              />
+              <Route
+                path='/offers/:id'
+                element={<ProtectedRoute><LayoutWrapper><OfferDetailPage /></LayoutWrapper></ProtectedRoute>}
+              />
+              <Route
+                path='/transactions'
+                element={<ProtectedRoute><LayoutWrapper><TransactionPage /></LayoutWrapper></ProtectedRoute>}
+              />
+              <Route
+                path='/transactions/:id'
+                element={<ProtectedRoute><LayoutWrapper><TransactionDetailPage /></LayoutWrapper></ProtectedRoute>}
+              />
+              <Route
+                path='/payments'
+                element={<ProtectedRoute><LayoutWrapper><PaymentPage /></LayoutWrapper></ProtectedRoute>}
+              />
+              <Route
+                path='/pickups'
+                element={<ProtectedRoute><LayoutWrapper><PickupPage /></LayoutWrapper></ProtectedRoute>}
+              />
+              <Route
+                path='/pickups/:id/track'
+                element={<ProtectedRoute><LayoutWrapper><TrackingPage /></LayoutWrapper></ProtectedRoute>}
+              />
+              <Route
+                path='/analytics'
+                element={<ProtectedRoute><LayoutWrapper><AnalyticsPage /></LayoutWrapper></ProtectedRoute>}
+              />
+              <Route
+                path='/analytics/impact'
+                element={<ProtectedRoute><LayoutWrapper><EnvironmentalImpactPage /></LayoutWrapper></ProtectedRoute>}
+              />
+              <Route
+                path='/nearby'
+                element={<ProtectedRoute><LayoutWrapper><NearbyPage /></LayoutWrapper></ProtectedRoute>}
+              />
+              <Route
+                path='/admin'
+                element={
+                  <ProtectedRoute>
+                    <RoleGuard roles={["admin"]}>
+                      <LayoutWrapper><AdminDashboard /></LayoutWrapper>
+                    </RoleGuard>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path='/browse'
+                element={<ProtectedRoute><LayoutWrapper><ListingsPage /></LayoutWrapper></ProtectedRoute>}
+              />
+              <Route path='/' element={<Navigate to='/login' />} />
+              <Route path='*' element={<Navigate to='/login' />} />
+            </Routes>
+          </Suspense>
         </ListingProvider>
       </AuthProvider>
     </BrowserRouter>

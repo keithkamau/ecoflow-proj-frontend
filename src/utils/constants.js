@@ -128,6 +128,7 @@ export const NAV_ITEMS = {
     { label: "My Listings", path: "/listings/mine", icon: "List" },
     { label: "New Listing", path: "/listings/new", icon: "PlusCircle" },
     { label: "Offers", path: "/offers", icon: "Tag" },
+    { label: "Transactions", path: "/transactions", icon: "ArrowLeftRight" },
     { label: "Nearby", path: "/nearby", icon: "MapPin" },
     { label: "Impact", path: "/analytics/impact", icon: "Leaf" },
   ],

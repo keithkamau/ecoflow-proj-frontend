@@ -84,6 +84,7 @@ export default function Chat({ offerId, recipientId, currentUserId, offer }) {
     const payload = {
       action: "message",
       recipient_id: to,
+      offer_id: Number(offerIdentifier),
       message_text: text.trim(),
     };
 
@@ -91,7 +92,8 @@ export default function Chat({ offerId, recipientId, currentUserId, offer }) {
       wsRef.current.send(JSON.stringify(payload));
       setText("");
     } else {
-      messageService.send(payload).then((msg) => {
+      const { action, ...restPayload } = payload;
+      messageService.send(restPayload).then((msg) => {
         setMessages((prev) => [...prev, msg]);
         setText("");
       }).catch(() => {});

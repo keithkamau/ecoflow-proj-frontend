@@ -339,6 +339,7 @@ export default function Navbar({ onMenuToggle, sidebarOpen, notificationCount = 
           {user && (
             <button
               onClick={onMenuToggle}
+              className='hide-mobile'
               style={{
                 display: "flex",
                 alignItems: "center",

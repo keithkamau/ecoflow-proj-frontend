@@ -20,7 +20,8 @@ export function formatDateTime(dateStr) {
 export function timeAgo(dateStr) {
   if (!dateStr) return "";
   const now = new Date();
-  const then = new Date(dateStr);
+  const normalized = dateStr.endsWith("Z") || dateStr.includes("+") ? dateStr : dateStr + "Z";
+  const then = new Date(normalized);
   const diffMs = now - then;
   const mins = Math.floor(diffMs / 60000);
   if (mins < 1) return "just now";

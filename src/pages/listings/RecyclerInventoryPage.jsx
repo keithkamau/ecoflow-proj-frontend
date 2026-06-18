@@ -1,65 +1,53 @@
-import { useState } from 'react';
+import { useEffect } from 'react';
+import { useAuth } from '../../hooks/useAuth';
 import { useListingContext } from '../../context/ListingContexts';
 import { Recycle, Hash, Package } from 'lucide-react';
 
 const MATERIAL_EMOJIS = {
-  plastic: '🥤',
-  metal: '🔩',
-  glass: '🍾',
-  paper: '📄',
-  e_waste: '🔌',
-  organic: '🌱',
-  mixed: '📦',
+  plastic: '\u{1FAD4}',
+  metal: '\u{1F529}',
+  glass: '\u{1F37E}',
+  paper: '\u{1F4C4}',
+  e_waste: '\u{1F50C}',
+  organic: '\u{1F331}',
+  mixed: '\u{1F4E6}',
 };
 
 const RecyclerInventoryPage = () => {
+  const { user } = useAuth();
   const { inventory, loading, error, fetchInventory } = useListingContext();
-  const [recyclerId, setRecyclerId] = useState('');
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-    if (!recyclerId.trim()) return;
-    fetchInventory(recyclerId.trim());
-  };
+  useEffect(() => {
+    if (user?.role === 'recycler') {
+      fetchInventory(user.id);
+    }
+  }, [user, fetchInventory]);
 
   return (
     <div className="page-content animate-fade-in">
       <div className="section-header">
         <div>
-          <h1 className="text-h3">Recycler Inventory</h1>
+          <h1 className="text-h3">My Inventory</h1>
           <p className="text-sm text-neutral-500 mt-0.5">
-            View materials sourced from completed transactions
+            Materials sourced from your completed transactions
           </p>
         </div>
       </div>
-
-      <form onSubmit={handleSearch} className="flex gap-3 mb-6">
-        <input
-          type="text"
-          placeholder="Enter Recycler User ID"
-          value={recyclerId}
-          onChange={(e) => setRecyclerId(e.target.value)}
-          className="input flex-1 max-w-sm"
-        />
-        <button
-          type="submit"
-          disabled={loading}
-          className="btn btn-primary"
-        >
-          {loading ? 'Loading...' : 'View Inventory'}
-        </button>
-      </form>
 
       {error && (
         <div className="alert alert-error mb-4">{error}</div>
       )}
 
+      {loading && (
+        <div className="flex justify-center py-8">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-500"></div>
+        </div>
+      )}
+
       {inventory && (
         <div className="card">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-h5">
-              Inventory for Recycler #{inventory.recycler_id}
-            </h2>
+            <h2 className="text-h5">Inventory</h2>
             <span className="text-sm text-neutral-500">
               {inventory.items?.length || 0} entries
             </span>
@@ -90,7 +78,7 @@ const RecyclerInventoryPage = () => {
                       <td className="py-3">
                         <span className="flex items-center gap-2 capitalize">
                           <span className="text-lg">
-                            {MATERIAL_EMOJIS[item.material_type] || '📦'}
+                            {MATERIAL_EMOJIS[item.material_type] || '\u{1F4E6}'}
                           </span>
                           {item.material_type.replace('_', ' ')}
                         </span>
@@ -106,10 +94,17 @@ const RecyclerInventoryPage = () => {
           ) : (
             <div className="text-center py-8 text-neutral-400">
               <Recycle size={40} className="mx-auto mb-3" />
-              <p>No inventory found for this recycler</p>
+              <p>No inventory yet</p>
               <p className="text-xs mt-1">Complete transactions to build inventory</p>
             </div>
           )}
+        </div>
+      )}
+
+      {!inventory && !loading && user?.role !== 'recycler' && (
+        <div className="card text-center py-8 text-neutral-400">
+          <Recycle size={40} className="mx-auto mb-3" />
+          <p>Only recyclers can view inventory</p>
         </div>
       )}
     </div>

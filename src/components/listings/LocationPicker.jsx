@@ -92,7 +92,7 @@ const LocationPicker = ({ onLocationSelect, initialLocation }) => {
         </button>
       </div>
 
-      <div className="relative rounded-xl overflow-hidden border border-gray-200">
+      <div className="relative rounded-xl overflow-hidden border border-gray-200" style={{ zIndex: 0 }}>
         <MapContainer
           center={markerPosition || defaultCenter}
           zoom={markerPosition ? 15 : 12}

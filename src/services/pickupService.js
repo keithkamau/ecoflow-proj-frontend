@@ -1,11 +1,11 @@
 import api from './api';
 
 export const schedulePickup = async (data) => {
-  return api.post('/pickups', data);
+  return api.post('/pickups/', data);
 };
 
 export const getPickups = async (params = {}) => {
-  return api.get('/pickups', { params });
+  return api.get('/pickups/', { params });
 };
 
 export const getPickup = async (id) => {

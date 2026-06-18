@@ -1,50 +1,103 @@
-import { useState, useEffect, useRef } from "react";
-import { Send, MessageSquare } from "lucide-react";
+import { useState, useEffect, useRef, useCallback } from "react";
+import { Send, MessageSquare, Wifi, WifiOff } from "lucide-react";
 import { messageService } from "../../services/messageService";
+import { getWsBaseUrl } from "../../services/api";
 import { timeAgo } from "../../utils/formatters";
 
-export default function Chat({ offerId, currentUserId = 1 }) {
+export default function Chat({ offerId, recipientId, currentUserId, offer }) {
+  const offerIdentifier = offerId || offer?.id;
+  const to = recipientId || offer?.recycler_id;
   const [messages, setMessages] = useState([]);
   const [text, setText] = useState("");
   const [loading, setLoading] = useState(true);
-  const [typing, setTyping] = useState(false);
+  const [connected, setConnected] = useState(false);
+  const wsRef = useRef(null);
   const bottomRef = useRef(null);
-  const typingTimeout = useRef(null);
 
-  useEffect(() => {
-    if (!offerId) return;
+  const loadHistory = useCallback(() => {
+    if (!offerIdentifier) return;
     setLoading(true);
     messageService
-      .getByOffer(offerId)
+      .getByOffer(offerIdentifier)
       .then(setMessages)
       .catch(() => setMessages([]))
       .finally(() => setLoading(false));
-  }, [offerId]);
+  }, [offerIdentifier]);
+
+  useEffect(() => {
+    if (!offerIdentifier) return;
+    const token = localStorage.getItem("access_token");
+    if (!token) { loadHistory(); return; }
+
+    const wsUrl = `${getWsBaseUrl()}/ws/chat/${offerIdentifier}?token=${token}`;
+    let reconnectTimer = null;
+
+    function connect() {
+      const ws = new WebSocket(wsUrl);
+      wsRef.current = ws;
+
+      ws.onopen = () => setConnected(true);
+
+      ws.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          if (data.type === "new_message") {
+            setMessages((prev) => {
+              if (prev.some((m) => m.id === data.id)) return prev;
+              return [...prev, data];
+            });
+          }
+        } catch {}
+      };
+
+      ws.onclose = () => {
+        setConnected(false);
+        wsRef.current = null;
+        reconnectTimer = setTimeout(connect, 3000);
+      };
+
+      ws.onerror = () => ws.close();
+    }
+
+    connect();
+
+    return () => {
+      clearTimeout(reconnectTimer);
+      if (wsRef.current) wsRef.current.close();
+    };
+  }, [offerIdentifier, loadHistory]);
+
+  useEffect(() => {
+    if (!offerIdentifier) return;
+    loadHistory();
+  }, [offerIdentifier, loadHistory]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView?.({ behavior: "smooth" });
   }, [messages]);
 
-  function handleTyping(e) {
-    setText(e.target.value);
-    setTyping(true);
-    clearTimeout(typingTimeout.current);
-    typingTimeout.current = setTimeout(() => setTyping(false), 1000);
-  }
-
-  async function handleSend(e) {
+  function handleSend(e) {
     e.preventDefault();
-    if (!text.trim()) return;
-    const msg = await messageService.send({
-      recipient_id: currentUserId === 1 ? 2 : 1,
-      offer_id: offerId,
+    if (!text.trim() || !to) return;
+
+    const payload = {
+      action: "message",
+      recipient_id: to,
       message_text: text.trim(),
-    });
-    setMessages((prev) => [...prev, msg]);
-    setText("");
+    };
+
+    if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+      wsRef.current.send(JSON.stringify(payload));
+      setText("");
+    } else {
+      messageService.send(payload).then((msg) => {
+        setMessages((prev) => [...prev, msg]);
+        setText("");
+      }).catch(() => {});
+    }
   }
 
-  if (!offerId) {
+  if (!offerIdentifier) {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-neutral-400">
         <MessageSquare size={32} />
@@ -55,6 +108,19 @@ export default function Chat({ offerId, currentUserId = 1 }) {
 
   return (
     <div className="flex flex-col h-full">
+      <div className="flex items-center justify-between px-4 py-2 border-b border-neutral-200 bg-neutral-50">
+        <span className="text-xs font-medium text-neutral-500">Chat</span>
+        {connected ? (
+          <span className="flex items-center gap-1 text-xs text-green-600">
+            <Wifi size={12} /> Live
+          </span>
+        ) : (
+          <span className="flex items-center gap-1 text-xs text-neutral-400">
+            <WifiOff size={12} /> Offline
+          </span>
+        )}
+      </div>
+
       <div className="flex-1 overflow-y-auto space-y-3 p-4">
         {loading ? (
           <div className="space-y-3">
@@ -93,7 +159,7 @@ export default function Chat({ offerId, currentUserId = 1 }) {
       <form onSubmit={handleSend} className="flex items-center gap-2 border-t border-neutral-200 p-3">
         <input
           value={text}
-          onChange={handleTyping}
+          onChange={(e) => setText(e.target.value)}
           className="input flex-1"
           placeholder="Type a message..."
         />
@@ -101,12 +167,6 @@ export default function Chat({ offerId, currentUserId = 1 }) {
           <Send size={16} />
         </button>
       </form>
-
-      {typing && text.length > 0 && (
-        <p className="text-xs text-neutral-400 px-3 pb-2 italic animate-pulse">
-          typing...
-        </p>
-      )}
     </div>
   );
 }

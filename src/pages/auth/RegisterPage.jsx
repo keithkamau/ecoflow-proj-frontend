@@ -60,12 +60,16 @@ export default function RegisterPage() {
     setSubmitting(true);
     try {
       const res = await register({ ...form, role });
-      if (res.data?.otp) {
-        setDevOtp(res.data.otp);
+      if (res?.otp) {
+        setDevOtp(res.otp);
       }
-      navigate("/login");
+      if (res?.access_token) {
+        navigate("/dashboard");
+      } else {
+        navigate("/login");
+      }
     } catch (err) {
-      setError(err.response?.data?.detail || "Registration failed");
+      setError(err.message || "Registration failed");
     } finally {
       setSubmitting(false);
     }

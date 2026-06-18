@@ -30,8 +30,9 @@ const ListingDetailPage = () => {
     try {
       const data = await offerService.getAll({ listing_id: id });
       setOffers(Array.isArray(data) ? data : []);
-    } catch {
+    } catch (err) {
       setOffers([]);
+      console.error('Failed to fetch offers:', err);
     }
   };
 
@@ -40,7 +41,9 @@ const ListingDetailPage = () => {
     try {
       await deleteListing(id);
       navigate('/listings');
-    } catch {}
+    } catch (err) {
+      alert(err?.message || 'Failed to delete listing');
+    }
   };
 
   const handleAcceptOffer = async (offerId) => {
@@ -48,8 +51,8 @@ const ListingDetailPage = () => {
       await offerService.update(offerId, { status: "accepted" });
       fetchListing(id);
       fetchOffers();
-    } catch {
-      alert('Failed to accept offer');
+    } catch (err) {
+      alert(err?.message || 'Failed to accept offer');
     }
   };
 
@@ -62,10 +65,17 @@ const ListingDetailPage = () => {
   }
 
   if (error || !currentListing) {
+    const isNetworkError = error?.toLowerCase?.()?.includes('network error') || error?.toLowerCase?.()?.includes('unable to reach');
+    const displayMsg = isNetworkError
+      ? 'Unable to connect to the server. Please check that the backend is running.'
+      : (error || 'Listing not found');
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <p className="text-gray-500">{error || 'Listing not found'}</p>
+          <p className="text-gray-500">{displayMsg}</p>
+          {isNetworkError && (
+            <p className="text-xs text-gray-400 mt-2">Network error: unable to reach server</p>
+          )}
           <button
             onClick={() => navigate('/listings')}
             className="mt-4 text-emerald-500 hover:text-emerald-600 text-sm font-medium"

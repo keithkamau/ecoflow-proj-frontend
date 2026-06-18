@@ -63,13 +63,6 @@ const COLS = [
   },
 ];
 
-const STATS = [
-  { value: "0+", label: "kg Recycled" },
-  { value: "0+", label: "Transactions" },
-  { value: "0+", label: "Members" },
-  { value: "0 kg", label: "CO₂ Saved" },
-];
-
 function FooterLink({ label, to }) {
   return (
     <li style={{ listStyle: "none" }}>

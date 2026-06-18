@@ -3,10 +3,10 @@ import listingService from '../../services/listingService';
 
 const statusOptions = [
   { value: '', label: 'All Status' },
-  { value: 'active', label: 'Active' },
-  { value: 'matched', label: 'Matched' },
-  { value: 'completed', label: 'Completed' },
-  { value: 'expired', label: 'Expired' },
+  { value: 'waiting', label: 'Waiting' },
+  { value: 'offer_accepted', label: 'Offer Accepted' },
+  { value: 'awaiting_pickup', label: 'Awaiting Pickup' },
+  { value: 'pickup_complete', label: 'Pickup Complete' },
 ];
 
 const SearchBar = ({ onSearch }) => {
@@ -21,7 +21,7 @@ const SearchBar = ({ onSearch }) => {
   const [materials, setMaterials] = useState([]);
 
   useEffect(() => {
-    listingService.getMaterials().then((res) => setMaterials(res)).catch(() => {});
+    listingService.getMaterials().then((res) => setMaterials(res)).catch((err) => console.error('Failed to load materials:', err));
   }, []);
 
   const handleChange = (e) => {

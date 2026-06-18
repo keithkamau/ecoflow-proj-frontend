@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  LayoutDashboard, Truck, Package, Leaf,
+  LayoutDashboard, Truck, Package,
   ArrowRight, PlusCircle, Search,
 } from 'lucide-react';
-import ImpactDashboard from '../components/analytics/ImpactDashboard';
 import PickupCard from '../components/pickup/PickupCard';
 import { useAuth } from '../hooks/useAuth';
 import usePickup from '../hooks/usePickup';
@@ -86,17 +85,6 @@ const DashboardPage = () => {
           </>}
         </div>
       )}
-
-      {/* ── Environmental impact ─────────────────────────── */}
-      <section className='mb-8'>
-        <div className='flex items-center justify-between mb-4'>
-          <h2 className='text-h5'>Environmental Impact</h2>
-          <Link to='/analytics/impact' className='text-sm text-primary font-medium hover:underline flex items-center gap-1'>
-            Full report <ArrowRight size={13} />
-          </Link>
-        </div>
-        <ImpactDashboard />
-      </section>
 
       {/* ── Quick actions ────────────────────────────────── */}
       <section className='mb-8'>

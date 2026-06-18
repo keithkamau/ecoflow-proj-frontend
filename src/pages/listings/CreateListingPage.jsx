@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useListingContext } from '../../context/ListingContexts';
 import LocationPicker from '../../components/listings/LocationPicker';
+import UnitSelector from '../../components/listings/UnitSelector';
 import PhotoUploadComponent from '../../components/listings/PhotoUploadComponent';
 import listingService from '../../services/listingService';
 
@@ -17,6 +18,7 @@ const CreateListingPage = () => {
     price_expectation: '',
   });
 
+  const [unit, setUnit] = useState('');
   const [location, setLocation] = useState(null);
   const [photos, setPhotos] = useState([]);
   const [submitError, setSubmitError] = useState(null);
@@ -41,6 +43,7 @@ const CreateListingPage = () => {
         ...formData,
         material_id: parseInt(formData.material_id),
         quantity: parseFloat(formData.quantity),
+        unit: unit || selectedMaterial?.unit,
         location_lat: location?.lat,
         location_lng: location?.lng,
         location_address: location?.address || formData.location_address,
@@ -94,7 +97,7 @@ const CreateListingPage = () => {
               <option value="">Select material</option>
               {materials?.map((m) => (
                 <option key={m.id} value={m.id}>
-                  {m.type} ({m.unit}) {m.reference_price ? `- KES ${m.reference_price}` : ''}
+                  {m.type}
                 </option>
               ))}
             </select>
@@ -115,6 +118,13 @@ const CreateListingPage = () => {
               className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
             />
           </div>
+
+          {/* Unit Selector */}
+          <UnitSelector
+            value={unit}
+            onChange={setUnit}
+            materialUnit={selectedMaterial?.unit}
+          />
 
           {/* Condition */}
           <div>

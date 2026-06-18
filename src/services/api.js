@@ -56,7 +56,7 @@ async function request(url, options = {}) {
     throw new Error(`Network error: unable to reach server. Check your connection.`);
   }
 
-  if (res.status === 401 && !options._retry) {
+  if (res.status === 401 && !options._retry && !url.includes("/auth/login")) {
     if (!refreshPromise) {
       refreshPromise = refreshToken();
     }
@@ -79,7 +79,9 @@ async function request(url, options = {}) {
     }
     localStorage.removeItem("access_token");
     localStorage.removeItem("refresh_token");
-    window.location.href = "/login";
+    if (!url.includes("/auth/")) {
+      window.location.href = "/login";
+    }
     throw new Error("Session expired. Please log in again.");
   }
 

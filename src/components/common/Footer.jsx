@@ -1,10 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import {
-  Globe,
-  MessageCircle,
-  Share2,
-  Users,
   Mail,
   Phone,
   MapPin,
@@ -26,13 +22,6 @@ const C = {
   bgAlt: "#1F2937",
 };
 
-const SOCIALS = [
-  { Icon: Globe, href: "#", label: "Twitter" },
-  { Icon: MessageCircle, href: "#", label: "LinkedIn" },
-  { Icon: Share2, href: "#", label: "Instagram" },
-  { Icon: Users, href: "#", label: "Facebook" },
-];
-
 const COLS = [
   {
     title: "Platform",
@@ -41,24 +30,6 @@ const COLS = [
       { label: "Create Listing", to: "/listings/new" },
       { label: "How It Works", to: "/how-it-works" },
       { label: "Impact Dashboard", to: "/analytics/impact" },
-    ],
-  },
-  {
-    title: "Company",
-    links: [
-      { label: "About EcoFlow", to: "/about" },
-      { label: "Our Mission", to: "/mission" },
-      { label: "Blog", to: "/blog" },
-      { label: "Careers", to: "/careers" },
-    ],
-  },
-  {
-    title: "Support",
-    links: [
-      { label: "Help Center", to: "/help" },
-      { label: "Contact Us", to: "/contact" },
-      { label: "Privacy Policy", to: "/privacy" },
-      { label: "Terms of Service", to: "/terms" },
     ],
   },
 ];
@@ -259,39 +230,6 @@ export default function Footer() {
                 )}
               </div>
             ))}
-            {/* Socials */}
-            <div style={{ display: "flex", gap: 10, marginTop: 16 }}>
-              {SOCIALS.map(({ Icon, href, label }) => (
-                <a
-                  key={label}
-                  href={href}
-                  aria-label={label}
-                  target='_blank'
-                  rel='noopener noreferrer'
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    width: 32,
-                    height: 32,
-                    borderRadius: 6,
-                    background: C.bgAlt,
-                    color: C.neutral400,
-                    transition: "all 150ms",
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = C.primary;
-                    e.currentTarget.style.color = "#fff";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background = C.bgAlt;
-                    e.currentTarget.style.color = C.neutral400;
-                  }}
-                >
-                  <Icon size={14} />
-                </a>
-              ))}
-            </div>
           </div>
 
           {/* Link columns */}

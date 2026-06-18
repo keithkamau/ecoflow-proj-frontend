@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { Upload, Scale, Image, X, CheckCircle, AlertCircle } from 'lucide-react';
+import { Upload, Scale, Image, X, CheckCircle, AlertCircle, PenLine } from 'lucide-react';
 import { ButtonSpinner } from '../common/LoadingSpinner';
 
 const MAX_FILES   = 4;
@@ -7,6 +7,7 @@ const MAX_SIZE_MB = 5;
 
 const ProofUpload = ({ pickupId, onSubmit }) => {
   const [weight,     setWeight]     = useState('');
+  const [signature,  setSignature]  = useState('');
   const [files,      setFiles]      = useState([]);
   const [previews,   setPreviews]   = useState([]);
   const [errors,     setErrors]     = useState({});
@@ -47,6 +48,7 @@ const ProofUpload = ({ pickupId, onSubmit }) => {
     try {
       const fd = new FormData();
       fd.append('weight', weight);
+      if (signature.trim()) fd.append('signature', signature.trim());
       files.forEach((f) => fd.append('photos', f));
       await onSubmit?.(pickupId, fd);
       setDone(true);
@@ -92,6 +94,21 @@ const ProofUpload = ({ pickupId, onSubmit }) => {
             <AlertCircle size={11} />{errors.weight}
           </p>
         )}
+      </div>
+
+      {/* Signature */}
+      <div>
+        <label className='label' htmlFor='proof-signature'>
+          <PenLine size={13} className='inline mr-1' />Collector Signature
+        </label>
+        <input
+          id='proof-signature'
+          type='text'
+          placeholder='Full name of collector'
+          value={signature}
+          onChange={(e) => { setSignature(e.target.value); setErrors((p) => ({ ...p, signature: '' })); }}
+          className='input'
+        />
       </div>
 
       {/* Drop zone */}

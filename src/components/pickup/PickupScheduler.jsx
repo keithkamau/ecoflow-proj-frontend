@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Calendar, Clock, MapPin, FileText, AlertCircle } from 'lucide-react';
 import { ButtonSpinner } from '../common/LoadingSpinner';
+import { transactionService } from '../../services/transactionService';
 
 const TIME_SLOTS = [
   { value: '08:00', label: '8:00 AM – 10:00 AM (Morning)' },
@@ -11,11 +12,22 @@ const TIME_SLOTS = [
 
 const todayStr = () => new Date().toISOString().split('T')[0];
 
-const PickupScheduler = ({ transactionId, onScheduled }) => {
+const PickupScheduler = ({ transactionId: initialTransactionId, onScheduled }) => {
+  const [transactions, setTransactions] = useState([]);
+  const [selectedTxId, setSelectedTxId] = useState(initialTransactionId || '');
   const [form, setForm] = useState({ date: '', time: '', address: '', notes: '' });
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
+
+  useEffect(() => {
+    if (!initialTransactionId) {
+      transactionService.getAll().then((data) => {
+        const list = Array.isArray(data) ? data : data?.transactions || [];
+        setTransactions(list.filter((t) => t.status === 'completed' || t.status === 'active'));
+      }).catch(() => {});
+    }
+  }, [initialTransactionId]);
 
   const set = (field) => (e) => {
     setForm((prev) => ({ ...prev, [field]: e.target.value }));
@@ -24,8 +36,9 @@ const PickupScheduler = ({ transactionId, onScheduled }) => {
 
   const validate = () => {
     const e = {};
-    if (!form.date)           e.date    = 'Please select a date';
-    if (!form.time)           e.time    = 'Please choose a time slot';
+    if (!selectedTxId)      e.transaction = 'Please select a transaction';
+    if (!form.date)          e.date    = 'Please select a date';
+    if (!form.time)          e.time    = 'Please choose a time slot';
     if (!form.address.trim()) e.address = 'Pickup address is required';
     return e;
   };
@@ -38,8 +51,8 @@ const PickupScheduler = ({ transactionId, onScheduled }) => {
     setSubmitting(true);
     try {
       await onScheduled?.({
-        transaction_id: transactionId,
-        scheduled_time: `${form.date}T${form.time}:00Z`,
+        transaction_id: Number(selectedTxId),
+        scheduled_time: `${form.date}T${form.time}:00`,
         pickup_address: form.address,
         notes: form.notes,
       });
@@ -66,6 +79,29 @@ const PickupScheduler = ({ transactionId, onScheduled }) => {
   return (
     <form onSubmit={handleSubmit} className='card space-y-4' data-testid='pickup-scheduler' noValidate>
       <h3 className='text-h5'>Schedule a Pickup</h3>
+
+      {!initialTransactionId && transactions.length > 0 && (
+        <div>
+          <label className='label'>Transaction</label>
+          <select
+            value={selectedTxId}
+            onChange={(e) => setSelectedTxId(e.target.value)}
+            className={`input ${errors.transaction ? 'input-error' : ''}`}
+          >
+            <option value=''>Select a transaction…</option>
+            {transactions.map((t) => (
+              <option key={t.id} value={t.id}>
+                #{t.id} — {t.listing?.material?.type || `Transaction #${t.id}`}
+              </option>
+            ))}
+          </select>
+          {errors.transaction && (
+            <p className='error-text flex items-center gap-1'>
+              <AlertCircle size={11} />{errors.transaction}
+            </p>
+          )}
+        </div>
+      )}
 
       <div>
         <label className='label' htmlFor='pickup-date'>

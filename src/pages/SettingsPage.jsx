@@ -33,7 +33,7 @@ export default function SettingsPage() {
       setPasswordForm({ current: "", newPassword: "", confirm: "" });
     } catch (err) {
       setPasswordError(
-        err.response?.data?.detail || "Failed to update password",
+        err.message || "Failed to update password",
       );
     } finally {
       setSaving(false);

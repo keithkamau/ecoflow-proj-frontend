@@ -30,7 +30,7 @@ const UserStats = () => {
       getImpact(),
     ];
     Promise.all(fetches)
-      .then(([s, imp]) => { setStats(s.data); setImpact(imp.data); })
+      .then(([s, imp]) => { setStats(s); setImpact(imp); })
       .finally(() => setLoading(false));
   }, [isRecycler]);
 

@@ -1,5 +1,5 @@
 import { Tag, Clock, User, DollarSign } from "lucide-react";
-import { formatCurrency, formatDateTime, statusBadgeClass, statusLabel } from "../../utils/formatters";
+import { formatCurrency, timeAgo, statusBadgeClass, statusLabel } from "../../utils/formatters";
 
 export default function OfferCard({ offer, onAccept, onReject, onMessage, isSeller }) {
   return (
@@ -10,9 +10,9 @@ export default function OfferCard({ offer, onAccept, onReject, onMessage, isSell
             <span className={`badge ${statusBadgeClass(offer.status)}`}>
               {statusLabel(offer.status)}
             </span>
-            <span className="text-xs text-neutral-400 flex items-center gap-1">
+            <span className="text-xs text-neutral-400 flex items-center gap-1" title={offer.created_at}>
               <Clock size={12} />
-              {formatDateTime(offer.created_at)}
+              {timeAgo(offer.created_at)}
             </span>
           </div>
 

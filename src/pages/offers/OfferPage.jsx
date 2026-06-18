@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Plus, RefreshCw, Tag, ExternalLink, Filter, ArrowUpDown } from "lucide-react";
+import { useAuth } from "../../hooks/useAuth";
 import { offerService } from "../../services/offerService";
 import { transactionService } from "../../services/transactionService";
 import OfferCard from "../../components/offers/OfferCard";
@@ -10,6 +11,7 @@ import { PageLoader } from "../../components/common/LoadingSpinner";
 
 export default function OfferPage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [offers, setOffers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -46,7 +48,7 @@ export default function OfferPage() {
     await transactionService.create({
       offer_id: updated.id,
       listing_id: updated.listing_id,
-      seller_id: 1,
+      seller_id: user?.id,
       recycler_id: updated.recycler_id,
       agreed_price: updated.offered_price,
       final_quantity: updated.quantity,
@@ -157,7 +159,7 @@ export default function OfferPage() {
               Messages
             </h2>
             <div className="min-h-[300px] sm:h-[400px] lg:h-[500px]">
-              <Chat offerId={selectedOffer?.id} />
+              <Chat offerId={selectedOffer?.id} offer={selectedOffer} currentUserId={user?.id} />
             </div>
           </div>
         </div>

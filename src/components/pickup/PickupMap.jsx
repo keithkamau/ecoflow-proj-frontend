@@ -1,7 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { MapPin } from 'lucide-react';
 
-// Lazily load Leaflet only in the browser to avoid SSR issues
 let L = null;
 let MapContainer, TileLayer, Marker, Popup;
 
@@ -17,7 +16,6 @@ const loadLeaflet = async () => {
   Marker       = reactLeaflet.Marker;
   Popup        = reactLeaflet.Popup;
 
-  // Fix Leaflet's broken default icon path in bundlers
   delete L.Icon.Default.prototype._getIconUrl;
   L.Icon.Default.mergeOptions({
     iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
@@ -32,9 +30,11 @@ const PickupMap = ({ pickupLocation, recyclerLocation }) => {
   const mapRef      = useRef(null);
   const leafletReady = useRef(false);
 
-  const center = pickupLocation?.lat
-    ? [pickupLocation.lat, pickupLocation.lng]
-    : NAIROBI;
+  const lat = pickupLocation?.lat ?? pickupLocation?.pickup_lat;
+  const lng = pickupLocation?.lng ?? pickupLocation?.pickup_lng;
+  const address = pickupLocation?.address ?? pickupLocation?.pickup_address;
+
+  const center = lat ? [lat, lng] : NAIROBI;
 
   useEffect(() => {
     let map = null;
@@ -51,8 +51,8 @@ const PickupMap = ({ pickupLocation, recyclerLocation }) => {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
       }).addTo(map);
 
-      if (pickupLocation?.lat) {
-        L.marker([pickupLocation.lat, pickupLocation.lng])
+      if (lat) {
+        L.marker([lat, lng])
           .addTo(map)
           .bindPopup('<b>Pickup Location</b>');
       }
@@ -78,8 +78,8 @@ const PickupMap = ({ pickupLocation, recyclerLocation }) => {
         <MapPin size={14} className='text-primary' />
         <div>
           <p className='text-sm font-semibold text-neutral-700'>Pickup Location</p>
-          {pickupLocation?.address && (
-            <p className='text-xs text-neutral-500'>{pickupLocation.address}</p>
+          {address && (
+            <p className='text-xs text-neutral-500'>{address}</p>
           )}
         </div>
       </div>

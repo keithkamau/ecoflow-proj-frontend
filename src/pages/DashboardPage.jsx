@@ -21,7 +21,7 @@ const QuickAction = ({ to, Icon, label, desc, variant = 'primary' }) => (
     }`}>
       <Icon size={18} className={variant === 'secondary' ? 'text-secondary' : 'text-primary'} />
     </span>
-    <div className='flex-1 min-w-0'>
+    <div className='flex-1 min-w-0 py-4'>
       <p className='text-sm font-semibold text-neutral-700'>{label}</p>
       <p className='text-xs text-neutral-500 truncate'>{desc}</p>
     </div>
@@ -47,8 +47,8 @@ const DashboardPage = () => {
 
   useEffect(() => {
     fetchPickups();
-    if (isSeller)   getSellerStats().then(({ data }) => setStats(data));
-    if (isRecycler) getRecyclerStats().then(({ data }) => setStats(data));
+    if (isSeller)   getSellerStats().then(setStats);
+    if (isRecycler) getRecyclerStats().then(setStats);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -101,7 +101,7 @@ const DashboardPage = () => {
       {/* ── Quick actions ────────────────────────────────── */}
       <section className='mb-8'>
         <h2 className='text-h5 mb-4'>Quick Actions</h2>
-        <div className='grid grid-cols-1 sm:grid-cols-2 gap-3'>
+        <div className='grid grid-cols-1 sm:grid-cols-2 gap-8'>
           {isSeller && <>
             <QuickAction to='/listings/new' Icon={PlusCircle} label='New Listing'    desc='Add waste material to sell' />
             <QuickAction to='/pickups'      Icon={Truck}       label='My Pickups'    desc='View & schedule pickups' variant='secondary' />

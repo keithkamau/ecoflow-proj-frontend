@@ -2,14 +2,18 @@ import { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Tag } from "lucide-react";
 import { offerService } from "../../services/offerService";
+import { listingService } from "../../services/listingService";
 import OfferCard from "../../components/offers/OfferCard";
 import Chat from "../../components/offers/Chat";
 import { PageLoader } from "../../components/common/LoadingSpinner";
+import { useAuth } from "../../hooks/useAuth";
 
 export default function OfferDetailPage() {
   const { id } = useParams();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [offer, setOffer] = useState(null);
+  const [listing, setListing] = useState(null);
   const [loading, setLoading] = useState(true);
 
   const fetch = useCallback(async () => {
@@ -17,6 +21,10 @@ export default function OfferDetailPage() {
     try {
       const data = await offerService.getById(id);
       setOffer(data);
+      try {
+        const listingData = await listingService.getListing(data.listing_id);
+        setListing(listingData);
+      } catch {}
     } catch {
       setOffer(null);
     } finally {
@@ -35,6 +43,10 @@ export default function OfferDetailPage() {
     await offerService.update(offerId, { status: "rejected" });
     fetch();
   }
+
+  const recipientId = offer && listing
+    ? (user?.id === listing.seller_id ? offer.recycler_id : listing.seller_id)
+    : null;
 
   if (loading) return <PageLoader message="Loading offer..." />;
 
@@ -74,7 +86,7 @@ export default function OfferDetailPage() {
             Messages
           </h2>
           <div className="min-h-[300px] sm:h-[400px]">
-            <Chat offerId={offer.id} />
+            <Chat offerId={offer.id} recipientId={recipientId} currentUserId={user?.id} />
           </div>
         </div>
       </div>

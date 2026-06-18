@@ -106,7 +106,7 @@ export default function App() {
               element={<ProtectedRoute><LayoutWrapper><TransactionDetailPage /></LayoutWrapper></ProtectedRoute>}
             />
             <Route
-              path='/payments/:id'
+              path='/payments'
               element={<ProtectedRoute><LayoutWrapper><PaymentPage /></LayoutWrapper></ProtectedRoute>}
             />
             <Route

@@ -59,7 +59,7 @@ const CreateListingPage = () => {
 
       navigate('/listings');
     } catch (err) {
-      setSubmitError(err.response?.data?.detail || 'Failed to create listing');
+      setSubmitError(err.message || 'Failed to create listing');
     }
   };
 

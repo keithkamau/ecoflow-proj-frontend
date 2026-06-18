@@ -101,6 +101,18 @@
     0%   { transform: translateX(-100%); }
     100% { transform: translateX(350%);  }
   }
+
+  @keyframes badge-earned {
+    0%   { transform: scale(1); }
+    50%  { transform: scale(1.08); }
+    100% { transform: scale(1); }
+  }
+
+  @keyframes bounce-in {
+    0%   { transform: scale(0.5); opacity: 0; }
+    60%  { transform: scale(1.05); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+  }
 }
 
 /* ─── Base Styles ────────────────────────────────────────────── */
@@ -322,7 +334,9 @@ input, textarea, select { font-family: inherit; font-size: inherit; }
 .animate-slide-down    { animation: var(--animate-slide-down); }
 .animate-slide-in-left { animation: var(--animate-slide-in-left); }
 .animate-spin-slow     { animation: var(--animate-spin-slow); }
-.animate-eco-bounce    { animation: var(--animate-eco-bounce); }
+.animate-eco-bounce     { animation: var(--animate-eco-bounce); }
+.animate-badge-earned   { animation: badge-earned 500ms ease-out; }
+.animate-bounce-in      { animation: bounce-in 400ms ease-out; }
 
 /* ── Skeleton pulse ──────────────────────────────────────────── */
 @keyframes skeleton-pulse {

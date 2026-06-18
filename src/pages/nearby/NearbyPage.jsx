@@ -110,7 +110,7 @@ const LocationCard = ({ location, active, onClick }) => (
     </div>
 
     <div className='mt-2 flex flex-wrap gap-1'>
-      {location.materials.map((m) => <MaterialChip key={m} material={m} />)}
+      {(location.materials || [location.material_type]).filter(Boolean).map((m) => <MaterialChip key={m} material={m} />)}
     </div>
 
     {active && (
@@ -142,7 +142,8 @@ const NearbyPage = () => {
 
   // ── Load nearby data ───────────────────────────────────────
   useEffect(() => {
-    getNearby({}).then(({ data }) => {
+    getNearby({ lat: NAIROBI[0], lng: NAIROBI[1], radius_km: 50 }).then((response) => {
+      const data = response.data ?? response;
       setLocations(data);
       setLoading(false);
     });

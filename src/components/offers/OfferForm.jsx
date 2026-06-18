@@ -1,16 +1,23 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { X } from "lucide-react";
 import { validateOfferForm } from "../../utils/validators";
+import { listingService } from "../../services/listingService";
 
 export default function OfferForm({ listingId, onSubmit, onClose }) {
+  const [materials, setMaterials] = useState([]);
   const [form, setForm] = useState({
     listing_id: listingId || "",
     offered_price: "",
     quantity: "",
     note: "",
+    material_id: "",
   });
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    listingService.getMaterials().then(setMaterials).catch(() => {});
+  }, []);
 
   function handleChange(e) {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -27,10 +34,11 @@ export default function OfferForm({ listingId, onSubmit, onClose }) {
     setSubmitting(true);
     try {
       await onSubmit({
-        listing_id: Number(form.listing_id),
+        listing_id: form.listing_id ? Number(form.listing_id) : undefined,
         offered_price: Number(form.offered_price),
         quantity: Number(form.quantity),
         note: form.note || undefined,
+        material_id: form.material_id ? Number(form.material_id) : undefined,
       });
     } finally {
       setSubmitting(false);
@@ -48,9 +56,24 @@ export default function OfferForm({ listingId, onSubmit, onClose }) {
         </div>
 
         <form onSubmit={handleSubmit} className="p-4 space-y-4">
+          <div>
+            <label className="label">Material Type</label>
+            <select
+              name="material_id"
+              value={form.material_id}
+              onChange={handleChange}
+              className={`input ${errors.material_id ? "input-error" : ""}`}
+            >
+              <option value="">Select material...</option>
+              {materials.map((m) => (
+                <option key={m.id} value={m.id}>{m.type}</option>
+              ))}
+            </select>
+            {errors.material_id && <p className="error-text">{errors.material_id}</p>}
+          </div>
           {!listingId && (
             <div>
-              <label className="label">Listing ID</label>
+              <label className="label">Listing ID (optional)</label>
               <input
                 name="listing_id"
                 type="number"
@@ -58,7 +81,7 @@ export default function OfferForm({ listingId, onSubmit, onClose }) {
                 value={form.listing_id}
                 onChange={handleChange}
                 className={`input ${errors.listing_id ? "input-error" : ""}`}
-                placeholder="Enter the listing ID"
+                placeholder="Leave blank to match any listing"
               />
               {errors.listing_id && <p className="error-text">{errors.listing_id}</p>}
             </div>

@@ -52,7 +52,7 @@ const ImpactDashboard = () => {
 
   useEffect(() => {
     getImpact()
-      .then(({ data }) => setImpact(data))
+      .then(setImpact)
       .finally(() => setLoading(false));
   }, []);
 

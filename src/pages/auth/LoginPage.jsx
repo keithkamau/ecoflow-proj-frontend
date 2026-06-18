@@ -24,8 +24,7 @@ export default function LoginPage() {
       const redirect = searchParams.get("redirect") || "/dashboard";
       navigate(redirect);
     } catch (err) {
-      console.log("Login error:", err);
-      setError(err.response?.data?.detail || "Login failed");
+      setError(err.message || "Login failed");
     } finally {
       setLoading(false);
     }

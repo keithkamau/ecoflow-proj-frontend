@@ -20,7 +20,7 @@ const DriverAssignment = ({ pickupId, onAssigned }) => {
 
   useEffect(() => {
     getDrivers()
-      .then(({ data }) => setDrivers(data))
+      .then((response) => setDrivers(response.data ?? response))
       .finally(() => setLoading(false));
   }, []);
 

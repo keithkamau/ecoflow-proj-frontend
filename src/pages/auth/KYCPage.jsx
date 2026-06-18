@@ -46,7 +46,7 @@ export default function KYCPage() {
       await authService.uploadKYC(formData);
       navigate("/dashboard");
     } catch (err) {
-      setError(err.response?.data?.detail || "Upload failed");
+      setError(err.message || "Upload failed");
     } finally {
       setUploading(false);
     }

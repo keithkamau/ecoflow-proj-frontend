@@ -13,6 +13,7 @@ import {
   BarChart2,
   Users,
   AlertTriangle,
+  MapPin,
   ChevronLeft,
   ChevronRight,
   Recycle,
@@ -33,6 +34,7 @@ const ICON_MAP = {
   BarChart2,
   Users,
   AlertTriangle,
+  MapPin,
 };
 
 const C = {

@@ -12,6 +12,7 @@ export const listingService = {
   getRecyclerInventory: (recyclerId) => api.get('/listings/recyclers/inventory', {
     params: { recycler_id: recyclerId }
   }),
+  getMyListings: (params) => api.get('/listings/mine', { params }),
   uploadListingPhoto: (listingId, file) => {
     const formData = new FormData();
     formData.append('file', file);

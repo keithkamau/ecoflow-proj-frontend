@@ -35,7 +35,7 @@ export default function ProfilePage() {
       setSuccess("Profile updated");
       setEditing(false);
     } catch (err) {
-      setError(err.response?.data?.detail || "Update failed");
+      setError(err.message || "Update failed");
     } finally {
       setSaving(false);
     }

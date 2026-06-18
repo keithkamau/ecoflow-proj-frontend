@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { CreditCard, CheckCircle, Smartphone } from "lucide-react";
+import { useAuth } from "../../hooks/useAuth";
 import { paymentService } from "../../services/paymentService";
 import PaymentSelector from "../../components/offers/PaymentSelector";
 import { formatCurrency } from "../../utils/formatters";
@@ -47,6 +48,7 @@ function WaitingScreen({ payment, phone, onSuccess, onError, onCancel }) {
 
 export default function PaymentPage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [searchParams] = useSearchParams();
   const [step, setStep] = useState(searchParams.get("success") ? "success" : "select");
   const [transactionId, setTransactionId] = useState(searchParams.get("transaction_id") || "");
@@ -64,7 +66,7 @@ export default function PaymentPage() {
     try {
       const result = await paymentService.create({
         transaction_id: Number(transactionId),
-        user_id: 1,
+        user_id: user?.id,
         amount: Number(amount),
         payment_method: method,
         phone_number: phone,

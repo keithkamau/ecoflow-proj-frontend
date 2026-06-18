@@ -1,6 +1,16 @@
-// src/pages/listings/RecyclerInventoryPage.jsx
 import { useState } from 'react';
 import { useListingContext } from '../../context/ListingContexts';
+import { Recycle, Hash, Package } from 'lucide-react';
+
+const MATERIAL_EMOJIS = {
+  plastic: '🥤',
+  metal: '🔩',
+  glass: '🍾',
+  paper: '📄',
+  e_waste: '🔌',
+  organic: '🌱',
+  mixed: '📦',
+};
 
 const RecyclerInventoryPage = () => {
   const { inventory, loading, error, fetchInventory } = useListingContext();
@@ -8,96 +18,100 @@ const RecyclerInventoryPage = () => {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    if (!recyclerId) return;
-    fetchInventory(parseInt(recyclerId));
+    if (!recyclerId.trim()) return;
+    fetchInventory(recyclerId.trim());
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-4xl mx-auto px-4 py-6">
-        <h1 className="text-2xl font-bold text-gray-900 mb-6">Recycler Inventory</h1>
-
-        <form onSubmit={handleSearch} className="bg-white rounded-xl shadow-sm p-4 mb-6 flex gap-3">
-          <input
-            type="number"
-            placeholder="Enter Recycler ID"
-            value={recyclerId}
-            onChange={(e) => setRecyclerId(e.target.value)}
-            className="flex-1 px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
-          />
-          <button
-            type="submit"
-            disabled={loading}
-            className="bg-emerald-500 hover:bg-emerald-600 disabled:bg-emerald-300 text-white px-6 py-2 rounded-lg text-sm font-medium transition-colors"
-          >
-            {loading ? 'Loading...' : 'View'}
-          </button>
-        </form>
-
-        {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4 text-sm">
-            {error}
-          </div>
-        )}
-
-        {inventory && (
-          <div className="bg-white rounded-xl shadow-sm p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-gray-900">
-                Inventory for Recycler #{inventory.recycler_id}
-              </h2>
-              <span className="text-sm text-gray-500">
-                {inventory.items?.length || 0} materials
-              </span>
-            </div>
-
-            {inventory.items?.length > 0 ? (
-              <div className="space-y-3">
-                {inventory.items.map((item, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
-                  >
-                    <div className="flex items-center gap-3">
-                      <span className="text-2xl">
-                        {item.material_type === 'plastic' && ''}
-                        {item.material_type === 'metal' && ''}
-                        {item.material_type === 'glass' && ''}
-                        {item.material_type === 'e_waste' && ''}
-                        {item.material_type === 'paper' && ''}
-                        {item.material_type === 'organic' && ''}
-                        {item.material_type === 'mixed' && ''}
-                      </span>
-                      <div>
-                        <p className="font-medium text-gray-900 capitalize">
-                          {item.material_type.replace('_', '-')}
-                        </p>
-                        <p className="text-sm text-gray-500">
-                          {item.listing_count} transactions
-                        </p>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <p className="font-semibold text-emerald-600">
-                        {item.total_quantity.toLocaleString()} kg
-                      </p>
-                      {item.total_spent && (
-                        <p className="text-sm text-gray-500">
-                          KES {item.total_spent.toLocaleString()}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-8 text-gray-500">
-                <p>No inventory found for this recycler</p>
-              </div>
-            )}
-          </div>
-        )}
+    <div className="page-content animate-fade-in">
+      <div className="section-header">
+        <div>
+          <h1 className="text-h3">Recycler Inventory</h1>
+          <p className="text-sm text-neutral-500 mt-0.5">
+            View materials sourced from completed transactions
+          </p>
+        </div>
       </div>
+
+      <form onSubmit={handleSearch} className="flex gap-3 mb-6">
+        <input
+          type="text"
+          placeholder="Enter Recycler User ID"
+          value={recyclerId}
+          onChange={(e) => setRecyclerId(e.target.value)}
+          className="input flex-1 max-w-sm"
+        />
+        <button
+          type="submit"
+          disabled={loading}
+          className="btn btn-primary"
+        >
+          {loading ? 'Loading...' : 'View Inventory'}
+        </button>
+      </form>
+
+      {error && (
+        <div className="alert alert-error mb-4">{error}</div>
+      )}
+
+      {inventory && (
+        <div className="card">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-h5">
+              Inventory for Recycler #{inventory.recycler_id}
+            </h2>
+            <span className="text-sm text-neutral-500">
+              {inventory.items?.length || 0} entries
+            </span>
+          </div>
+
+          {inventory.items?.length > 0 ? (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-neutral-200 text-left text-neutral-500">
+                    <th className="pb-3 font-medium flex items-center gap-1">
+                      <Hash size={14} /> Transaction ID
+                    </th>
+                    <th className="pb-3 font-medium flex items-center gap-1">
+                      <Recycle size={14} /> Material
+                    </th>
+                    <th className="pb-3 font-medium flex items-center gap-1">
+                      <Package size={14} /> Quantity
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {inventory.items.map((item, index) => (
+                    <tr key={index} className="border-b border-neutral-100 last:border-0">
+                      <td className="py-3 text-neutral-900 font-mono">
+                        #{item.transaction_id}
+                      </td>
+                      <td className="py-3">
+                        <span className="flex items-center gap-2 capitalize">
+                          <span className="text-lg">
+                            {MATERIAL_EMOJIS[item.material_type] || '📦'}
+                          </span>
+                          {item.material_type.replace('_', ' ')}
+                        </span>
+                      </td>
+                      <td className="py-3 font-semibold text-emerald-600">
+                        {item.quantity.toLocaleString()} kg
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <div className="text-center py-8 text-neutral-400">
+              <Recycle size={40} className="mx-auto mb-3" />
+              <p>No inventory found for this recycler</p>
+              <p className="text-xs mt-1">Complete transactions to build inventory</p>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };

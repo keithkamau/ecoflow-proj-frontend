@@ -14,9 +14,9 @@ const AnalyticsPage = () => {
   const isRecycler = user?.role === 'recycler';
 
   useEffect(() => {
-    getEarningsTrend().then(({ data }) => setEarnings(data));
-    getMaterialsBreakdown().then(({ data }) => setMaterials(data));
-    if (isRecycler) getRecyclerStats().then(({ data }) => setRecyclerStats(data));
+    getEarningsTrend().then(setEarnings);
+    getMaterialsBreakdown().then(setMaterials);
+    if (isRecycler) getRecyclerStats().then(setRecyclerStats);
   }, [isRecycler]);
 
   return (

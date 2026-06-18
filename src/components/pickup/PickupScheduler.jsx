@@ -40,7 +40,7 @@ const PickupScheduler = ({ transactionId, onScheduled }) => {
       await onScheduled?.({
         transaction_id: transactionId,
         scheduled_time: `${form.date}T${form.time}:00Z`,
-        pickup_location: { address: form.address },
+        pickup_address: form.address,
         notes: form.notes,
       });
       setSuccess(true);
@@ -67,7 +67,6 @@ const PickupScheduler = ({ transactionId, onScheduled }) => {
     <form onSubmit={handleSubmit} className='card space-y-4' data-testid='pickup-scheduler' noValidate>
       <h3 className='text-h5'>Schedule a Pickup</h3>
 
-      {/* Date */}
       <div>
         <label className='label' htmlFor='pickup-date'>
           <Calendar size={13} className='inline mr-1' />Pickup Date
@@ -88,7 +87,6 @@ const PickupScheduler = ({ transactionId, onScheduled }) => {
         )}
       </div>
 
-      {/* Time slot */}
       <div>
         <label className='label' htmlFor='pickup-time'>
           <Clock size={13} className='inline mr-1' />Time Slot
@@ -112,7 +110,6 @@ const PickupScheduler = ({ transactionId, onScheduled }) => {
         )}
       </div>
 
-      {/* Address */}
       <div>
         <label className='label' htmlFor='pickup-address'>
           <MapPin size={13} className='inline mr-1' />Pickup Address
@@ -133,7 +130,6 @@ const PickupScheduler = ({ transactionId, onScheduled }) => {
         )}
       </div>
 
-      {/* Notes */}
       <div>
         <label className='label' htmlFor='pickup-notes'>
           <FileText size={13} className='inline mr-1' />Special Instructions (optional)

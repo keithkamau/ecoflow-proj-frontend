@@ -1,17 +1,24 @@
-// src/pages/listings/MyListingsPage.jsx
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useListingContext } from '../../context/ListingContexts';
+import { useAuth } from '../../hooks/useAuth';
+import listingService from '../../services/listingService';
 import ListingCard from '../../components/listings/ListingCard';
 
 const MyListingsPage = () => {
   const navigate = useNavigate();
-  const { listings, loading, error, fetchListings } = useListingContext();
+  const { user } = useAuth();
+  const [listings, setListings] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    // TODO: filter by current user ID when auth is ready
-    fetchListings({ status: 'active' });
-  }, [fetchListings]);
+    if (!user) return;
+    setLoading(true);
+    listingService.getMyListings()
+      .then((data) => setListings(data?.listings || []))
+      .catch((err) => setError(err.message || 'Failed to fetch listings'))
+      .finally(() => setLoading(false));
+  }, [user]);
 
   const handleCardClick = (id) => {
     navigate(`/listings/${id}`);

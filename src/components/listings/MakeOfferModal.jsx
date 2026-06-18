@@ -1,5 +1,5 @@
-// src/components/listings/MakeOfferModal.jsx
 import { useState } from 'react';
+import { offerService } from '../../services/offerService';
 
 const MakeOfferModal = ({ listingId, onClose, onOfferMade }) => {
   const [offeredPrice, setOfferedPrice] = useState('');
@@ -12,23 +12,15 @@ const MakeOfferModal = ({ listingId, onClose, onOfferMade }) => {
     setError(null);
 
     try {
-      const response = await fetch(`http://localhost:8000/api/v1/listings/${listingId}/offers`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          recycler_id: 2, // Hardcoded for now - replace with actual user ID
-          offered_price: offeredPrice ? parseFloat(offeredPrice) : null,
-        }),
+      await offerService.create({
+        listing_id: listingId,
+        offered_price: offeredPrice ? parseFloat(offeredPrice) : null,
+        quantity: 0,
       });
-
-      if (!response.ok) {
-        throw new Error('Failed to make offer');
-      }
-
       onOfferMade?.();
       onClose();
     } catch (err) {
-      setError(err.message);
+      setError(err.message || 'Failed to make offer');
     } finally {
       setLoading(false);
     }

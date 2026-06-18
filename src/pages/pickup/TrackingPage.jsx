@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, Phone, Truck, Package, Clock } from 'lucide-react';
+import { ArrowLeft, Phone, Truck, Clock } from 'lucide-react';
 import usePickup from '../../hooks/usePickup';
 import PickupTracker from '../../components/pickup/PickupTracker';
 import PickupMap from '../../components/pickup/PickupMap';
@@ -14,8 +14,6 @@ const fmt = (iso) =>
     weekday: 'long', month: 'long', day: 'numeric',
     hour: '2-digit', minute: '2-digit',
   });
-
-const capitalise = (s = '') => s.charAt(0).toUpperCase() + s.slice(1);
 
 const TrackingPage = () => {
   const { id }                      = useParams();
@@ -53,10 +51,11 @@ const TrackingPage = () => {
   const isRecycler   = user?.role === 'recycler';
   const showProof    = p.status === 'arrived' && !proofDone;
   const showAssign   = isRecycler && !p.driver_id;
+  const driver       = p.driver || null;
+  const pickupLoc    = p.pickup_location || { address: p.pickup_address, lat: p.pickup_lat, lng: p.pickup_lng };
 
   return (
     <div className='page-content animate-fade-in'>
-      {/* ── Back nav ────────────────────────────────────── */}
       <Link
         to='/pickups'
         className='inline-flex items-center gap-1.5 text-sm text-neutral-500 hover:text-primary mb-5 transition-colors'
@@ -64,27 +63,23 @@ const TrackingPage = () => {
         <ArrowLeft size={14} />Back to Pickups
       </Link>
 
-      {/* ── Page header ─────────────────────────────────── */}
       <div className='flex items-start justify-between mb-6'>
         <div>
-          <h1 className='text-h3'>{capitalise(p.material?.type)} Pickup</h1>
+          <h1 className='text-h3'>Pickup</h1>
           <p className='text-xs text-neutral-400 mt-0.5'>#{p.id}</p>
         </div>
       </div>
 
       <div className='grid grid-cols-1 lg:grid-cols-3 gap-6'>
-        {/* ── Left column: tracker + map ─────────────────── */}
         <div className='lg:col-span-2 space-y-5'>
           <PickupTracker status={p.status} />
-          <PickupMap pickupLocation={p.pickup_location} />
+          <PickupMap pickupLocation={pickupLoc} />
           {showProof && (
             <ProofUpload pickupId={p.id} onSubmit={handleProof} />
           )}
         </div>
 
-        {/* ── Right column: details + driver ─────────────── */}
         <div className='space-y-5'>
-          {/* Pickup details card */}
           <div className='card space-y-3'>
             <h3 className='text-h6'>Pickup Details</h3>
             <div className='flex items-center gap-2.5'>
@@ -94,19 +89,9 @@ const TrackingPage = () => {
                 <p className='text-sm font-medium text-neutral-700'>{fmt(p.scheduled_time)}</p>
               </div>
             </div>
-            <div className='flex items-center gap-2.5'>
-              <Package size={14} className='text-neutral-400 shrink-0' />
-              <div>
-                <p className='text-xs text-neutral-400'>Material</p>
-                <p className='text-sm font-medium text-neutral-700'>
-                  {capitalise(p.material?.type)} · {p.material?.quantity} {p.material?.unit}
-                </p>
-              </div>
-            </div>
           </div>
 
-          {/* Driver card */}
-          {p.driver ? (
+          {driver ? (
             <div className='card space-y-3'>
               <h3 className='text-h6'>Your Driver</h3>
               <div className='flex items-center gap-3'>
@@ -114,15 +99,15 @@ const TrackingPage = () => {
                   <Truck size={18} className='text-primary' />
                 </span>
                 <div>
-                  <p className='text-sm font-semibold text-neutral-700'>{p.driver.name}</p>
-                  <p className='text-xs text-neutral-500'>{p.driver.vehicle} · {p.driver.license_plate}</p>
+                  <p className='text-sm font-semibold text-neutral-700'>{driver.name}</p>
+                  <p className='text-xs text-neutral-500'>{driver.vehicle} · {driver.license_plate}</p>
                 </div>
               </div>
               <a
-                href={`tel:${p.driver.phone}`}
+                href={`tel:${driver.phone}`}
                 className='btn-tertiary w-full text-sm'
               >
-                <Phone size={14} />{p.driver.phone}
+                <Phone size={14} />{driver.phone}
               </a>
             </div>
           ) : showAssign ? (

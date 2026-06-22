@@ -54,9 +54,9 @@ describe("OfferForm", () => {
     render(<OfferForm onSubmit={vi.fn()} onClose={vi.fn()} />);
     fireEvent.click(screen.getByText("Submit Offer"));
     await waitFor(() => {
-      expect(screen.getByText(/Material is required/i)).toBeInTheDocument();
-      expect(screen.getByText(/Price is required/i)).toBeInTheDocument();
-      expect(screen.getByText(/Quantity is required/i)).toBeInTheDocument();
+      expect(screen.getByText(/Material type is required/i)).toBeInTheDocument();
+      expect(screen.getByText(/Offered price must be greater than zero/i)).toBeInTheDocument();
+      expect(screen.getByText(/Quantity must be greater than zero/i)).toBeInTheDocument();
     });
   });
 

@@ -16,11 +16,19 @@ vi.mock('../../components/pickup/PickupMap', () => {
 });
 
 vi.mock('../../services/pickupService', () => ({
-  getPickups:     vi.fn().mockResolvedValue({ data: [] }),
-  getDrivers:     vi.fn().mockResolvedValue({ data: [] }),
-  schedulePickup: vi.fn().mockResolvedValue({ data: { id: 'p99', status: 'scheduled' } }),
-  uploadProof:    vi.fn().mockResolvedValue({ data: { success: true } }),
-  assignDriver:   vi.fn().mockResolvedValue({ data: { success: true } }),
+  getPickups:        vi.fn().mockResolvedValue({ data: [] }),
+  getDrivers:        vi.fn().mockResolvedValue({ data: [] }),
+  schedulePickup:    vi.fn().mockResolvedValue({ data: { id: 'p99', status: 'scheduled' } }),
+  uploadProof:       vi.fn().mockResolvedValue({ data: { success: true } }),
+  assignDriver:      vi.fn().mockResolvedValue({ data: { success: true } }),
+  getDriverById:     vi.fn().mockResolvedValue({ data: null }),
+  selfCompletePickup: vi.fn().mockResolvedValue({ data: { status: 'completed' } }),
+}));
+
+vi.mock('../../services/transactionService', () => ({
+  transactionService: {
+    getAll: vi.fn().mockResolvedValue([{ id: 99, status: 'offer_accepted', listing: { material: { type: 'plastic' } } }]),
+  },
 }));
 
 import PickupCard       from '../../components/pickup/PickupCard';
@@ -29,6 +37,7 @@ import PickupScheduler  from '../../components/pickup/PickupScheduler';
 import PickupMap        from '../../components/pickup/PickupMap';
 import ProofUpload      from '../../components/pickup/ProofUpload';
 import DriverAssignment from '../../components/pickup/DriverAssignment';
+import * as pickupServiceModule from '../../services/pickupService';
 
 // ── Helpers ────────────────────────────────────────────────────
 const wrap = (ui) => render(<MemoryRouter>{ui}</MemoryRouter>);
@@ -44,9 +53,9 @@ const MOCK_PICKUP = {
 
 // ── PickupCard ─────────────────────────────────────────────────
 describe('PickupCard', () => {
-  it('renders pickup card with material type and status', () => {
+  it('renders pickup card with pickup id and status', () => {
     wrap(<PickupCard pickup={MOCK_PICKUP} />);
-    expect(screen.getByText(/Plastic Pickup/i)).toBeInTheDocument();
+    expect(screen.getByText(/Pickup/i)).toBeInTheDocument();
     expect(screen.getByText(/Scheduled/i)).toBeInTheDocument();
   });
 
@@ -59,7 +68,7 @@ describe('PickupCard', () => {
   it('links to the tracking page', () => {
     wrap(<PickupCard pickup={MOCK_PICKUP} />);
     const link = screen.getByTestId('pickup-card').closest('a');
-    expect(link).toHaveAttribute('href', '/pickups/p1');
+    expect(link).toHaveAttribute('href', '/pickups/p1/track');
   });
 
   it('shows error badge for cancelled status', () => {
@@ -70,16 +79,15 @@ describe('PickupCard', () => {
 
 // ── PickupTracker ──────────────────────────────────────────────
 describe('PickupTracker', () => {
-  it('renders all four status steps', () => {
+  it('renders all three status steps', () => {
     render(<PickupTracker status='scheduled' />);
     expect(screen.getByText('Scheduled')).toBeInTheDocument();
-    expect(screen.getByText('On the Way')).toBeInTheDocument();
-    expect(screen.getByText('Arrived')).toBeInTheDocument();
-    expect(screen.getByText('Completed')).toBeInTheDocument();
+    expect(screen.getByText('Pickup in Progress')).toBeInTheDocument();
+    expect(screen.getByText('Pickup Complete')).toBeInTheDocument();
   });
 
   it('marks the current step with "Current" badge', () => {
-    render(<PickupTracker status='on_the_way' />);
+    render(<PickupTracker status='in_progress' />);
     expect(screen.getByText('Current')).toBeInTheDocument();
   });
 
@@ -97,14 +105,14 @@ describe('PickupTracker', () => {
 // ── PickupScheduler ────────────────────────────────────────────
 describe('PickupScheduler', () => {
   it('renders date, time, and address inputs', () => {
-    render(<PickupScheduler />);
+    render(<PickupScheduler transactionId={99} />);
     expect(screen.getByLabelText(/Pickup Date/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/Time Slot/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/Pickup Address/i)).toBeInTheDocument();
   });
 
   it('shows validation errors on empty submit', async () => {
-    render(<PickupScheduler />);
+    render(<PickupScheduler transactionId={99} />);
     fireEvent.click(screen.getByRole('button', { name: /Confirm Pickup/i }));
     await waitFor(() => {
       expect(screen.getByText(/Please select a date/i)).toBeInTheDocument();
@@ -114,7 +122,7 @@ describe('PickupScheduler', () => {
   });
 
   it('clears address error when field is filled', async () => {
-    render(<PickupScheduler />);
+    render(<PickupScheduler transactionId={99} />);
     fireEvent.click(screen.getByRole('button', { name: /Confirm Pickup/i }));
     await waitFor(() => expect(screen.getByText(/Pickup address is required/i)).toBeInTheDocument());
 
@@ -126,7 +134,7 @@ describe('PickupScheduler', () => {
 
   it('calls onScheduled with correct payload on valid submit', async () => {
     const onScheduled = vi.fn();
-    render(<PickupScheduler onScheduled={onScheduled} />);
+    render(<PickupScheduler transactionId={99} onScheduled={onScheduled} />);
 
     fireEvent.change(screen.getByLabelText(/Pickup Date/i),    { target: { value: '2026-12-01' } });
     fireEvent.change(screen.getByLabelText(/Time Slot/i),      { target: { value: '08:00' } });
@@ -136,8 +144,10 @@ describe('PickupScheduler', () => {
     await waitFor(() => {
       expect(onScheduled).toHaveBeenCalledWith(
         expect.objectContaining({
-          scheduled_time: '2026-12-01T08:00:00Z',
-          pickup_location: { address: '45 Ngong Road' },
+          transaction_id: 99,
+          scheduled_time: '2026-12-01T08:00:00',
+          pickup_address: '45 Ngong Road',
+          notes: '',
         })
       );
     });
@@ -248,8 +258,7 @@ describe('DriverAssignment', () => {
   });
 
   it('renders available driver cards', async () => {
-    const { getDrivers } = require('../../services/pickupService');
-    getDrivers.mockResolvedValueOnce({ data: MOCK_DRIVERS });
+    pickupServiceModule.getDrivers.mockResolvedValueOnce({ data: MOCK_DRIVERS });
     render(<DriverAssignment pickupId='p1' />);
     await waitFor(() => {
       expect(screen.getByText('John Mwangi')).toBeInTheDocument();
@@ -259,8 +268,7 @@ describe('DriverAssignment', () => {
   });
 
   it('shows validation error when submitting without a selection', async () => {
-    const { getDrivers } = require('../../services/pickupService');
-    getDrivers.mockResolvedValueOnce({ data: MOCK_DRIVERS });
+    pickupServiceModule.getDrivers.mockResolvedValueOnce({ data: MOCK_DRIVERS });
     render(<DriverAssignment pickupId='p1' />);
     await waitFor(() => expect(screen.getByText('John Mwangi')).toBeInTheDocument());
     fireEvent.click(screen.getByRole('button', { name: /Assign Driver/i }));
@@ -270,8 +278,7 @@ describe('DriverAssignment', () => {
   });
 
   it('shows assigned state after successful assignment', async () => {
-    const { getDrivers } = require('../../services/pickupService');
-    getDrivers.mockResolvedValueOnce({ data: MOCK_DRIVERS });
+    pickupServiceModule.getDrivers.mockResolvedValueOnce({ data: MOCK_DRIVERS });
     const onAssigned = vi.fn();
     render(<DriverAssignment pickupId='p1' onAssigned={onAssigned} />);
     await waitFor(() => expect(screen.getByText('John Mwangi')).toBeInTheDocument());

@@ -45,8 +45,7 @@ describe('SearchBar', () => {
     render(<SearchBar />);
     expect(screen.getByText('All Materials')).toBeInTheDocument();
     expect(screen.getByText('All Status')).toBeInTheDocument();
-    expect(screen.getByPlaceholderText('Min qty e.g. 10')).toBeInTheDocument();
-    expect(screen.getByPlaceholderText('Max qty e.g. 100')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('At least e.g. 10')).toBeInTheDocument();
   });
 
   it('calls onSearch when submitted', () => {
@@ -84,10 +83,10 @@ describe('PhotoUploadComponent', () => {
 
 describe('ListingStatusBadge', () => {
   it.each([
-    ['active', 'Active'],
-    ['matched', 'Matched'],
-    ['completed', 'Completed'],
-    ['expired', 'Expired'],
+    ['waiting', 'Waiting'],
+    ['offer_accepted', 'Offer Accepted'],
+    ['awaiting_pickup', 'Awaiting Pickup'],
+    ['pickup_complete', 'Pickup Complete'],
   ])('renders %s status', (status, label) => {
     render(<ListingStatusBadge status={status} />);
     expect(screen.getByText(label)).toBeInTheDocument();

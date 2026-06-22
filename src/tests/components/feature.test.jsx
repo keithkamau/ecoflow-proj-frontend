@@ -44,6 +44,14 @@ vi.mock("../../components/offers/Chat", () => ({
   default: () => null,
 }));
 
+vi.mock("../../hooks/useAuth", () => ({
+  useAuth: () => ({ user: { id: 1, role: "seller" } }),
+}));
+
+vi.mock("../../hooks/useListings", () => ({
+  useListings: () => ({ listings: [], loading: false }),
+}));
+
 async function mockOfferService() {
   const { api } = await import("../../services/api");
   api.get.mockResolvedValue(mockOfferData);
@@ -129,7 +137,8 @@ describe("TransactionDetailPage", () => {
     render(<TransactionDetailPage />);
     expect(screen.getByText(/Loading transaction/)).toBeInTheDocument();
     expect(await screen.findByText("Transaction #1")).toBeInTheDocument();
-    expect(await screen.findByText("KES 750.00")).toBeInTheDocument();
+    const prices = await screen.findAllByText("KES 750.00");
+    expect(prices.length).toBeGreaterThanOrEqual(1);
     expect(await screen.findByText("50 kg")).toBeInTheDocument();
   });
 

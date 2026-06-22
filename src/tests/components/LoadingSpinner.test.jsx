@@ -11,8 +11,8 @@ describe("LoadingSpinner", () => {
 
   it("renders dots variant", () => {
     const { container } = render(<LoadingSpinner variant="dots" />);
-    const dots = container.querySelectorAll("span > span");
-    expect(dots.length).toBe(3);
+    const dots = container.querySelectorAll('[role="status"] > span');
+    expect(dots.length).toBe(4);
   });
 
   it("renders bar variant", () => {

@@ -1,5 +1,6 @@
 import { renderHook, act } from '@testing-library/react';
 import usePickup from '../../hooks/usePickup';
+import * as pickupService from '../../services/pickupService';
 
 // ── Mock pickupService ─────────────────────────────────────────
 vi.mock('../../services/pickupService', () => ({
@@ -48,8 +49,7 @@ describe('usePickup — fetchPickups', () => {
   });
 
   it('sets error on failure', async () => {
-    const { getPickups } = require('../../services/pickupService');
-    getPickups.mockRejectedValueOnce({ response: { data: { detail: 'Server error' } } });
+    pickupService.getPickups.mockRejectedValueOnce(new Error('Server error'));
     const { result } = renderHook(() => usePickup());
     await act(async () => {
       await result.current.fetchPickups();
@@ -86,8 +86,7 @@ describe('usePickup — schedulePickup', () => {
   });
 
   it('returns { success: false } and sets error on failure', async () => {
-    const { schedulePickup } = require('../../services/pickupService');
-    schedulePickup.mockRejectedValueOnce({ response: { data: { detail: 'Bad request' } } });
+    pickupService.schedulePickup.mockRejectedValueOnce(new Error('Bad request'));
     const { result } = renderHook(() => usePickup());
     let res;
     await act(async () => {
@@ -101,8 +100,7 @@ describe('usePickup — schedulePickup', () => {
 // ── fetchPickup error ──────────────────────────────────────────
 describe('usePickup — fetchPickup error', () => {
   it('sets error and returns null on failure', async () => {
-    const { getPickup } = require('../../services/pickupService');
-    getPickup.mockRejectedValueOnce({ response: { data: { detail: 'Not found' } } });
+    pickupService.getPickup.mockRejectedValueOnce(new Error('Not found'));
     const { result } = renderHook(() => usePickup());
     let res;
     await act(async () => {
@@ -125,8 +123,7 @@ describe('usePickup — uploadProof', () => {
   });
 
   it('returns { success: false } and sets error on upload failure', async () => {
-    const { uploadProof } = require('../../services/pickupService');
-    uploadProof.mockRejectedValueOnce({ response: { data: { detail: 'Upload failed' } } });
+    pickupService.uploadProof.mockRejectedValueOnce(new Error('Upload failed'));
     const { result } = renderHook(() => usePickup());
     let res;
     await act(async () => {
@@ -149,8 +146,7 @@ describe('usePickup — assignDriver', () => {
   });
 
   it('returns { success: false } and sets error on failure', async () => {
-    const { assignDriver } = require('../../services/pickupService');
-    assignDriver.mockRejectedValueOnce({ response: { data: { detail: 'Driver unavailable' } } });
+    pickupService.assignDriver.mockRejectedValueOnce(new Error('Driver unavailable'));
     const { result } = renderHook(() => usePickup());
     let res;
     await act(async () => {

@@ -15,6 +15,8 @@ export function mustBePositive(value, fieldName = "Value") {
 
 export function validateOfferForm(values) {
   const errors = {};
+  const materialErr = required(values.material_id, "Material type");
+  if (materialErr) errors.material_id = materialErr;
   const priceErr = mustBePositive(values.offered_price, "Offered price");
   if (priceErr) errors.offered_price = priceErr;
   const qtyErr = mustBePositive(values.quantity, "Quantity");

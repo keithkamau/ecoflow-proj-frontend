@@ -33,7 +33,7 @@ describe('useListing', () => {
   });
 
   it('fetches materials', async () => {
-    listingService.getMaterials.mockResolvedValue({ data: [{ id: 1, type: 'plastic' }] });
+    listingService.getMaterials.mockResolvedValue([{ id: 1, type: 'plastic' }]);
     const { result } = renderHook(() => useListing());
 
     await act(async () => {
@@ -44,7 +44,7 @@ describe('useListing', () => {
   });
 
   it('fetches listings', async () => {
-    listingService.getListings.mockResolvedValue({ data: { listings: [{ id: 1 }], total: 1 } });
+    listingService.getListings.mockResolvedValue({ listings: [{ id: 1 }], total: 1 });
     const { result } = renderHook(() => useListing());
 
     await act(async () => {
@@ -56,7 +56,7 @@ describe('useListing', () => {
 
   it('creates listing', async () => {
     const newListing = { id: 1, quantity: 100, status: 'active' };
-    listingService.createListing.mockResolvedValue({ data: newListing });
+    listingService.createListing.mockResolvedValue(newListing);
     const { result } = renderHook(() => useListing());
 
     await act(async () => {

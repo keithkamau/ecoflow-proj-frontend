@@ -2,16 +2,26 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import Chat from "../../components/offers/Chat";
 
-class MockWebSocket {
-  constructor(url) { this.url = url; this.readyState = 0; }
-  send = vi.fn();
-  close = vi.fn();
-  triggerOpen() { this.readyState = 1; this.onopen?.(); }
-  triggerMessage(data) { this.onmessage?.({ data: JSON.stringify(data) }); }
-  triggerClose() { this.onclose?.(); }
-}
-
 let mockWs;
+
+class MockWebSocket {
+  static CONNECTING = 0;
+  static OPEN = 1;
+  static CLOSING = 2;
+  static CLOSED = 3;
+
+  constructor(url) {
+    mockWs = this;
+    this.url = url;
+    this.readyState = MockWebSocket.CONNECTING;
+    this.send = vi.fn();
+    this.close = vi.fn();
+    setTimeout(() => { this.readyState = MockWebSocket.OPEN; this.onopen?.(); }, 0);
+  }
+  triggerMessage(data) { this.onmessage?.({ data: JSON.stringify(data) }); }
+  triggerClose() { this.readyState = MockWebSocket.CLOSED; this.onclose?.(); }
+  triggerOpen() { this.readyState = MockWebSocket.OPEN; this.onopen?.(); }
+}
 
 vi.mock("../../services/api", () => ({
   getWsBaseUrl: () => "ws://127.0.0.1:8000",
@@ -20,6 +30,7 @@ vi.mock("../../services/api", () => ({
 vi.mock("../../services/messageService", () => ({
   messageService: {
     getByOffer: vi.fn(),
+    send: vi.fn(),
   },
 }));
 
@@ -28,11 +39,7 @@ import { messageService } from "../../services/messageService";
 beforeEach(() => {
   vi.clearAllMocks();
   localStorage.setItem("access_token", "test-token");
-  global.WebSocket = vi.fn(() => {
-    mockWs = new MockWebSocket();
-    setTimeout(() => mockWs.triggerOpen(), 0);
-    return mockWs;
-  });
+  global.WebSocket = MockWebSocket;
   messageService.getByOffer.mockResolvedValue([
     { id: 1, sender_id: "me", message_text: "Hello", created_at: new Date().toISOString() },
   ]);
